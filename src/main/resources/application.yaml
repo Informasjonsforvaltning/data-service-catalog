@@ -26,7 +26,7 @@ spring:
 application:
   prop: 1
   cors:
-    originPatterns: "${CORS_ORIGIN_PATTERNS}"
+    originPatterns: "*"
 
 ---
 spring:
