@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    fdk.service: data-service-catalog
+  name: data-service-catalog
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      fdk.service: data-service-catalog
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        fdk.service: data-service-catalog
+    spec:
+      containers:
+        - name: data-service-catalog
+          image: data-service-catalog
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              memory: "350Mi"
+          livenessProbe:
+            httpGet:
+              path: /ping
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 30
+            successThreshold: 1
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 30
+            successThreshold: 1
+            failureThreshold: 5
+      restartPolicy: Always
