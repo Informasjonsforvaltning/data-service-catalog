@@ -42,7 +42,8 @@ class SecurityConfig(@Value("\${application.cors.originPatterns}") val corsOrigi
                 it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             }
             .authorizeHttpRequests { authorize ->
-                authorize.requestMatchers(HttpMethod.GET).permitAll()
+                authorize.requestMatchers(HttpMethod.GET, "/ping").permitAll()
+                authorize.requestMatchers(HttpMethod.GET, "/ready").permitAll()
                 authorize.anyRequest().authenticated()
             }
             .oauth2ResourceServer { resourceServer -> resourceServer.jwt { } }
