@@ -20,7 +20,7 @@ class SecurityConfigTest(@Autowired val mockMvc: MockMvc) {
 
     @ParameterizedTest
     @ValueSource(strings = ["/ping", "/ready"])
-    fun shouldNotRequireAuthenticationOnPingAndReadyTest(endpoint: String) {
+    fun shouldNotRequireAuthenticationOnPingAndReady(endpoint: String) {
         mockMvc.get(endpoint).andExpect {
             status { isOk() }
         }
