@@ -19,14 +19,14 @@ management:
       application: data-service-catalog
 spring:
   security.oauth2.resourceserver.jwt:
-    jwk-set-uri: ${SSO_HOST:https://sso.staging.fellesdatakatalog.digdir.no}/auth/realms/fdk/protocol/openid-connect/certs
-    issuer-uri: ${SSO_HOST:https://sso.staging.fellesdatakatalog.digdir.no}/auth/realms/fdk
+    jwk-set-uri: ${SSO_HOST}
+    issuer-uri: ${SSO_HOST}
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
 application:
   prop: 1
   cors:
-    originPatterns: "${CORS_ORIGIN_PATTERNS:*}"
+    originPatterns: "${CORS_ORIGIN_PATTERNS}"
 
 ---
 spring:

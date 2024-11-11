@@ -4,7 +4,7 @@ kind: Kustomization
 namespace: staging
 resources:
   - ../base
+  - ingress.yaml
 
 patchesStrategicMerge:
   - env.yaml
-  - ingress.yaml
