@@ -3,6 +3,16 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: data-service-catalog
+  annotations:
+    nginx.ingress.kubernetes.io/limit-rpm: '2'
+    nginx.ingress.kubernetes.io/limit-burst-multiplier: '2'
+    nginx.ingress.kubernetes.io/limit-whitelist: '10.0.0.0/8,162.244.5.0/24'
+    nginx.ingress.kubernetes.io/server-snippet: |
+      server_tokens off;
+      location ~ ^/(ping|ready|prometheus) {
+        deny all;
+        return 404;
+      }
 spec:
   ingressClassName: nginx
   rules:
