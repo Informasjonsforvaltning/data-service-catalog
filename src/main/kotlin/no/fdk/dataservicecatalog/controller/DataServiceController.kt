@@ -4,6 +4,7 @@ import jakarta.validation.Valid
 import no.fdk.dataservicecatalog.domain.FindDataServiceQuery
 import no.fdk.dataservicecatalog.domain.JsonPatchOperation
 import no.fdk.dataservicecatalog.domain.RegisterDataServiceCommand
+import no.fdk.dataservicecatalog.domain.DataServiceCount
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ProblemDetail
@@ -14,6 +15,11 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/internal/catalogs")
 class DataServiceController {
+
+    @GetMapping(value = ["/count"], produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun getDataServiceCountsForPermittedCatalogs(): ResponseEntity<List<DataServiceCount>> {
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build()
+    }
 
     @GetMapping("{catalogId}/data-services", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun findDataServicesByCatalogId(@PathVariable catalogId: String): ResponseEntity<List<FindDataServiceQuery>> {

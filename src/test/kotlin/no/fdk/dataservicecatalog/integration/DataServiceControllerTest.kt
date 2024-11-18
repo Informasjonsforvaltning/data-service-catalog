@@ -10,8 +10,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.post
+import org.springframework.test.web.servlet.*
 
 @Tag("integration")
 @ActiveProfiles("test")
@@ -20,8 +19,35 @@ import org.springframework.test.web.servlet.post
 class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
 
     @Test
-    fun `should respond with not implemented on valid register data service`() {
-        mockMvc.post("/internal/catalogs/12345/data-services") {
+    fun `count should respond with not implemented`() {
+        mockMvc.get("/internal/catalogs/count") {
+            with(jwt())
+        }.andExpect {
+            status { isNotImplemented() }
+        }
+    }
+
+    @Test
+    fun `find should respond with not implemented`() {
+        mockMvc.get("/internal/catalogs/1234/data-services") {
+            with(jwt())
+        }.andExpect {
+            status { isNotImplemented() }
+        }
+    }
+
+    @Test
+    fun `find by id should respond with not implemented`() {
+        mockMvc.get("/internal/catalogs/1234/data-services/5678") {
+            with(jwt())
+        }.andExpect {
+            status { isNotImplemented() }
+        }
+    }
+
+    @Test
+    fun `register should respond with not implemented on valid payload`() {
+        mockMvc.post("/internal/catalogs/1234/data-services") {
             with(jwt())
             contentType = MediaType.APPLICATION_JSON
             content = """
@@ -41,8 +67,8 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
     }
 
     @Test
-    fun `should respond with bad request on missing endpointUrl in register data service`() {
-        mockMvc.post("/internal/catalogs/12345/data-services") {
+    fun `register should respond with bad request on missing endpointUrl in payload`() {
+        mockMvc.post("/internal/catalogs/1234/data-services") {
             with(jwt())
             contentType = MediaType.APPLICATION_JSON
             content = """
@@ -68,8 +94,8 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
     }
 
     @Test
-    fun `should respond with bad request on missing titles in register data service`() {
-        mockMvc.post("/internal/catalogs/12345/data-services") {
+    fun `register should respond with bad request on missing titles in payload`() {
+        mockMvc.post("/internal/catalogs/1234/data-services") {
             with(jwt())
             contentType = MediaType.APPLICATION_JSON
             content = """
@@ -90,8 +116,8 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
     }
 
     @Test
-    fun `should respond with bad request on missing language for titles in register data service`() {
-        mockMvc.post("/internal/catalogs/12345/data-services") {
+    fun `register should respond with bad request on missing language for titles in payload`() {
+        mockMvc.post("/internal/catalogs/1234/data-services") {
             with(jwt())
             contentType = MediaType.APPLICATION_JSON
             content = """
@@ -116,8 +142,8 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
     }
 
     @Test
-    fun `should respond with bad request on missing value for titles in register data service`() {
-        mockMvc.post("/internal/catalogs/12345/data-services") {
+    fun `register should respond with bad request on missing value for titles in payload`() {
+        mockMvc.post("/internal/catalogs/1234/data-services") {
             with(jwt())
             contentType = MediaType.APPLICATION_JSON
             content = """
@@ -138,6 +164,33 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
             jsonPath("$.detail") { value("Failed to read request") }
             jsonPath("$.errors[0].field") { value("titles[0].value") }
             jsonPath("$.errors[0].message") { value("Cannot be null or blank") }
+        }
+    }
+
+    @Test
+    fun `update should respond with not implemented`() {
+        mockMvc.patch("/internal/catalogs/1234/data-services/5678") {
+            with(jwt())
+            contentType = MediaType.valueOf("application/json-patch+json")
+            content = """
+                [
+                    {
+                        "op": "add",
+                        "path": "path"
+                    }
+                ]
+            """
+        }.andExpect {
+            status { isNotImplemented() }
+        }
+    }
+
+    @Test
+    fun `delete should respond with not implemented`() {
+        mockMvc.delete("/internal/catalogs/1234/data-services/5678") {
+            with(jwt())
+        }.andExpect {
+            status { isNotImplemented() }
         }
     }
 }
