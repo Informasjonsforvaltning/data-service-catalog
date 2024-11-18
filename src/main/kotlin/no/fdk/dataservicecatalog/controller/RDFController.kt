@@ -1,14 +1,14 @@
 package no.fdk.dataservicecatalog.controller
 
-import no.fdk.dataservicecatalog.controller.CatalogController.Companion.JSON_LD
-import no.fdk.dataservicecatalog.controller.CatalogController.Companion.N3
-import no.fdk.dataservicecatalog.controller.CatalogController.Companion.N_QUADS
-import no.fdk.dataservicecatalog.controller.CatalogController.Companion.N_TRIPLES
-import no.fdk.dataservicecatalog.controller.CatalogController.Companion.RDF_JSON
-import no.fdk.dataservicecatalog.controller.CatalogController.Companion.RDF_XML
-import no.fdk.dataservicecatalog.controller.CatalogController.Companion.TRIG
-import no.fdk.dataservicecatalog.controller.CatalogController.Companion.TRIX
-import no.fdk.dataservicecatalog.controller.CatalogController.Companion.TURTLE
+import no.fdk.dataservicecatalog.controller.RDFController.Companion.JSON_LD
+import no.fdk.dataservicecatalog.controller.RDFController.Companion.N3
+import no.fdk.dataservicecatalog.controller.RDFController.Companion.N_QUADS
+import no.fdk.dataservicecatalog.controller.RDFController.Companion.N_TRIPLES
+import no.fdk.dataservicecatalog.controller.RDFController.Companion.RDF_JSON
+import no.fdk.dataservicecatalog.controller.RDFController.Companion.RDF_XML
+import no.fdk.dataservicecatalog.controller.RDFController.Companion.TRIG
+import no.fdk.dataservicecatalog.controller.RDFController.Companion.TRIX
+import no.fdk.dataservicecatalog.controller.RDFController.Companion.TURTLE
 import org.apache.jena.riot.Lang
 import org.apache.jena.riot.RDFLanguages
 import org.springframework.http.HttpHeaders
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/catalogs", produces = [N3, TURTLE, RDF_XML, RDF_JSON, JSON_LD, TRIX, TRIG, N_QUADS, N_TRIPLES])
-class CatalogController {
+class RDFController {
 
     @GetMapping
     fun findCatalogs(
