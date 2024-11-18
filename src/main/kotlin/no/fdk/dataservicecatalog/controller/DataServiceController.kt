@@ -12,7 +12,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/catalogs")
+@RequestMapping("/internal/catalogs")
 class DataServiceController {
 
     @GetMapping("{catalogId}/data-services", produces = [MediaType.APPLICATION_JSON_VALUE])

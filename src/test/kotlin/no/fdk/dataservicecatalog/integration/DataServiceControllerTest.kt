@@ -21,7 +21,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
 
     @Test
     fun `should respond with not implemented on valid register data service`() {
-        mockMvc.post("/catalogs/12345/data-services") {
+        mockMvc.post("/internal/catalogs/12345/data-services") {
             with(jwt())
             contentType = MediaType.APPLICATION_JSON
             content = """
@@ -42,7 +42,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
 
     @Test
     fun `should respond with bad request on missing endpointUrl in register data service`() {
-        mockMvc.post("/catalogs/12345/data-services") {
+        mockMvc.post("/internal/catalogs/12345/data-services") {
             with(jwt())
             contentType = MediaType.APPLICATION_JSON
             content = """
@@ -69,7 +69,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
 
     @Test
     fun `should respond with bad request on missing titles in register data service`() {
-        mockMvc.post("/catalogs/12345/data-services") {
+        mockMvc.post("/internal/catalogs/12345/data-services") {
             with(jwt())
             contentType = MediaType.APPLICATION_JSON
             content = """
@@ -91,7 +91,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
 
     @Test
     fun `should respond with bad request on missing language for titles in register data service`() {
-        mockMvc.post("/catalogs/12345/data-services") {
+        mockMvc.post("/internal/catalogs/12345/data-services") {
             with(jwt())
             contentType = MediaType.APPLICATION_JSON
             content = """
@@ -117,7 +117,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
 
     @Test
     fun `should respond with bad request on missing value for titles in register data service`() {
-        mockMvc.post("/catalogs/12345/data-services") {
+        mockMvc.post("/internal/catalogs/12345/data-services") {
             with(jwt())
             contentType = MediaType.APPLICATION_JSON
             content = """
