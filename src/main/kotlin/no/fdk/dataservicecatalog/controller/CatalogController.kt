@@ -1,51 +1,52 @@
 package no.fdk.dataservicecatalog.controller
 
-import jakarta.validation.Valid
-import no.fdk.dataservicecatalog.domain.DataService
-import no.fdk.dataservicecatalog.domain.RegisterDataServiceCommand
+import org.apache.jena.rdf.model.Model
+import org.apache.jena.riot.Lang
+import org.apache.jena.riot.RDFLanguages
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
-import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.MethodArgumentNotValidException
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestHeader
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/catalogs")
 class CatalogController {
 
-    @GetMapping("{catalogId}/data-services", produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun findDataServicesByCatalogId(@PathVariable catalogId: String): ResponseEntity<List<DataService>> {
+    @GetMapping(produces = [N3, TURTLE, RDF_XML, RDF_JSON, JSON_LD, TRIX, TRIG, N_QUADS, N_TRIPLES])
+    fun findCatalogs(
+        @RequestHeader(value = HttpHeaders.ACCEPT, defaultValue = TURTLE) acceptHeader: String
+    ): ResponseEntity<String> {
+        val lang = getRDFLang(acceptHeader)
+
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build()
     }
 
-    @GetMapping("{catalogId}/data-services/{dataServiceId}", produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun findDataServiceByCatalogIdAndDataServiceId(
-        @PathVariable catalogId: String, @PathVariable dataServiceId: String
-    ): ResponseEntity<DataService> {
+    @GetMapping("/{catalogId}", produces = [N3, TURTLE, RDF_XML, RDF_JSON, JSON_LD, TRIX, TRIG, N_QUADS, N_TRIPLES])
+    fun findCatalogById(
+        @RequestHeader(value = HttpHeaders.ACCEPT, defaultValue = TURTLE) acceptHeader: String
+    ): ResponseEntity<String> {
+        val lang = getRDFLang(acceptHeader)
+
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build()
     }
+    
+    companion object {
+        const val N3 = "text/n3"
+        const val TURTLE = "text/turtle"
+        const val RDF_XML = "application/rdf+xml"
+        const val RDF_JSON = "application/rdf+json"
+        const val JSON_LD = "application/ld+json"
+        const val TRIX = "application/trix"
+        const val TRIG = "application/trig"
+        const val N_QUADS = "application/n-quads"
+        const val N_TRIPLES = "application/n-triples"
 
-    @PostMapping("{catalogId}/data-services", consumes = [MediaType.APPLICATION_JSON_VALUE])
-    fun registerDataServiceByCatalogId(
-        @PathVariable catalogId: String, @Valid @RequestBody registerDataServiceCommand: RegisterDataServiceCommand
-    ): ResponseEntity<Void> {
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build()
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException::class)
-    fun handleMethodArgumentNotValidException(ex: MethodArgumentNotValidException): ResponseEntity<ProblemDetail> {
-        val problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Failed to read request")
-
-        val errors = ex.bindingResult.fieldErrors.map { fieldError ->
-            mapOf(
-                "field" to fieldError.field,
-                "message" to fieldError.defaultMessage
-            )
+        fun getRDFLang(accept: String): Lang {
+            return RDFLanguages.contentTypeToLang(accept) ?: Lang.TURTLE
         }
-
-        problemDetail.setProperty("errors", errors)
-
-        return ResponseEntity.badRequest().body(problemDetail)
     }
 }

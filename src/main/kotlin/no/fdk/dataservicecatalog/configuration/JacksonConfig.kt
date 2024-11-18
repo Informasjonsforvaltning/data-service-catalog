@@ -1,5 +1,7 @@
 package no.fdk.dataservicecatalog.configuration
 
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinFeature
 import com.fasterxml.jackson.module.kotlin.KotlinModule
@@ -19,6 +21,8 @@ class JacksonConfig {
                     .configure(KotlinFeature.NullIsSameAsDefault, true)
                     .build()
             )
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .setSerializationInclusion(JsonInclude.Include.NON_NULL)
             .addMixIn(ProblemDetail::class.java, ProblemDetailJacksonMixin::class.java)
     }
 }

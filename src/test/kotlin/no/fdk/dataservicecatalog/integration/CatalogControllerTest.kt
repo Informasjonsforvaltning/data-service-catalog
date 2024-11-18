@@ -2,8 +2,19 @@ package no.fdk.dataservicecatalog.integration
 
 import no.fdk.dataservicecatalog.configuration.JacksonConfig
 import no.fdk.dataservicecatalog.controller.CatalogController
+import no.fdk.dataservicecatalog.controller.CatalogController.Companion.JSON_LD
+import no.fdk.dataservicecatalog.controller.CatalogController.Companion.N3
+import no.fdk.dataservicecatalog.controller.CatalogController.Companion.N_QUADS
+import no.fdk.dataservicecatalog.controller.CatalogController.Companion.N_TRIPLES
+import no.fdk.dataservicecatalog.controller.CatalogController.Companion.RDF_JSON
+import no.fdk.dataservicecatalog.controller.CatalogController.Companion.RDF_XML
+import no.fdk.dataservicecatalog.controller.CatalogController.Companion.TRIG
+import no.fdk.dataservicecatalog.controller.CatalogController.Companion.TRIX
+import no.fdk.dataservicecatalog.controller.CatalogController.Companion.TURTLE
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
@@ -11,7 +22,7 @@ import org.springframework.http.MediaType
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.post
+import org.springframework.test.web.servlet.get
 
 @Tag("integration")
 @ActiveProfiles("test")
@@ -19,67 +30,24 @@ import org.springframework.test.web.servlet.post
 @WebMvcTest(controllers = [CatalogController::class])
 class CatalogControllerTest(@Autowired val mockMvc: MockMvc) {
 
-    @Test
-    fun shouldRespondWithCreatedOnValidDataServiceObject() {
-        mockMvc.post("/catalogs/12345/data-services") {
+    @ParameterizedTest
+    @ValueSource(strings = [N3, TURTLE, RDF_XML, RDF_JSON, JSON_LD, TRIX, TRIG, N_QUADS, N_TRIPLES])
+    fun `should respond with not implemented on valid media type`(mediaType: String) {
+        mockMvc.get("/catalogs") {
             with(jwt())
-            contentType = MediaType.APPLICATION_JSON
-            content = """
-                {
-                    "endpointUrl": "endpointUrl",
-                    "title": {
-                        "nb": "title"
-                    }
-                }
-            """.trimIndent()
+            accept = MediaType.valueOf(mediaType)
         }.andExpect {
             status { isNotImplemented() }
         }
     }
 
     @Test
-    fun shouldRespondWithBadRequestOnMissingEndpointUrlInDataServiceObject() {
-        mockMvc.post("/catalogs/12345/data-services") {
+    fun `should respond with not acceptable on invalid media type`() {
+        mockMvc.get("/catalogs") {
             with(jwt())
-            contentType = MediaType.APPLICATION_JSON
-            content = """
-                {
-                    "endpointUrl": null,
-                    "title": {
-                        "nb": "title"
-                    }
-                }
-            """.trimIndent()
+            accept = MediaType.APPLICATION_JSON
         }.andExpect {
-            status { isBadRequest() }
-            header {
-                string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
-            }
-            jsonPath("$.detail") { value("Failed to read request") }
-            jsonPath("$.errors[0].field") { value("endpointUrl") }
-            jsonPath("$.errors[0].message") { value("Cannot be null or blank") }
-        }
-    }
-
-    @Test
-    fun shouldRespondWithBadRequestOnMissingTitleInDataServiceObject() {
-        mockMvc.post("/catalogs/12345/data-services") {
-            with(jwt())
-            contentType = MediaType.APPLICATION_JSON
-            content = """
-                {
-                    "endpointUrl": "endpointUrl",
-                    "title": null
-                }
-            """.trimIndent()
-        }.andExpect {
-            status { isBadRequest() }
-            header {
-                string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
-            }
-            jsonPath("$.detail") { value("Failed to read request") }
-            jsonPath("$.errors[0].field") { value("title") }
-            jsonPath("$.errors[0].message") { value("Cannot be null or empty") }
+            status { isNotAcceptable() }
         }
     }
 }
