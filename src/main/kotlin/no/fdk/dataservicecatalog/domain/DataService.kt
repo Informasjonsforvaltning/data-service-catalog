@@ -101,10 +101,10 @@ data class DataService(
 data class LanguageString(
 
     @field:NotBlank(message = "Cannot be null or blank")
-    val language: String = "",
+    val language: String? = null,
 
     @field:NotBlank(message = "Cannot be null or blank")
-    val value: String = ""
+    val value: String? = null
 )
 
 data class ContactPoint(
