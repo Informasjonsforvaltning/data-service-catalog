@@ -1,29 +1,39 @@
 package no.fdk.dataservicecatalog.domain
 
+import com.fasterxml.jackson.annotation.JsonProperty
+import jakarta.validation.Valid
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotEmpty
+
 /*
 https://data.norge.no/specification/dcat-ap-no#Datatjeneste
  */
 
-data class FindDataServiceQuery(
+data class DataService(
 
     /*
     endepunktsURL (dcat:endpointURL)
      */
-    val endpointUrl: String,
+    @field:NotBlank(message = "Cannot be null or blank")
+    val endpointUrl: String? = null,
 
     /*
     identifikator (dct:identifier)
      */
-    val identifier: String,
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    val identifier: String? = null,
 
     /*
     tittel (dct:title)
      */
-    val titles: List<LanguageString>,
+    @field:Valid
+    @field:NotEmpty(message = "Cannot be null or empty")
+    val titles: List<LanguageString>? = null,
 
     /*
     emneord (dcat:keyword)
      */
+    @field:Valid
     val keywords: List<LanguageString>? = null,
 
     /*
@@ -54,6 +64,7 @@ data class FindDataServiceQuery(
     /*
     beskrivelse (dct:description)
      */
+    @field:Valid
     val description: LanguageString? = null,
 
     /*
@@ -85,21 +96,25 @@ data class FindDataServiceQuery(
     type (dct:type)
      */
     val type: String? = null
-) {
-    data class LanguageString(
-        val language: String,
-        val value: String
-    )
+)
 
-    data class ContactPoint(
-        val name: String?,
-        val phone: String?,
-        val email: String?,
-        val url: String?
-    )
+data class LanguageString(
 
-    data class License(
-        val name: String?,
-        val url: String?
-    )
-}
+    @field:NotBlank(message = "Cannot be null or blank")
+    val language: String = "",
+
+    @field:NotBlank(message = "Cannot be null or blank")
+    val value: String = ""
+)
+
+data class ContactPoint(
+    val name: String? = null,
+    val phone: String? = null,
+    val email: String? = null,
+    val url: String? = null
+)
+
+data class License(
+    val name: String? = null,
+    val url: String? = null
+)

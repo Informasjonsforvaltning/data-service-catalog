@@ -87,7 +87,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
             header {
                 string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
             }
-            jsonPath("$.detail") { value("Failed to read request") }
+            jsonPath("$.detail") { value("Invalid request content.") }
             jsonPath("$.errors[0].field") { value("endpointUrl") }
             jsonPath("$.errors[0].message") { value("Cannot be null or blank") }
         }
@@ -109,7 +109,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
             header {
                 string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
             }
-            jsonPath("$.detail") { value("Failed to read request") }
+            jsonPath("$.detail") { value("Invalid request content.") }
             jsonPath("$.errors[0].field") { value("titles") }
             jsonPath("$.errors[0].message") { value("Cannot be null or empty") }
         }
@@ -135,7 +135,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
             header {
                 string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
             }
-            jsonPath("$.detail") { value("Failed to read request") }
+            jsonPath("$.detail") { value("Invalid request content.") }
             jsonPath("$.errors[0].field") { value("titles[0].language") }
             jsonPath("$.errors[0].message") { value("Cannot be null or blank") }
         }
@@ -161,7 +161,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
             header {
                 string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
             }
-            jsonPath("$.detail") { value("Failed to read request") }
+            jsonPath("$.detail") { value("Invalid request content.") }
             jsonPath("$.errors[0].field") { value("titles[0].value") }
             jsonPath("$.errors[0].message") { value("Cannot be null or blank") }
         }
@@ -182,6 +182,79 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
             """
         }.andExpect {
             status { isNotImplemented() }
+        }
+    }
+
+    @Test
+    fun `update should respond with bad request on invalid op in payload`() {
+        mockMvc.patch("/internal/catalogs/1234/data-services/5678") {
+            with(jwt())
+            contentType = MediaType.valueOf("application/json-patch+json")
+            content = """
+                [
+                    {
+                        "op": "invalid",
+                        "path": "path"
+                    }
+                ]
+            """
+        }.andExpect {
+            status { isBadRequest() }
+            header {
+                string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
+            }
+            jsonPath("$.detail") { value("Invalid request content.") }
+            jsonPath("$.errors[0].field") { value("patchOperations[0].op") }
+            jsonPath("$.errors[0].message") { value("Cannot be null or invalid operator") }
+        }
+    }
+
+    @Test
+    fun `update should respond with bad request on missing op in payload`() {
+        mockMvc.patch("/internal/catalogs/1234/data-services/5678") {
+            with(jwt())
+            contentType = MediaType.valueOf("application/json-patch+json")
+            content = """
+                [
+                    {
+                        "op": null,
+                        "path": "path"
+                    }
+                ]
+            """
+        }.andExpect {
+            status { isBadRequest() }
+            header {
+                string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
+            }
+            jsonPath("$.detail") { value("Invalid request content.") }
+            jsonPath("$.errors[0].field") { value("patchOperations[0].op") }
+            jsonPath("$.errors[0].message") { value("Cannot be null or invalid operator") }
+        }
+    }
+
+    @Test
+    fun `update should respond with bad request on missing path in payload`() {
+        mockMvc.patch("/internal/catalogs/1234/data-services/5678") {
+            with(jwt())
+            contentType = MediaType.valueOf("application/json-patch+json")
+            content = """
+                [
+                    {
+                        "op": "add",
+                        "path": null
+                    }
+                ]
+                
+            """
+        }.andExpect {
+            status { isBadRequest() }
+            header {
+                string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
+            }
+            jsonPath("$.detail") { value("Invalid request content.") }
+            jsonPath("$.errors[0].field") { value("patchOperations[0].path") }
+            jsonPath("$.errors[0].message") { value("Cannot be null or blank") }
         }
     }
 

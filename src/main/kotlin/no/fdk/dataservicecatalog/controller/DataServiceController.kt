@@ -1,10 +1,9 @@
 package no.fdk.dataservicecatalog.controller
 
 import jakarta.validation.Valid
-import no.fdk.dataservicecatalog.domain.FindDataServiceQuery
-import no.fdk.dataservicecatalog.domain.JsonPatchOperation
-import no.fdk.dataservicecatalog.domain.RegisterDataServiceCommand
 import no.fdk.dataservicecatalog.domain.DataServiceCount
+import no.fdk.dataservicecatalog.domain.PatchRequest
+import no.fdk.dataservicecatalog.domain.DataService
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ProblemDetail
@@ -16,26 +15,26 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/internal/catalogs")
 class DataServiceController {
 
-    @GetMapping(value = ["/count"], produces = [MediaType.APPLICATION_JSON_VALUE])
+    @GetMapping("/count", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getDataServiceCountsForPermittedCatalogs(): ResponseEntity<List<DataServiceCount>> {
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build()
     }
 
     @GetMapping("{catalogId}/data-services", produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun findDataServicesByCatalogId(@PathVariable catalogId: String): ResponseEntity<List<FindDataServiceQuery>> {
+    fun findDataServicesByCatalogId(@PathVariable catalogId: String): ResponseEntity<List<DataService>> {
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build()
     }
 
     @GetMapping("{catalogId}/data-services/{dataServiceId}", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun findDataServiceByCatalogIdAndDataServiceId(
         @PathVariable catalogId: String, @PathVariable dataServiceId: String
-    ): ResponseEntity<FindDataServiceQuery> {
+    ): ResponseEntity<DataService> {
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build()
     }
 
     @PostMapping("{catalogId}/data-services", consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun registerDataServiceByCatalogId(
-        @PathVariable catalogId: String, @Valid @RequestBody registerDataServiceCommand: RegisterDataServiceCommand
+        @PathVariable catalogId: String, @Valid @RequestBody dataService: DataService
     ): ResponseEntity<Void> {
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build()
     }
@@ -48,8 +47,8 @@ class DataServiceController {
     fun updateDataServiceByCatalogIdAndDataServiceId(
         @PathVariable catalogId: String,
         @PathVariable dataServiceId: String,
-        @RequestBody patchOperations: List<JsonPatchOperation>
-    ): ResponseEntity<Void> {
+        @Valid @RequestBody patchRequest: PatchRequest
+    ): ResponseEntity<DataService> {
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build()
     }
 
@@ -62,7 +61,7 @@ class DataServiceController {
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleMethodArgumentNotValidException(ex: MethodArgumentNotValidException): ResponseEntity<ProblemDetail> {
-        val problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Failed to read request")
+        val problemDetail = ex.body
 
         val errors = ex.bindingResult.fieldErrors.map { fieldError ->
             mapOf(
