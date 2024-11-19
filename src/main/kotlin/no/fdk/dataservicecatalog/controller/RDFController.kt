@@ -14,10 +14,7 @@ import org.apache.jena.riot.RDFLanguages
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestHeader
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/catalogs", produces = [N3, TURTLE, RDF_XML, RDF_JSON, JSON_LD, TRIX, TRIG, N_QUADS, N_TRIPLES])
@@ -34,7 +31,18 @@ class RDFController {
 
     @GetMapping("/{catalogId}")
     fun findCatalogById(
-        @RequestHeader(value = HttpHeaders.ACCEPT, defaultValue = TURTLE) acceptHeader: String
+        @RequestHeader(value = HttpHeaders.ACCEPT, defaultValue = TURTLE) acceptHeader: String,
+        @PathVariable catalogId: String
+    ): ResponseEntity<String> {
+        val lang = getRDFLang(acceptHeader)
+
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build()
+    }
+
+    @GetMapping("/{catalogId}/data-services/{dataServiceId}")
+    fun findDataServiceByCatalogIdAndDataServiceId(
+        @RequestHeader(value = HttpHeaders.ACCEPT, defaultValue = TURTLE) acceptHeader: String,
+        @PathVariable catalogId: String, @PathVariable dataServiceId: String
     ): ResponseEntity<String> {
         val lang = getRDFLang(acceptHeader)
 

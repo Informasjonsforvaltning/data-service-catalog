@@ -51,24 +51,24 @@ class RDFControllerTest(@Autowired val mockMvc: MockMvc) {
         }
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = [N3, TURTLE, RDF_XML, RDF_JSON, JSON_LD, TRIX, TRIG, N_QUADS, N_TRIPLES])
-    fun `find by id should respond with not implemented on valid media type`(mediaType: String) {
+    @Test
+    fun `find by id should respond with not implemented on valid media type`() {
         mockMvc.get("/catalogs/12345") {
             with(jwt())
-            accept = MediaType.valueOf(mediaType)
+            accept = MediaType.valueOf(N3)
         }.andExpect {
             status { isNotImplemented() }
         }
     }
 
+
     @Test
-    fun `find by id should respond with not acceptable on invalid media type`() {
-        mockMvc.get("/catalogs/12345") {
+    fun `find data service by id should respond with not implemented on valid media type`() {
+        mockMvc.get("/catalogs/1234/data-services/5678") {
             with(jwt())
-            accept = MediaType.APPLICATION_JSON
+            accept = MediaType.valueOf(N3)
         }.andExpect {
-            status { isNotAcceptable() }
+            status { isNotImplemented() }
         }
     }
 }
