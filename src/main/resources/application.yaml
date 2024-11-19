@@ -23,6 +23,9 @@ spring:
     issuer-uri: ${SSO_HOST}
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
+  mvc:
+    problemdetails:
+      enabled: true
 application:
   prop: 1
   cors:

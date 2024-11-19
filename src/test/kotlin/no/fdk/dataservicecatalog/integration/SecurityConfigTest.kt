@@ -20,15 +20,15 @@ class SecurityConfigTest(@Autowired val mockMvc: MockMvc) {
 
     @ParameterizedTest
     @ValueSource(strings = ["/ping", "/ready"])
-    fun shouldNotRequireAuthenticationOnPingAndReady(endpoint: String) {
+    fun `should not require authentication on ping and ready`(endpoint: String) {
         mockMvc.get(endpoint).andExpect {
             status { isOk() }
         }
     }
 
     @Test
-    fun shouldRespondWithOkOnJwtAuthentication() {
-        mockMvc.get("/test") {
+    fun `should respond with ok on jwt authentication`() {
+        mockMvc.get("/catalogs") {
             with(jwt())
         }.andExpect {
             status { isNotImplemented() }
@@ -36,8 +36,8 @@ class SecurityConfigTest(@Autowired val mockMvc: MockMvc) {
     }
 
     @Test
-    fun shouldRespondWithUnauthorizedOnMissingJwtAuthentication() {
-        mockMvc.get("/test").andExpect {
+    fun `should respond with unauthorized on missing jwt authentication`() {
+        mockMvc.get("/catalogs").andExpect {
             status { isUnauthorized() }
         }
     }
