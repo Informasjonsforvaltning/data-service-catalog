@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean
 import org.testcontainers.containers.MongoDBContainer
 
 @TestConfiguration(proxyBeanMethods = false)
-class IntegrationTestConfig {
+class MongoDBTestcontainer {
 
     @Bean
     @ServiceConnection

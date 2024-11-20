@@ -1,6 +1,6 @@
 package no.fdk.dataservicecatalog.integration.config
 
-import no.fdk.dataservicecatalog.integration.IntegrationTestConfig
+import no.fdk.dataservicecatalog.integration.MongoDBTestcontainer
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -19,7 +19,7 @@ import org.springframework.test.web.servlet.get
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Import(IntegrationTestConfig::class)
+@Import(MongoDBTestcontainer::class)
 class SecurityConfigTest(@Autowired val mockMvc: MockMvc) {
 
     @ParameterizedTest

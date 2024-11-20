@@ -1,6 +1,6 @@
 package no.fdk.dataservicecatalog.integration.config
 
-import no.fdk.dataservicecatalog.integration.IntegrationTestConfig
+import no.fdk.dataservicecatalog.integration.MongoDBTestcontainer
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -14,7 +14,7 @@ import org.springframework.test.context.ActiveProfiles
 @ActiveProfiles("test")
 
 @DataMongoTest
-@Import(IntegrationTestConfig::class)
+@Import(MongoDBTestcontainer::class)
 class MongoConfigTest(@Autowired val mongoTemplate: MongoOperations) {
 
     @Test
