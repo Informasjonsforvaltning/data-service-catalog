@@ -20,7 +20,13 @@ management:
 spring:
   data:
     mongodb:
-      uri: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGODB_HOST}/dataServiceCatalog?authSource=${MONGODB_AUTH}&replicaSet=${MONGODB_REPLICASET}
+      host: ${MONGODB_HOST}
+      username: ${MONGO_USERNAME}
+      password: ${MONGO_PASSWORD}
+      authentication-database: ${MONGODB_AUTH}
+      replica-set-name: ${MONGODB_REPLICASET}
+      port: 27017
+      database: dataServiceCatalog
   security:
     oauth2:
       resourceserver:
@@ -44,7 +50,10 @@ spring:
       on-profile: dev
   data:
     mongodb:
-      uri: mongodb://root:secret@localhost:27017/dataServiceCatalog
+      host: localhost
+      username: root
+      password: secret
+      replica-set-name: null
   security:
     oauth2:
       resourceserver:
