@@ -12,7 +12,7 @@ import org.springframework.data.mongodb.core.MongoTemplate
 class MongoConfig {
 
     @Bean
-    fun mongoTemplate(mongoClient: MongoClient): MongoOperations {
+    fun mongoTemplate(mongoClient: MongoClient): MongoTemplate {
         return MongoTemplate(mongoClient, "dataServiceCatalog")
     }
 }
