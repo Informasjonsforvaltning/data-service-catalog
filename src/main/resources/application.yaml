@@ -18,9 +18,15 @@ management:
     tags:
       application: data-service-catalog
 spring:
-  security.oauth2.resourceserver.jwt:
-    jwk-set-uri: ${SSO_HOST}
-    issuer-uri: ${SSO_HOST}
+  data:
+    mongodb:
+      uri: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGODB_HOST}/dataServiceCatalog?authSource=${MONGODB_AUTH}&replicaSet=${MONGODB_REPLICASET}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${SSO_HOST}/auth/realms/fdk
+          issuer-uri: ${SSO_HOST}/auth/realms/fdk/protocol/openid-connect/certs
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
   mvc:
@@ -33,10 +39,18 @@ application:
 
 ---
 spring:
-  config.activate.on-profile: dev
-  security.oauth2.resourceserver.jwt:
-    jwk-set-uri: https://sso.staging.fellesdatakatalog.digdir.no/auth/realms/fdk/protocol/openid-connect/certs
-    issuer-uri: https://sso.staging.fellesdatakatalog.digdir.no/auth/realms/fdk
+  config:
+    activate:
+      on-profile: dev
+  data:
+    mongodb:
+      uri: mongodb://root:secret@localhost:27017/dataServiceCatalog
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: https://sso.staging.fellesdatakatalog.digdir.no/auth/realms/fdk/protocol/openid-connect/certs
+          issuer-uri: https://sso.staging.fellesdatakatalog.digdir.no/auth/realms/fdk
 application:
   scope: test.scope
   cors:
@@ -45,10 +59,15 @@ logging.level.no: DEBUG
 
 ---
 spring:
-  config.activate.on-profile: test
-  security.oauth2.resourceserver.jwt:
-    jwk-set-uri: http://localhost:5050/auth/realms/fdk/protocol/openid-connect/certs
-    issuer-uri: http://localhost:5050/auth/realms/fdk
+  config:
+    activate:
+      on-profile: test
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:5050/auth/realms/fdk/protocol/openid-connect/certs
+          issuer-uri: http://localhost:5050/auth/realms/fdk
 application:
   scope: test.scope
   cors:

@@ -1,4 +1,4 @@
-package no.fdk.dataservicecatalog.configuration
+package no.fdk.dataservicecatalog.config
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.DeserializationFeature
