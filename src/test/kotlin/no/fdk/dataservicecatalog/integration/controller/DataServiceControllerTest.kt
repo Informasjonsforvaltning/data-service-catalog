@@ -1,6 +1,6 @@
-package no.fdk.dataservicecatalog.integration
+package no.fdk.dataservicecatalog.integration.controller
 
-import no.fdk.dataservicecatalog.configuration.JacksonConfig
+import no.fdk.dataservicecatalog.config.JacksonConfig
 import no.fdk.dataservicecatalog.controller.DataServiceController
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test

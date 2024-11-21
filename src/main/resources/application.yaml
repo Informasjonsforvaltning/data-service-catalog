@@ -18,9 +18,21 @@ management:
     tags:
       application: data-service-catalog
 spring:
-  security.oauth2.resourceserver.jwt:
-    jwk-set-uri: ${SSO_HOST}
-    issuer-uri: ${SSO_HOST}
+  data:
+    mongodb:
+      host: ${MONGODB_HOST}
+      username: ${MONGO_USERNAME}
+      password: ${MONGO_PASSWORD}
+      authentication-database: ${MONGODB_AUTH}
+      replica-set-name: ${MONGODB_REPLICASET}
+      port: 27017
+      database: dataServiceCatalog
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${SSO_HOST}/auth/realms/fdk
+          issuer-uri: ${SSO_HOST}/auth/realms/fdk/protocol/openid-connect/certs
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
   mvc:
@@ -33,10 +45,21 @@ application:
 
 ---
 spring:
-  config.activate.on-profile: dev
-  security.oauth2.resourceserver.jwt:
-    jwk-set-uri: https://sso.staging.fellesdatakatalog.digdir.no/auth/realms/fdk/protocol/openid-connect/certs
-    issuer-uri: https://sso.staging.fellesdatakatalog.digdir.no/auth/realms/fdk
+  config:
+    activate:
+      on-profile: dev
+  data:
+    mongodb:
+      host: localhost
+      username: root
+      password: secret
+      replica-set-name: null
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: https://sso.staging.fellesdatakatalog.digdir.no/auth/realms/fdk/protocol/openid-connect/certs
+          issuer-uri: https://sso.staging.fellesdatakatalog.digdir.no/auth/realms/fdk
 application:
   scope: test.scope
   cors:
@@ -45,10 +68,15 @@ logging.level.no: DEBUG
 
 ---
 spring:
-  config.activate.on-profile: test
-  security.oauth2.resourceserver.jwt:
-    jwk-set-uri: http://localhost:5050/auth/realms/fdk/protocol/openid-connect/certs
-    issuer-uri: http://localhost:5050/auth/realms/fdk
+  config:
+    activate:
+      on-profile: test
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:5050/auth/realms/fdk/protocol/openid-connect/certs
+          issuer-uri: http://localhost:5050/auth/realms/fdk
 application:
   scope: test.scope
   cors:

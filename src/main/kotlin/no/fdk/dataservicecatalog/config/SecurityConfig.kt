@@ -1,4 +1,4 @@
-package no.fdk.dataservicecatalog.configuration
+package no.fdk.dataservicecatalog.config
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

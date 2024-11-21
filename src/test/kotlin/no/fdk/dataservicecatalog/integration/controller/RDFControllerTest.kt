@@ -1,6 +1,6 @@
-package no.fdk.dataservicecatalog.integration
+package no.fdk.dataservicecatalog.integration.controller
 
-import no.fdk.dataservicecatalog.configuration.JacksonConfig
+import no.fdk.dataservicecatalog.config.JacksonConfig
 import no.fdk.dataservicecatalog.controller.RDFController
 import no.fdk.dataservicecatalog.controller.RDFController.Companion.JSON_LD
 import no.fdk.dataservicecatalog.controller.RDFController.Companion.N3
