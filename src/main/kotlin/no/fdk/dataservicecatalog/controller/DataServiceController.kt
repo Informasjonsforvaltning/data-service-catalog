@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.*
 
@@ -15,10 +16,12 @@ import org.springframework.web.bind.annotation.*
 class DataServiceController {
 
     @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
+    @PreAuthorize("hasAnyAuthority('system:root:admin', 'organization:' + #catalogId + ':admin', 'organization:' + #catalogId + ':write', 'organization:' + #catalogId + ':read')")
     fun findDataServicesByCatalogId(@PathVariable catalogId: String): ResponseEntity<List<DataService>> {
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build()
     }
 
+    @PreAuthorize("hasAnyAuthority('system:root:admin', 'organization:' + #catalogId + ':admin', 'organization:' + #catalogId + ':write', 'organization:' + #catalogId + ':read')")
     @GetMapping("/{dataServiceId}", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun findDataServiceByCatalogIdAndDataServiceId(
         @PathVariable catalogId: String, @PathVariable dataServiceId: String
@@ -26,6 +29,7 @@ class DataServiceController {
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build()
     }
 
+    @PreAuthorize("hasAnyAuthority('organization:' + #catalogId + ':admin', 'organization:' + #catalogId + ':write')")
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun registerDataServiceByCatalogId(
         @PathVariable catalogId: String, @Valid @RequestBody dataService: DataService
@@ -33,6 +37,7 @@ class DataServiceController {
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build()
     }
 
+    @PreAuthorize("hasAnyAuthority('organization:' + #catalogId + ':admin', 'organization:' + #catalogId + ':write')")
     @PatchMapping(
         "/{dataServiceId}", consumes = ["application/json-patch+json"], produces = [MediaType.APPLICATION_JSON_VALUE]
     )
@@ -44,6 +49,7 @@ class DataServiceController {
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build()
     }
 
+    @PreAuthorize("hasAnyAuthority('organization:' + #catalogId + ':admin', 'organization:' + #catalogId + ':write')")
     @DeleteMapping("/{dataServiceId}")
     fun deleteDataServiceByCatalogIdAndDataServiceId(
         @PathVariable catalogId: String, @PathVariable dataServiceId: String
