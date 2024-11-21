@@ -13,7 +13,7 @@ import org.springframework.data.mongodb.core.MongoTemplate
 class MongoConfig {
 
     @Value("\${spring.data.mongodb.database}")
-    lateinit var database: String
+    private lateinit var database: String
 
     @Bean
     fun mongoTemplate(mongoClient: MongoClient): MongoOperations {

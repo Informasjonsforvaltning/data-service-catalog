@@ -1,6 +1,7 @@
 package no.fdk.dataservicecatalog.integration.controller
 
 import no.fdk.dataservicecatalog.config.JacksonConfig
+import no.fdk.dataservicecatalog.config.SecurityConfig
 import no.fdk.dataservicecatalog.controller.DataServiceController
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -14,18 +15,10 @@ import org.springframework.test.web.servlet.*
 
 @Tag("integration")
 @ActiveProfiles("test")
-@Import(JacksonConfig::class)
+
+@Import(SecurityConfig::class, JacksonConfig::class)
 @WebMvcTest(controllers = [DataServiceController::class])
 class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
-
-    @Test
-    fun `count should respond with not implemented`() {
-        mockMvc.get("/internal/catalogs/count") {
-            with(jwt())
-        }.andExpect {
-            status { isNotImplemented() }
-        }
-    }
 
     @Test
     fun `find should respond with not implemented`() {
