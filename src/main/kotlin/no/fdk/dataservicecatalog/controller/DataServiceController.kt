@@ -15,13 +15,13 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/internal/catalogs/{catalogId}/data-services")
 class DataServiceController {
 
+    @PreAuthorize(READ)
     @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
-    @PreAuthorize("hasAnyAuthority('system:root:admin', 'organization:' + #catalogId + ':admin', 'organization:' + #catalogId + ':write', 'organization:' + #catalogId + ':read')")
     fun findDataServicesByCatalogId(@PathVariable catalogId: String): ResponseEntity<List<DataService>> {
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build()
     }
 
-    @PreAuthorize("hasAnyAuthority('system:root:admin', 'organization:' + #catalogId + ':admin', 'organization:' + #catalogId + ':write', 'organization:' + #catalogId + ':read')")
+    @PreAuthorize(READ)
     @GetMapping("/{dataServiceId}", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun findDataServiceByCatalogIdAndDataServiceId(
         @PathVariable catalogId: String, @PathVariable dataServiceId: String
@@ -29,7 +29,7 @@ class DataServiceController {
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build()
     }
 
-    @PreAuthorize("hasAnyAuthority('organization:' + #catalogId + ':admin', 'organization:' + #catalogId + ':write')")
+    @PreAuthorize(WRITE)
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun registerDataServiceByCatalogId(
         @PathVariable catalogId: String, @Valid @RequestBody dataService: DataService
@@ -37,7 +37,7 @@ class DataServiceController {
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build()
     }
 
-    @PreAuthorize("hasAnyAuthority('organization:' + #catalogId + ':admin', 'organization:' + #catalogId + ':write')")
+    @PreAuthorize(WRITE)
     @PatchMapping(
         "/{dataServiceId}", consumes = ["application/json-patch+json"], produces = [MediaType.APPLICATION_JSON_VALUE]
     )
@@ -49,7 +49,7 @@ class DataServiceController {
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build()
     }
 
-    @PreAuthorize("hasAnyAuthority('organization:' + #catalogId + ':admin', 'organization:' + #catalogId + ':write')")
+    @PreAuthorize(WRITE)
     @DeleteMapping("/{dataServiceId}")
     fun deleteDataServiceByCatalogIdAndDataServiceId(
         @PathVariable catalogId: String, @PathVariable dataServiceId: String
@@ -71,5 +71,13 @@ class DataServiceController {
         problemDetail.setProperty("errors", errors)
 
         return ResponseEntity.badRequest().body(problemDetail)
+    }
+
+    companion object {
+        const val READ =
+            "hasAnyAuthority('system:root:admin', 'organization:' + #catalogId + ':admin', 'organization:' + #catalogId + ':write', 'organization:' + #catalogId + ':read')"
+
+        const val WRITE =
+            "hasAnyAuthority('organization:' + #catalogId + ':admin', 'organization:' + #catalogId + ':write')"
     }
 }
