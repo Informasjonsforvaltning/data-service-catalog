@@ -1,54 +1,71 @@
 package no.fdk.dataservicecatalog.integration.controller
 
 import no.fdk.dataservicecatalog.config.JacksonConfig
+import no.fdk.dataservicecatalog.config.SecurityConfig
 import no.fdk.dataservicecatalog.controller.DataServiceController
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.*
 
 @Tag("integration")
 @ActiveProfiles("test")
-@Import(JacksonConfig::class)
+
+@Import(SecurityConfig::class, JacksonConfig::class)
 @WebMvcTest(controllers = [DataServiceController::class])
 class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
 
-    @Test
-    fun `count should respond with not implemented`() {
-        mockMvc.get("/internal/catalogs/count") {
-            with(jwt())
-        }.andExpect {
-            status { isNotImplemented() }
-        }
-    }
-
-    @Test
-    fun `find should respond with not implemented`() {
+    @ParameterizedTest
+    @ValueSource(strings = ["system:root:admin", "organization:1234:admin", "organization:1234:write", "organization:1234:read"])
+    fun `find should respond with not implemented`(authority: String) {
         mockMvc.get("/internal/catalogs/1234/data-services") {
-            with(jwt())
+            with(jwt().authorities(SimpleGrantedAuthority(authority)))
         }.andExpect {
             status { isNotImplemented() }
         }
     }
 
     @Test
-    fun `find by id should respond with not implemented`() {
+    fun `find should respond with forbidden`() {
+        mockMvc.get("/internal/catalogs/1234/data-services") {
+            with(jwt().authorities(SimpleGrantedAuthority("invalid")))
+        }.andExpect {
+            status { isForbidden() }
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["system:root:admin", "organization:1234:admin", "organization:1234:write", "organization:1234:read"])
+    fun `find by id should respond with not implemented`(authority: String) {
         mockMvc.get("/internal/catalogs/1234/data-services/5678") {
-            with(jwt())
+            with(jwt().authorities(SimpleGrantedAuthority(authority)))
         }.andExpect {
             status { isNotImplemented() }
         }
     }
 
     @Test
-    fun `register should respond with not implemented on valid payload`() {
+    fun `find by id should respond with forbidden`() {
+        mockMvc.get("/internal/catalogs/1234/data-services/5678") {
+            with(jwt().authorities(SimpleGrantedAuthority("invalid")))
+        }.andExpect {
+            status { isForbidden() }
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["organization:1234:admin", "organization:1234:write"])
+    fun `register should respond with not implemented on valid payload`(authority: String) {
         mockMvc.post("/internal/catalogs/1234/data-services") {
-            with(jwt())
+            with(jwt().authorities(SimpleGrantedAuthority(authority)))
             contentType = MediaType.APPLICATION_JSON
             content = """
                 {
@@ -63,6 +80,27 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
             """
         }.andExpect {
             status { isNotImplemented() }
+        }
+    }
+
+    @Test
+    fun `register should respond with forbidden`() {
+        mockMvc.post("/internal/catalogs/1234/data-services") {
+            with(jwt().authorities(SimpleGrantedAuthority("invalid")))
+            contentType = MediaType.APPLICATION_JSON
+            content = """
+                {
+                    "endpointUrl": "endpointUrl",
+                    "titles": [
+                        {
+                            "language": "nb",
+                            "value": "title"
+                        }
+                    ]
+                }
+            """
+        }.andExpect {
+            status { isForbidden() }
         }
     }
 
@@ -167,10 +205,11 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
         }
     }
 
-    @Test
-    fun `update should respond with not implemented`() {
+    @ParameterizedTest
+    @ValueSource(strings = ["organization:1234:admin", "organization:1234:write"])
+    fun `update should respond with not implemented`(authority: String) {
         mockMvc.patch("/internal/catalogs/1234/data-services/5678") {
-            with(jwt())
+            with(jwt().authorities(SimpleGrantedAuthority(authority)))
             contentType = MediaType.valueOf("application/json-patch+json")
             content = """
                 [
@@ -182,6 +221,24 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
             """
         }.andExpect {
             status { isNotImplemented() }
+        }
+    }
+
+    @Test
+    fun `update should respond with forbidden`() {
+        mockMvc.patch("/internal/catalogs/1234/data-services/5678") {
+            with(jwt().authorities(SimpleGrantedAuthority("invalid")))
+            contentType = MediaType.valueOf("application/json-patch+json")
+            content = """
+                [
+                    {
+                        "op": "add",
+                        "path": "path"
+                    }
+                ]
+            """
+        }.andExpect {
+            status { isForbidden() }
         }
     }
 
@@ -258,12 +315,22 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
         }
     }
 
-    @Test
-    fun `delete should respond with not implemented`() {
+    @ParameterizedTest
+    @ValueSource(strings = ["organization:1234:admin", "organization:1234:write"])
+    fun `delete should respond with not implemented`(authority: String) {
         mockMvc.delete("/internal/catalogs/1234/data-services/5678") {
-            with(jwt())
+            with(jwt().authorities(SimpleGrantedAuthority(authority)))
         }.andExpect {
             status { isNotImplemented() }
+        }
+    }
+
+    @Test
+    fun `delete should respond with forbidden`() {
+        mockMvc.delete("/internal/catalogs/1234/data-services/5678") {
+            with(jwt().authorities(SimpleGrantedAuthority("invalid")))
+        }.andExpect {
+            status { isForbidden() }
         }
     }
 }
