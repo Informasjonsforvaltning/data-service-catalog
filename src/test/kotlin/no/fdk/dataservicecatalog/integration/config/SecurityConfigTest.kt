@@ -35,7 +35,7 @@ class SecurityConfigTest(@Autowired val mockMvc: MockMvc) {
         mockMvc.get("/catalogs") {
             with(jwt())
         }.andExpect {
-            status { isNotImplemented() }
+            status { isOk() }
         }
     }
 

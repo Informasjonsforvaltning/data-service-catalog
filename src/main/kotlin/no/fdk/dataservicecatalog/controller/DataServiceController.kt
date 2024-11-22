@@ -3,6 +3,9 @@ package no.fdk.dataservicecatalog.controller
 import jakarta.validation.Valid
 import no.fdk.dataservicecatalog.domain.DataService
 import no.fdk.dataservicecatalog.domain.PatchRequest
+import no.fdk.dataservicecatalog.exception.CatalogNotFoundException
+import no.fdk.dataservicecatalog.exception.DataServiceNotFoundException
+import no.fdk.dataservicecatalog.handler.DataServiceHandler
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ProblemDetail
@@ -10,15 +13,16 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.*
+import java.net.URI
 
 @RestController
 @RequestMapping("/internal/catalogs/{catalogId}/data-services")
-class DataServiceController {
+class DataServiceController(private val handler: DataServiceHandler) {
 
     @PreAuthorize(READ)
     @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
     fun findDataServicesByCatalogId(@PathVariable catalogId: String): ResponseEntity<List<DataService>> {
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build()
+        return handler.findAll(catalogId).let { ResponseEntity.ok(it) }
     }
 
     @PreAuthorize(READ)
@@ -26,7 +30,7 @@ class DataServiceController {
     fun findDataServiceByCatalogIdAndDataServiceId(
         @PathVariable catalogId: String, @PathVariable dataServiceId: String
     ): ResponseEntity<DataService> {
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build()
+        return handler.findById(catalogId, dataServiceId).let { ResponseEntity.ok(it) }
     }
 
     @PreAuthorize(WRITE)
@@ -34,7 +38,16 @@ class DataServiceController {
     fun registerDataServiceByCatalogId(
         @PathVariable catalogId: String, @Valid @RequestBody dataService: DataService
     ): ResponseEntity<Void> {
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build()
+        val register = handler.register(catalogId, dataService)
+
+
+
+        return handler.register(catalogId, dataService)
+            .let {
+                ResponseEntity
+                    .created(URI("/internal/catalogs/${catalogId}/data-services/${it}"))
+                    .build()
+            }
     }
 
     @PreAuthorize(WRITE)
@@ -57,7 +70,7 @@ class DataServiceController {
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build()
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException::class)
+    @ExceptionHandler
     fun handleMethodArgumentNotValidException(ex: MethodArgumentNotValidException): ResponseEntity<ProblemDetail> {
         val problemDetail = ex.body
 
@@ -70,7 +83,12 @@ class DataServiceController {
 
         problemDetail.setProperty("errors", errors)
 
-        return ResponseEntity.badRequest().body(problemDetail)
+        return ResponseEntity.of(problemDetail).build()
+    }
+
+    @ExceptionHandler(CatalogNotFoundException::class, DataServiceNotFoundException::class)
+    fun handleNotFoundException(ex: RuntimeException): ResponseEntity<ProblemDetail> {
+        return ResponseEntity.of(ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.message)).build()
     }
 
     companion object {
