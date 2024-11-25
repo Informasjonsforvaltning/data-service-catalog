@@ -9,7 +9,7 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.annotation.Version
 import org.springframework.data.mongodb.core.mapping.Document
-import java.time.Instant
+import java.time.LocalDateTime
 
 /*
 https://data.norge.no/specification/dcat-ap-no#Datatjeneste
@@ -27,11 +27,11 @@ data class DataService(
 
     @CreatedDate
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    val created: Instant? = null,
+    val created: LocalDateTime? = null,
 
     @LastModifiedDate
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    val modified: Instant? = null,
+    val modified: LocalDateTime? = null,
 
     @Version
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)

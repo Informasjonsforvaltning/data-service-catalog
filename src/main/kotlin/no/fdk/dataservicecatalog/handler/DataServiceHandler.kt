@@ -2,12 +2,14 @@ package no.fdk.dataservicecatalog.handler
 
 import no.fdk.dataservicecatalog.domain.DataService
 import no.fdk.dataservicecatalog.domain.PatchRequest
+import no.fdk.dataservicecatalog.domain.Status
 import no.fdk.dataservicecatalog.exception.CatalogNotFoundException
 import no.fdk.dataservicecatalog.exception.DataServiceNotFoundException
 import no.fdk.dataservicecatalog.repository.DataServiceRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
+import java.util.*
 
 @Component
 class DataServiceHandler(private val repository: DataServiceRepository) {
@@ -26,7 +28,32 @@ class DataServiceHandler(private val repository: DataServiceRepository) {
     }
 
     fun register(catalogId: String, dataService: DataService): String {
-        return ""
+        val id = UUID.randomUUID().toString()
+
+        val newDataService = DataService(
+            id = id,
+            catalogId = catalogId,
+            status = dataService.status ?: Status.DRAFT,
+            endpointUrl = dataService.endpointUrl,
+            titles = dataService.titles,
+            keywords = dataService.keywords,
+            endpointDescriptions = dataService.endpointDescriptions,
+            formats = dataService.formats,
+            contactPoint = dataService.contactPoint,
+            themes = dataService.themes,
+            servesDataset = dataService.servesDataset,
+            description = dataService.description,
+            pages = dataService.pages,
+            landingPage = dataService.landingPage,
+            license = dataService.license,
+            mediaTypes = dataService.mediaTypes,
+            accessRights = dataService.accessRights,
+            type = dataService.type,
+        )
+
+        repository.save(newDataService)
+
+        return id
     }
 
     fun update(catalogId: String, dataServiceId: String, patchRequest: PatchRequest): DataService {

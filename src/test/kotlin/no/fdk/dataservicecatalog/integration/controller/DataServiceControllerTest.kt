@@ -38,7 +38,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
     @ValueSource(strings = ["system:root:admin", "organization:1234:admin", "organization:1234:write", "organization:1234:read"])
     fun `find should respond with ok and payload`(authority: String) {
         handler.stub {
-            on { handler.findAll("1234") } doReturn emptyList()
+            on { findAll("1234") } doReturn emptyList()
         }
 
         mockMvc.get("/internal/catalogs/1234/data-services") {
@@ -61,7 +61,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
     @Test
     fun `find should respond with not found on exception`() {
         handler.stub {
-            on { handler.findAll("1234") } doThrow CatalogNotFoundException("Catalog 1234 not found")
+            on { findAll("1234") } doThrow CatalogNotFoundException("Catalog 1234 not found")
         }
 
         mockMvc.get("/internal/catalogs/1234/data-services") {
@@ -79,7 +79,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
     @ValueSource(strings = ["system:root:admin", "organization:1234:admin", "organization:1234:write", "organization:1234:read"])
     fun `find by id should respond with ok and payload`(authority: String) {
         handler.stub {
-            on { handler.findById("1234", "5678") } doReturn DataService(id = "5678")
+            on { findById("1234", "5678") } doReturn DataService(id = "5678")
         }
 
         mockMvc.get("/internal/catalogs/1234/data-services/5678") {
@@ -102,7 +102,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
     @Test
     fun `find by id should respond with not found on exception`() {
         handler.stub {
-            on { handler.findById("1234", "5678") } doThrow DataServiceNotFoundException("Data Service 5678 not found")
+            on { findById("1234", "5678") } doThrow DataServiceNotFoundException("Data Service 5678 not found")
         }
 
         mockMvc.get("/internal/catalogs/1234/data-services/5678") {
@@ -125,7 +125,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
         )
 
         handler.stub {
-            on { handler.register("1234", dataService) } doReturn "5678"
+            on { register("1234", dataService) } doReturn "5678"
         }
 
         mockMvc.post("/internal/catalogs/1234/data-services") {
@@ -179,7 +179,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
         )
 
         handler.stub {
-            on { handler.register("1234", dataService) } doThrow CatalogNotFoundException("Catalog 1234 not found")
+            on { register("1234", dataService) } doThrow CatalogNotFoundException("Catalog 1234 not found")
         }
 
         mockMvc.post("/internal/catalogs/1234/data-services") {
@@ -319,7 +319,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
         )
 
         handler.stub {
-            on { handler.update("1234", "5678", patchRequest) } doReturn DataService(endpointUrl = "endpointUrl")
+            on { update("1234", "5678", patchRequest) } doReturn DataService(endpointUrl = "endpointUrl")
         }
 
         mockMvc.patch("/internal/catalogs/1234/data-services/5678") {
@@ -369,7 +369,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
 
         handler.stub {
             on {
-                handler.update(
+                update(
                     "1234",
                     "5678",
                     patchRequest
@@ -492,7 +492,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
     @Test
     fun `delete should respond with not found on exception`() {
         handler.stub {
-            on { handler.delete("1234", "5678") } doThrow DataServiceNotFoundException("Data Service 5678 not found")
+            on { delete("1234", "5678") } doThrow DataServiceNotFoundException("Data Service 5678 not found")
         }
 
         mockMvc.delete("/internal/catalogs/1234/data-services/5678") {

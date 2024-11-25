@@ -67,7 +67,7 @@ class RDFControllerTest(@Autowired val mockMvc: MockMvc) {
     @Test
     fun `find should respond with ok and payload`() {
         handler.stub {
-            on { handler.findAll(Lang.N3) } doReturn "turtle"
+            on { findAll(Lang.N3) } doReturn "turtle"
         }
 
         mockMvc.get("/catalogs") {
@@ -82,7 +82,7 @@ class RDFControllerTest(@Autowired val mockMvc: MockMvc) {
     @Test
     fun `find by id should respond with ok and payload`() {
         handler.stub {
-            on { handler.findById("1234", Lang.N3) } doReturn "turtle"
+            on { findById("1234", Lang.N3) } doReturn "turtle"
         }
 
         mockMvc.get("/catalogs/1234") {
@@ -98,7 +98,7 @@ class RDFControllerTest(@Autowired val mockMvc: MockMvc) {
     @Test
     fun `find by id should respond with not found on exception`() {
         handler.stub {
-            on { handler.findById("1234", Lang.N3) } doThrow CatalogNotFoundException("Catalog 1234 not found")
+            on { findById("1234", Lang.N3) } doThrow CatalogNotFoundException("Catalog 1234 not found")
         }
 
         mockMvc.get("/catalogs/1234") {
@@ -116,7 +116,7 @@ class RDFControllerTest(@Autowired val mockMvc: MockMvc) {
     @Test
     fun `find data service by id should respond with ok and payload`() {
         handler.stub {
-            on { handler.findById("1234", "5678", Lang.N3) } doReturn "turtle"
+            on { findById("1234", "5678", Lang.N3) } doReturn "turtle"
         }
 
         mockMvc.get("/catalogs/1234/data-services/5678") {
@@ -132,7 +132,7 @@ class RDFControllerTest(@Autowired val mockMvc: MockMvc) {
     fun `find data service by id should respond with not found on exception`() {
         handler.stub {
             on {
-                handler.findById(
+                findById(
                     "1234",
                     "5678",
                     Lang.N3

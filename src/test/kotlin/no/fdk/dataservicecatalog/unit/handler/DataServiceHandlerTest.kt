@@ -3,8 +3,7 @@ package no.fdk.dataservicecatalog.unit.handler
 import no.fdk.dataservicecatalog.domain.DataService
 import no.fdk.dataservicecatalog.handler.DataServiceHandler
 import no.fdk.dataservicecatalog.repository.DataServiceRepository
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
@@ -12,6 +11,7 @@ import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.stub
+import java.util.*
 
 @ExtendWith(MockitoExtension::class)
 class DataServiceHandlerTest {
@@ -25,34 +25,54 @@ class DataServiceHandlerTest {
     @Test
     fun `find all returns list of one`() {
         repository.stub {
-            on { repository.existsByCatalogId("1234") } doReturn true
-            on { repository.findAllByCatalogIdOrderByCreatedDesc(catalogId = "1234") } doReturn listOf(
+            on { existsByCatalogId("1234") } doReturn true
+            on { findAllByCatalogIdOrderByCreatedDesc(catalogId = "1234") } doReturn listOf(
                 DataService(
                     catalogId = "1234"
                 )
             )
         }
 
-        assertEquals(1, handler.findAll("1234").size)
+        val dataServices = handler.findAll("1234")
+
+        assertEquals(1, dataServices.size)
     }
 
     @Test
     fun `find by id returns data service`() {
         repository.stub {
-            on { repository.existsByCatalogId("1234") } doReturn true
-            on { repository.findByCatalogIdAndId("1234", "5678") } doReturn DataService(catalogId = "1234")
+            on { existsByCatalogId("1234") } doReturn true
+            on { findByCatalogIdAndId("1234", "5678") } doReturn DataService(catalogId = "1234")
         }
 
-        assertNotNull(handler.findById("1234", "5678"))
+        val dataService = handler.findById("1234", "5678")
+
+        assertNotNull(dataService)
+    }
+
+    @Test
+    fun `should register data service and return id`() {
+        repository.stub {
+            on { existsByCatalogId("1234") } doReturn true
+        }
+
+        assertDoesNotThrow {
+            val dataServiceId = handler.register("1234", DataService(catalogId = "1234"))
+            assertTrue(dataServiceId.isNotBlank())
+
+            UUID.fromString(dataServiceId)
+        }
     }
 
     @Test
     fun `should delete data service`() {
         repository.stub {
-            on { repository.existsByCatalogId("1234") } doReturn true
-            on { repository.existsById("5678") } doReturn true
+            on { existsByCatalogId("1234") } doReturn true
+            on { existsById("5678") } doReturn true
         }
 
-        handler.delete("1234", "5678")
+        assertDoesNotThrow {
+            handler.delete("1234", "5678")
+        }
     }
 }

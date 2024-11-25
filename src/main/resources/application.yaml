@@ -53,6 +53,7 @@ spring:
       host: localhost
       username: root
       password: secret
+      authentication-database: admin
       replica-set-name: null
   security:
     oauth2:
