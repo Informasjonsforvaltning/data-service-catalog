@@ -38,10 +38,6 @@ class DataServiceController(private val handler: DataServiceHandler) {
     fun registerDataServiceByCatalogId(
         @PathVariable catalogId: String, @Valid @RequestBody dataService: DataService
     ): ResponseEntity<Void> {
-        val register = handler.register(catalogId, dataService)
-
-
-
         return handler.register(catalogId, dataService)
             .let {
                 ResponseEntity
@@ -59,7 +55,8 @@ class DataServiceController(private val handler: DataServiceHandler) {
         @PathVariable dataServiceId: String,
         @Valid @RequestBody patchRequest: PatchRequest
     ): ResponseEntity<DataService> {
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build()
+        return handler.update(catalogId, dataServiceId, patchRequest)
+            .let { ResponseEntity.ok(it) }
     }
 
     @PreAuthorize(WRITE)
@@ -67,7 +64,12 @@ class DataServiceController(private val handler: DataServiceHandler) {
     fun deleteDataServiceByCatalogIdAndDataServiceId(
         @PathVariable catalogId: String, @PathVariable dataServiceId: String
     ): ResponseEntity<Void> {
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build()
+        return handler.delete(catalogId, dataServiceId)
+            .let {
+                ResponseEntity
+                    .noContent()
+                    .build()
+            }
     }
 
     @ExceptionHandler
