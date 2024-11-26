@@ -4,8 +4,7 @@ import no.fdk.dataservicecatalog.config.JacksonConfig
 import no.fdk.dataservicecatalog.config.SecurityConfig
 import no.fdk.dataservicecatalog.controller.DataServiceController
 import no.fdk.dataservicecatalog.domain.*
-import no.fdk.dataservicecatalog.exception.CatalogNotFoundException
-import no.fdk.dataservicecatalog.exception.DataServiceNotFoundException
+import no.fdk.dataservicecatalog.exception.NotFoundException
 import no.fdk.dataservicecatalog.handler.DataServiceHandler
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -61,7 +60,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
     @Test
     fun `find should respond with not found on exception`() {
         handler.stub {
-            on { findAll("1234") } doThrow CatalogNotFoundException("Catalog 1234 not found")
+            on { findAll("1234") } doThrow NotFoundException("Catalog 1234 not found")
         }
 
         mockMvc.get("/internal/catalogs/1234/data-services") {
@@ -102,7 +101,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
     @Test
     fun `find by id should respond with not found on exception`() {
         handler.stub {
-            on { findById("1234", "5678") } doThrow DataServiceNotFoundException("Data Service 5678 not found")
+            on { findById("1234", "5678") } doThrow NotFoundException("Data Service 5678 not found")
         }
 
         mockMvc.get("/internal/catalogs/1234/data-services/5678") {
@@ -179,7 +178,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
         )
 
         handler.stub {
-            on { register("1234", dataService) } doThrow CatalogNotFoundException("Catalog 1234 not found")
+            on { register("1234", dataService) } doThrow NotFoundException("Catalog 1234 not found")
         }
 
         mockMvc.post("/internal/catalogs/1234/data-services") {
@@ -324,7 +323,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
 
         mockMvc.patch("/internal/catalogs/1234/data-services/5678") {
             with(jwt().authorities(SimpleGrantedAuthority(authority)))
-            contentType = MediaType.valueOf("application/json-patch+json")
+            contentType = MediaType.APPLICATION_JSON
             content = """
                 [
                     {
@@ -342,7 +341,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
     fun `update should respond with forbidden on invalid authority`() {
         mockMvc.patch("/internal/catalogs/1234/data-services/5678") {
             with(jwt().authorities(SimpleGrantedAuthority("invalid")))
-            contentType = MediaType.valueOf("application/json-patch+json")
+            contentType = MediaType.APPLICATION_JSON
             content = """
                 [
                     {
@@ -374,12 +373,12 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
                     "5678",
                     patchRequest
                 )
-            } doThrow DataServiceNotFoundException("Data Service 5678 not found")
+            } doThrow NotFoundException("Data Service 5678 not found")
         }
 
         mockMvc.patch("/internal/catalogs/1234/data-services/5678") {
             with(jwt().authorities(SimpleGrantedAuthority("organization:1234:admin")))
-            contentType = MediaType.valueOf("application/json-patch+json")
+            contentType = MediaType.APPLICATION_JSON
             content = """
                 [
                     {
@@ -401,7 +400,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
     fun `update should respond with bad request on invalid op in payload`() {
         mockMvc.patch("/internal/catalogs/1234/data-services/5678") {
             with(jwt())
-            contentType = MediaType.valueOf("application/json-patch+json")
+            contentType = MediaType.APPLICATION_JSON
             content = """
                 [
                     {
@@ -425,7 +424,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
     fun `update should respond with bad request on missing op in payload`() {
         mockMvc.patch("/internal/catalogs/1234/data-services/5678") {
             with(jwt())
-            contentType = MediaType.valueOf("application/json-patch+json")
+            contentType = MediaType.APPLICATION_JSON
             content = """
                 [
                     {
@@ -449,7 +448,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
     fun `update should respond with bad request on missing path in payload`() {
         mockMvc.patch("/internal/catalogs/1234/data-services/5678") {
             with(jwt())
-            contentType = MediaType.valueOf("application/json-patch+json")
+            contentType = MediaType.APPLICATION_JSON
             content = """
                 [
                     {
@@ -492,7 +491,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
     @Test
     fun `delete should respond with not found on exception`() {
         handler.stub {
-            on { delete("1234", "5678") } doThrow DataServiceNotFoundException("Data Service 5678 not found")
+            on { delete("1234", "5678") } doThrow NotFoundException("Data Service 5678 not found")
         }
 
         mockMvc.delete("/internal/catalogs/1234/data-services/5678") {

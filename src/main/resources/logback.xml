@@ -19,7 +19,9 @@
                     <fieldName>shortMessage</fieldName>
                 </message>
                 <pattern>
-                    <pattern>{ "message": "%exception%message", "serviceContext": { "service": "data-service-catalog" } }</pattern>
+                    <pattern>{ "message": "%exception%message", "serviceContext": { "service": "data-service-catalog" }
+                        }
+                    </pattern>
                 </pattern>
             </providers>
         </encoder>
@@ -30,14 +32,14 @@
     </appender>
 
     <logger name="no.fdk" level="debug" additivity="false">
-        <appender-ref ref="${LOG_FORMAT:-json-async}" />
+        <appender-ref ref="${LOG_FORMAT:-json-async}"/>
     </logger>
 
     <logger name="org.apache.jena.riot" level="error" additivity="false">
-        <appender-ref ref="${LOG_FORMAT:-json-async}" />
+        <appender-ref ref="${LOG_FORMAT:-json-async}"/>
     </logger>
 
     <root level="warn">
-        <appender-ref ref="${LOG_FORMAT:-json-async}" />
+        <appender-ref ref="${LOG_FORMAT:-json-async}"/>
     </root>
 </configuration>

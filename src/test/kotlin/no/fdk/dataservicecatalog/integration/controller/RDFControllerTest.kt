@@ -12,8 +12,7 @@ import no.fdk.dataservicecatalog.controller.RDFController.Companion.RDF_XML
 import no.fdk.dataservicecatalog.controller.RDFController.Companion.TRIG
 import no.fdk.dataservicecatalog.controller.RDFController.Companion.TRIX
 import no.fdk.dataservicecatalog.controller.RDFController.Companion.TURTLE
-import no.fdk.dataservicecatalog.exception.CatalogNotFoundException
-import no.fdk.dataservicecatalog.exception.DataServiceNotFoundException
+import no.fdk.dataservicecatalog.exception.NotFoundException
 import no.fdk.dataservicecatalog.handler.RDFHandler
 import org.apache.jena.riot.Lang
 import org.junit.jupiter.api.Tag
@@ -98,7 +97,7 @@ class RDFControllerTest(@Autowired val mockMvc: MockMvc) {
     @Test
     fun `find by id should respond with not found on exception`() {
         handler.stub {
-            on { findById("1234", Lang.N3) } doThrow CatalogNotFoundException("Catalog 1234 not found")
+            on { findById("1234", Lang.N3) } doThrow NotFoundException("Catalog 1234 not found")
         }
 
         mockMvc.get("/catalogs/1234") {
@@ -137,7 +136,7 @@ class RDFControllerTest(@Autowired val mockMvc: MockMvc) {
                     "5678",
                     Lang.N3
                 )
-            } doThrow DataServiceNotFoundException("Data Service 5678 not found")
+            } doThrow NotFoundException("Data Service 5678 not found")
         }
 
         mockMvc.get("/catalogs/1234/data-services/5678") {

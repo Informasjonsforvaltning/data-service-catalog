@@ -9,8 +9,7 @@ import no.fdk.dataservicecatalog.controller.RDFController.Companion.RDF_XML
 import no.fdk.dataservicecatalog.controller.RDFController.Companion.TRIG
 import no.fdk.dataservicecatalog.controller.RDFController.Companion.TRIX
 import no.fdk.dataservicecatalog.controller.RDFController.Companion.TURTLE
-import no.fdk.dataservicecatalog.exception.CatalogNotFoundException
-import no.fdk.dataservicecatalog.exception.DataServiceNotFoundException
+import no.fdk.dataservicecatalog.exception.NotFoundException
 import no.fdk.dataservicecatalog.handler.RDFHandler
 import org.apache.jena.riot.Lang
 import org.apache.jena.riot.RDFLanguages
@@ -69,8 +68,8 @@ class RDFController(private val handler: RDFHandler) {
         }
     }
 
-    @ExceptionHandler(CatalogNotFoundException::class, DataServiceNotFoundException::class)
-    fun handleNotFoundException(ex: RuntimeException): ResponseEntity<ProblemDetail> {
+    @ExceptionHandler
+    fun handleNotFoundException(ex: NotFoundException): ResponseEntity<ProblemDetail> {
         return ResponseEntity.of(ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.message)).build()
     }
 }

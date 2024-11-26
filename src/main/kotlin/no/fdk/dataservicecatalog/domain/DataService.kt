@@ -1,6 +1,5 @@
 package no.fdk.dataservicecatalog.domain
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotEmpty
@@ -22,19 +21,15 @@ data class DataService(
     identifikator (dct:identifier)
      */
     @Id
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     val id: String? = null,
 
     @CreatedDate
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     val created: LocalDateTime? = null,
 
     @LastModifiedDate
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     val modified: LocalDateTime? = null,
 
     @Version
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     val version: Int? = null,
 
     val catalogId: String? = null,

@@ -11,5 +11,5 @@ interface DataServiceRepository : MongoRepository<DataService, String> {
 
     fun findAllByCatalogIdOrderByCreatedDesc(catalogId: String): List<DataService>
 
-    fun findByCatalogIdAndId(dataServiceId: String, catalogId: String): DataService?
+    fun findByCatalogIdAndId(catalogId: String, dataServiceId: String): DataService?
 }
