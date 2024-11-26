@@ -80,11 +80,13 @@ class RDFControllerTest(@Autowired val mockMvc: MockMvc) {
 
     @Test
     fun `find by id should respond with ok and payload`() {
+        val catalogId = "1234"
+
         handler.stub {
-            on { findById("1234", Lang.N3) } doReturn "turtle"
+            on { findById(catalogId, Lang.N3) } doReturn "turtle"
         }
 
-        mockMvc.get("/catalogs/1234") {
+        mockMvc.get("/catalogs/$catalogId") {
             with(jwt())
             accept = MediaType.valueOf(N3)
         }.andExpect {
@@ -96,11 +98,13 @@ class RDFControllerTest(@Autowired val mockMvc: MockMvc) {
 
     @Test
     fun `find by id should respond with not found on exception`() {
+        val catalogId = "1234"
+
         handler.stub {
-            on { findById("1234", Lang.N3) } doThrow NotFoundException("Catalog 1234 not found")
+            on { findById(catalogId, Lang.N3) } doThrow NotFoundException("Catalog $catalogId not found")
         }
 
-        mockMvc.get("/catalogs/1234") {
+        mockMvc.get("/catalogs/$catalogId") {
             with(jwt())
             accept = MediaType.valueOf(N3)
         }.andExpect {
@@ -108,17 +112,20 @@ class RDFControllerTest(@Autowired val mockMvc: MockMvc) {
             header {
                 string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
             }
-            jsonPath("$.detail") { value("Catalog 1234 not found") }
+            jsonPath("$.detail") { value("Catalog $catalogId not found") }
         }
     }
 
     @Test
     fun `find data service by id should respond with ok and payload`() {
+        val catalogId = "1234"
+        val dataServiceId = "5678"
+
         handler.stub {
-            on { findById("1234", "5678", Lang.N3) } doReturn "turtle"
+            on { findById(catalogId, dataServiceId, Lang.N3) } doReturn "turtle"
         }
 
-        mockMvc.get("/catalogs/1234/data-services/5678") {
+        mockMvc.get("/catalogs/$catalogId/data-services/$dataServiceId") {
             with(jwt())
             accept = MediaType.valueOf(N3)
         }.andExpect {
@@ -129,17 +136,16 @@ class RDFControllerTest(@Autowired val mockMvc: MockMvc) {
 
     @Test
     fun `find data service by id should respond with not found on exception`() {
+        val catalogId = "1234"
+        val dataServiceId = "5678"
+
         handler.stub {
             on {
-                findById(
-                    "1234",
-                    "5678",
-                    Lang.N3
-                )
-            } doThrow NotFoundException("Data Service 5678 not found")
+                findById(catalogId, dataServiceId, Lang.N3)
+            } doThrow NotFoundException("Data Service $dataServiceId not found")
         }
 
-        mockMvc.get("/catalogs/1234/data-services/5678") {
+        mockMvc.get("/catalogs/$catalogId/data-services/$dataServiceId") {
             with(jwt())
             accept = MediaType.valueOf(N3)
         }.andExpect {
@@ -147,7 +153,7 @@ class RDFControllerTest(@Autowired val mockMvc: MockMvc) {
             header {
                 string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
             }
-            jsonPath("$.detail") { value("Data Service 5678 not found") }
+            jsonPath("$.detail") { value("Data Service $dataServiceId not found") }
         }
     }
 }

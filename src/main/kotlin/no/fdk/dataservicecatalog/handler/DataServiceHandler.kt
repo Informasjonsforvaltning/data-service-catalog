@@ -14,40 +14,33 @@ import java.util.*
 class DataServiceHandler(private val repository: DataServiceRepository) {
 
     fun findAll(catalogId: String): List<DataService> {
-        return repository.existsByCatalogId(catalogId)
-            .takeIf { it }
-            ?.let { repository.findAllByCatalogIdOrderByCreatedDesc(catalogId) }
-            ?: throw NotFoundException("Catalog with id: $catalogId not found")
+        return repository.findAllByCatalogIdOrderByCreatedDesc(catalogId)
     }
 
     fun findById(catalogId: String, dataServiceId: String): DataService {
-        if (!repository.existsByCatalogId(catalogId)) {
-            throw NotFoundException("Catalog with id: $catalogId not found")
-        }
-
-        return repository.findByCatalogIdAndId(catalogId, dataServiceId)
-            ?: throw NotFoundException("Data Service with id: $dataServiceId not found")
+        return repository.findDataServiceById(dataServiceId)
+            ?.takeIf { it.catalogId == catalogId }
+            ?: throw NotFoundException("Data Service with id: $dataServiceId not found in Catalog with id: $catalogId")
     }
 
     fun register(catalogId: String, dataService: DataService): String {
-        return UUID.randomUUID().toString().also {
-            repository.insert(
-                dataService.copy(
-                    id = it,
-                    catalogId = catalogId,
-                    status = dataService.status ?: Status.DRAFT
-                )
+        val id = UUID.randomUUID().toString()
+
+        repository.insert(
+            dataService.copy(
+                id = id,
+                catalogId = catalogId,
+                status = dataService.status ?: Status.DRAFT
             )
-        }
+        )
+
+        return id
     }
 
     fun update(catalogId: String, dataServiceId: String, patchRequest: PatchRequest): DataService {
-        if (!repository.existsByCatalogId(catalogId)) {
-            throw NotFoundException("Catalog with id: $catalogId not found")
-        }
-
-        val dataService = repository.findByCatalogIdAndId(catalogId, dataServiceId)
-            ?: throw NotFoundException("Data Service with id: $dataServiceId not found")
+        val dataService = repository.findDataServiceById(dataServiceId)
+            ?.takeIf { it.catalogId == catalogId }
+            ?: throw NotFoundException("Data Service with id: $dataServiceId not found in Catalog with id: $catalogId")
 
         val patchedDataService = patchRequest.patchOperations?.let { operations ->
             patchOriginal(dataService, operations)
@@ -59,15 +52,11 @@ class DataServiceHandler(private val repository: DataServiceRepository) {
     }
 
     fun delete(catalogId: String, dataServiceId: String) {
-        if (!repository.existsByCatalogId(catalogId)) {
-            throw NotFoundException("Catalog with id: $catalogId not found")
-        }
+        val dataService = (repository.findDataServiceById(dataServiceId)
+            ?.takeIf { it.catalogId == catalogId }
+            ?: throw NotFoundException("Data Service with id: $dataServiceId not found in Catalog with id: $catalogId"))
 
-        if (!repository.existsById(dataServiceId)) {
-            throw NotFoundException("Data Service with id: $dataServiceId not found")
-        }
-
-        repository.deleteById(dataServiceId)
+        repository.delete(dataService)
 
         logger.info("Deleted Data Service with id: $dataServiceId in Catalog with id: $catalogId")
     }

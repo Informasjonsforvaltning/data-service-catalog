@@ -4,10 +4,10 @@ import no.fdk.dataservicecatalog.domain.DataService
 import no.fdk.dataservicecatalog.domain.JsonPatchOperation
 import no.fdk.dataservicecatalog.domain.OpEnum
 import no.fdk.dataservicecatalog.domain.PatchRequest
+import no.fdk.dataservicecatalog.exception.NotFoundException
 import no.fdk.dataservicecatalog.handler.DataServiceHandler
 import no.fdk.dataservicecatalog.repository.DataServiceRepository
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
@@ -32,7 +32,6 @@ class DataServiceHandlerTest {
         val catalogId = "1234"
 
         repository.stub {
-            on { existsByCatalogId(catalogId) } doReturn true
             on { findAllByCatalogIdOrderByCreatedDesc(catalogId) } doReturn listOf(
                 DataService(catalogId = catalogId)
             )
@@ -49,8 +48,7 @@ class DataServiceHandlerTest {
         val dataServiceId = "5678"
 
         repository.stub {
-            on { existsByCatalogId(catalogId) } doReturn true
-            on { findByCatalogIdAndId(catalogId, dataServiceId) } doReturn DataService(
+            on { findDataServiceById(dataServiceId) } doReturn DataService(
                 id = dataServiceId,
                 catalogId = catalogId
             )
@@ -59,6 +57,23 @@ class DataServiceHandlerTest {
         val dataService = handler.findById(catalogId, dataServiceId)
 
         assertEquals(dataServiceId, dataService.id)
+    }
+
+    @Test
+    fun `find by id throws exception on invalid catalog id`() {
+        val catalogId = "1234"
+        val dataServiceId = "5678"
+
+        repository.stub {
+            on { findDataServiceById(dataServiceId) } doReturn DataService(
+                id = dataServiceId,
+                catalogId = "invalid_catalog id"
+            )
+        }
+
+        assertThrows(NotFoundException::class.java) {
+            handler.findById(catalogId, dataServiceId)
+        }
     }
 
     @Test
@@ -88,8 +103,7 @@ class DataServiceHandlerTest {
         )
 
         repository.stub {
-            on { existsByCatalogId(catalogId) } doReturn true
-            on { findByCatalogIdAndId(catalogId, dataServiceId) } doReturn dataService
+            on { findDataServiceById(dataServiceId) } doReturn dataService
             on { save(patchedDataService) } doReturn patchedDataService
         }
 
@@ -109,17 +123,53 @@ class DataServiceHandlerTest {
     }
 
     @Test
+    fun `update throws exception on invalid catalog id`() {
+        val catalogId = "1234"
+        val dataServiceId = "5678"
+
+        repository.stub {
+            on { findDataServiceById(dataServiceId) } doReturn DataService(
+                id = dataServiceId,
+                catalogId = "invalid catalog id",
+            )
+        }
+
+        assertThrows(NotFoundException::class.java) {
+            handler.update(catalogId, dataServiceId, PatchRequest())
+        }
+    }
+
+    @Test
     fun `should delete data service`() {
         val catalogId = "1234"
         val dataServiceId = "5678"
 
         repository.stub {
-            on { existsByCatalogId(catalogId) } doReturn true
-            on { existsById(dataServiceId) } doReturn true
+            on { findDataServiceById(dataServiceId) } doReturn DataService(
+                id = dataServiceId,
+                catalogId = catalogId,
+            )
         }
 
         handler.delete(catalogId, dataServiceId)
 
-        verify(repository).deleteById(dataServiceId)
+        verify(repository).delete(any<DataService>())
+    }
+
+    @Test
+    fun `delete throws exception on invalid catalog id`() {
+        val catalogId = "1234"
+        val dataServiceId = "5678"
+
+        repository.stub {
+            on { findDataServiceById(dataServiceId) } doReturn DataService(
+                id = dataServiceId,
+                catalogId = "invalid catalog id",
+            )
+        }
+
+        assertThrows(NotFoundException::class.java) {
+            handler.delete(catalogId, dataServiceId)
+        }
     }
 }

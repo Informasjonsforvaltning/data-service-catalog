@@ -3,7 +3,7 @@ package no.fdk.dataservicecatalog.integration.repository
 import no.fdk.dataservicecatalog.domain.DataService
 import no.fdk.dataservicecatalog.integration.MongoDBTestcontainer
 import no.fdk.dataservicecatalog.repository.DataServiceRepository
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -23,28 +23,25 @@ class DataServiceRepositoryTest(
 ) {
 
     @Test
-    fun `find all by catalog id should return list of one`() {
+    fun `find all by catalog id`() {
+        val catalogId = "1234"
+
         operations.insertAll(
             listOf(
-                DataService(catalogId = "1234"),
+                DataService(catalogId = catalogId),
                 DataService(catalogId = "5678")
             )
         )
 
-        assertEquals(1, repository.findAllByCatalogIdOrderByCreatedDesc("1234").size)
+        assertEquals(1, repository.findAllByCatalogIdOrderByCreatedDesc(catalogId).size)
     }
 
     @Test
-    fun `find by catalog id and data service id should return data service`() {
-        val dataService = operations.insert(DataService(catalogId = "1234"))
+    fun `find by data service id`() {
+        val dataServiceId = "1234"
 
-        assertNotNull(repository.findByCatalogIdAndId("1234", dataService.id!!))
-    }
+        operations.insert(DataService(id = dataServiceId))
 
-    @Test
-    fun `exists by catalog id should return true`() {
-        operations.insert(DataService(catalogId = "1234"))
-
-        assertTrue(repository.existsByCatalogId("1234"))
+        assertEquals(dataServiceId, repository.findDataServiceById(dataServiceId)?.id)
     }
 }

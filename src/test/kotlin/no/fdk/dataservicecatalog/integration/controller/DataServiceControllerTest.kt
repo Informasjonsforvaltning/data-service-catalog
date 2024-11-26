@@ -57,23 +57,6 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
         }
     }
 
-    @Test
-    fun `find should respond with not found on exception`() {
-        handler.stub {
-            on { findAll("1234") } doThrow NotFoundException("Catalog 1234 not found")
-        }
-
-        mockMvc.get("/internal/catalogs/1234/data-services") {
-            with(jwt().authorities(SimpleGrantedAuthority("system:root:admin")))
-        }.andExpect {
-            status { isNotFound() }
-            header {
-                string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
-            }
-            jsonPath("$.detail") { value("Catalog 1234 not found") }
-        }
-    }
-
     @ParameterizedTest
     @ValueSource(strings = ["system:root:admin", "organization:1234:admin", "organization:1234:write", "organization:1234:read"])
     fun `find by id should respond with ok and payload`(authority: String) {
