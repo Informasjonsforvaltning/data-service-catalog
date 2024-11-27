@@ -32,7 +32,7 @@ class DataServiceHandlerTest {
         val catalogId = "1234"
 
         repository.stub {
-            on { findAllByCatalogIdOrderByCreatedDesc(catalogId) } doReturn listOf(
+            on { findAllByCatalogId(catalogId) } doReturn listOf(
                 DataService(catalogId = catalogId)
             )
         }

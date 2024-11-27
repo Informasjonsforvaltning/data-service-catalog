@@ -14,7 +14,7 @@ import java.util.*
 class DataServiceHandler(private val repository: DataServiceRepository) {
 
     fun findAll(catalogId: String): List<DataService> {
-        return repository.findAllByCatalogIdOrderByCreatedDesc(catalogId)
+        return repository.findAllByCatalogId(catalogId)
     }
 
     fun findById(catalogId: String, dataServiceId: String): DataService {
