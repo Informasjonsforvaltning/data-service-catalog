@@ -15,12 +15,12 @@ import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.stub
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.*
 
 @Tag("integration")
@@ -30,7 +30,7 @@ import org.springframework.test.web.servlet.*
 @WebMvcTest(controllers = [DataServiceController::class])
 class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
 
-    @MockBean
+    @MockitoBean
     lateinit var handler: DataServiceHandler
 
     @ParameterizedTest

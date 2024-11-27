@@ -24,11 +24,11 @@ import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.stub
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 
@@ -39,7 +39,7 @@ import org.springframework.test.web.servlet.get
 @WebMvcTest(controllers = [RDFController::class])
 class RDFControllerTest(@Autowired val mockMvc: MockMvc) {
 
-    @MockBean
+    @MockitoBean
     lateinit var handler: RDFHandler
 
     @ParameterizedTest
