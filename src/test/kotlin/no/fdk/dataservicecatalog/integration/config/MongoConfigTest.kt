@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest
 import org.springframework.context.annotation.Import
 import org.springframework.data.mongodb.core.MongoOperations
+import org.springframework.data.mongodb.core.index.IndexOperations
 import org.springframework.test.context.ActiveProfiles
 
 @Tag("integration")
@@ -16,13 +17,17 @@ import org.springframework.test.context.ActiveProfiles
 
 @DataMongoTest
 @Import(MongoDBTestcontainer::class)
-class MongoConfigTest(@Autowired val mongoTemplate: MongoOperations) {
+class MongoConfigTest(@Autowired val operations: MongoOperations) {
 
     @Test
-    fun `should connect to database and create index`() {
-        val hasCatalogIdIndex = mongoTemplate.indexOps(DataService::class.java)
-            .indexInfo.any { idx -> idx.isIndexForFields(listOf("catalogId")) }
+    fun `should connect to database and create indexes`() {
+        val indexOps = operations.indexOps(DataService::class.java)
 
-        assertTrue(hasCatalogIdIndex)
+        assertTrue(hasIndex(indexOps, listOf("catalogId")))
+        assertTrue(hasIndex(indexOps, listOf("status")))
+        assertTrue(hasIndex(indexOps, listOf("catalogId", "status")))
     }
+
+    private fun hasIndex(indexOps: IndexOperations, name: List<String>) =
+        indexOps.indexInfo.any { idx -> idx.isIndexForFields(name) }
 }
