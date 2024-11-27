@@ -27,6 +27,7 @@ spring:
       replica-set-name: ${MONGODB_REPLICASET}
       port: 27017
       database: dataServiceCatalog
+      auto-index-creation: true
   security:
     oauth2:
       resourceserver:

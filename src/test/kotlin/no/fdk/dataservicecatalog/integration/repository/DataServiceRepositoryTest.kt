@@ -33,7 +33,7 @@ class DataServiceRepositoryTest(
             )
         )
 
-        assertEquals(1, repository.findAllByCatalogIdOrderByCreatedDesc(catalogId).size)
+        assertEquals(1, repository.findAllByCatalogId(catalogId).size)
     }
 
     @Test

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository
 @Repository
 interface DataServiceRepository : MongoRepository<DataService, String> {
 
-    fun findAllByCatalogIdOrderByCreatedDesc(catalogId: String): List<DataService>
+    fun findAllByCatalogId(catalogId: String): List<DataService>
 
     fun findDataServiceById(dataServiceId: String): DataService?
 }
