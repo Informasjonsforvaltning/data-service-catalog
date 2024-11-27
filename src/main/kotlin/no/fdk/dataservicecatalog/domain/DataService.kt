@@ -1,27 +1,46 @@
 package no.fdk.dataservicecatalog.domain
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotEmpty
+import org.springframework.data.annotation.CreatedDate
+import org.springframework.data.annotation.Id
+import org.springframework.data.annotation.LastModifiedDate
+import org.springframework.data.annotation.Version
+import org.springframework.data.mongodb.core.mapping.Document
+import java.time.LocalDateTime
 
 /*
 https://data.norge.no/specification/dcat-ap-no#Datatjeneste
  */
 
+@Document(collection = "dataServices")
 data class DataService(
+
+    /*
+    identifikator (dct:identifier)
+     */
+    @Id
+    val id: String? = null,
+
+    @CreatedDate
+    val created: LocalDateTime? = null,
+
+    @LastModifiedDate
+    val modified: LocalDateTime? = null,
+
+    @Version
+    val version: Int? = null,
+
+    val catalogId: String? = null,
+
+    val status: Status? = null,
 
     /*
     endepunktsURL (dcat:endpointURL)
      */
     @field:NotBlank(message = "Cannot be null or blank")
     val endpointUrl: String? = null,
-
-    /*
-    identifikator (dct:identifier)
-     */
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    val identifier: String? = null,
 
     /*
     tittel (dct:title)
@@ -118,3 +137,7 @@ data class License(
     val name: String? = null,
     val url: String? = null
 )
+
+enum class Status {
+    DRAFT, PUBLISHED
+}
