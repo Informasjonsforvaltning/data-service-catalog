@@ -97,7 +97,7 @@ class RDFHandlerTest {
                     dcat:endpointURL          <http://example.com>;
                     dcat:keyword              "keyword"@en;
                     dcat:landingPage          <http://landing-page.com>;
-                    dcat:mediaType            <https://www.iana.org/assignments/media-types/application/xml> , <https://www.iana.org/assignments/media-types/application/json>;
+                    dcat:mediaType            <https://www.iana.org/assignments/media-types/application/json>;
                     dcat:servesDataset        <http://serves-dataset.com>;
                     foaf:page                 <http://page.com> .
 
@@ -196,7 +196,7 @@ class RDFHandlerTest {
                     dcat:endpointURL          <http://example.com>;
                     dcat:keyword              "keyword"@en;
                     dcat:landingPage          <http://landing-page.com>;
-                    dcat:mediaType            <https://www.iana.org/assignments/media-types/application/xml> , <https://www.iana.org/assignments/media-types/application/json>;
+                    dcat:mediaType            <https://www.iana.org/assignments/media-types/application/json>;
                     dcat:servesDataset        <http://serves-dataset.com>;
                     foaf:page                 <http://page.com> .
 
@@ -283,7 +283,7 @@ class RDFHandlerTest {
                     dcat:endpointURL          <http://example.com>;
                     dcat:keyword              "keyword"@en;
                     dcat:landingPage          <http://landing-page.com>;
-                    dcat:mediaType            <https://www.iana.org/assignments/media-types/application/xml> , <https://www.iana.org/assignments/media-types/application/json>;
+                    dcat:mediaType            <https://www.iana.org/assignments/media-types/application/json>;
                     dcat:servesDataset        <http://serves-dataset.com>;
                     foaf:page                 <http://page.com> .
         """
@@ -329,9 +329,7 @@ class RDFHandlerTest {
             name = "name",
             url = "http://license.com"
         ),
-        mediaTypes = listOf(
-            "https://www.iana.org/assignments/media-types/application/json", "application/xml"
-        ),
+        mediaTypes = listOf("https://www.iana.org/assignments/media-types/application/json"),
         accessRights = "http://access-rights.com",
         type = "http://type.com"
     )

@@ -69,8 +69,6 @@ class SecurityConfig(@Value("\${application.cors.originPatterns}") val corsOrigi
 
         return jwtDecoder
     }
-
-    companion object {
-        private val logger: Logger = LoggerFactory.getLogger(SecurityConfig::class.java)
-    }
 }
+
+private val logger: Logger = LoggerFactory.getLogger(SecurityConfig::class.java)

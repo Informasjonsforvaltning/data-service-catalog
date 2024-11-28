@@ -1,5 +1,6 @@
 package no.fdk.dataservicecatalog.handler
 
+import no.fdk.dataservicecatalog.config.SecurityConfig
 import no.fdk.dataservicecatalog.domain.DataService
 import no.fdk.dataservicecatalog.domain.Status
 import no.fdk.dataservicecatalog.exception.NotFoundException
@@ -12,6 +13,8 @@ import org.apache.jena.sparql.vocabulary.FOAF
 import org.apache.jena.util.FileUtils
 import org.apache.jena.util.URIref
 import org.apache.jena.vocabulary.*
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import java.io.StringWriter
 
@@ -92,6 +95,10 @@ class RDFHandler(private val repository: DataServiceRepository, private val prop
 
     private fun getPublisherUri(): String {
         return "https://data.brreg.no/enhetsregisteret/api/enheter/"
+    }
+
+    companion object {
+        private val logger: Logger = LoggerFactory.getLogger(SecurityConfig::class.java)
     }
 }
 
@@ -240,14 +247,13 @@ fun Model.addDataService(dataService: DataService, dataServiceUri: String) {
     }
 
     dataService.mediaTypes?.filter(String::isNotBlank)?.forEach { type ->
-        dataServiceResource.addProperty(
-            DCAT.mediaType, ResourceFactory.createResource(
-                URIref.encode(
-                    if (type.startsWith("https://www.iana.org/assignments/media-types/")) type
-                    else "https://www.iana.org/assignments/media-types/$type"
-                )
+        if (type.startsWith("https://www.iana.org/assignments/media-types/")) {
+            dataServiceResource.addProperty(
+                DCAT.mediaType, ResourceFactory.createResource(URIref.encode(type))
             )
-        )
+        } else {
+            logger.warn("Non iana media type {} on data service {} was skipped", type, dataService.id)
+        }
     }
 
     dataService.accessRights?.takeIf(FileUtils::isURI)?.let {
@@ -269,3 +275,5 @@ fun Model.serialize(lang: Lang): String {
 
     return stringWriter.buffer.toString()
 }
+
+private val logger: Logger = LoggerFactory.getLogger(RDFHandler::class.java)

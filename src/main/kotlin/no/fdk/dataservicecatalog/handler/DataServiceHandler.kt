@@ -60,8 +60,6 @@ class DataServiceHandler(private val repository: DataServiceRepository) {
 
         logger.info("Deleted Data Service with id: $dataServiceId in Catalog with id: $catalogId")
     }
-
-    companion object {
-        private val logger: Logger = LoggerFactory.getLogger(DataServiceHandler::class.java)
-    }
 }
+
+private val logger: Logger = LoggerFactory.getLogger(DataServiceHandler::class.java)
