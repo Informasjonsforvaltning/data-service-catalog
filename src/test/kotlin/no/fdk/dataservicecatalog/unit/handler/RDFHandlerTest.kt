@@ -47,7 +47,7 @@ class RDFHandlerTest {
             on { findAllByStatus(Status.PUBLISHED) } doReturn emptyList()
         }
 
-        val catalogs = handler.findAll(Lang.TURTLE)
+        val catalogs = handler.findCatalogs(Lang.TURTLE)
 
         val actualModel = ModelFactory.createDefaultModel()
         actualModel.read(StringReader(catalogs), null, Lang.TURTLE.name)
@@ -76,7 +76,7 @@ class RDFHandlerTest {
                     <http://www.w3.org/2002/07/owl#sameAs>
                             "https://data.brreg.no/enhetsregisteret/api/enheter/$catalogId" .
             
-            <$baseUri/data-services/$dataServiceId>
+            <$baseUri/catalogs/$catalogId/data-services/$dataServiceId>
                     rdf:type                  dcat:DataService;
                     dct:accessRights          <http://access-rights.com>;
                     dct:description           "description"@en;
@@ -104,7 +104,7 @@ class RDFHandlerTest {
             <$baseUri/catalogs/$catalogId>  rdf:type  dcat:Catalog;
                     dct:publisher  <$organizationCatalogBaseUri/organizations/$catalogId>;
                     dct:title      "Data service catalog ($catalogId)"@en;
-                    dcat:service   <$baseUri/data-services/$dataServiceId> .
+                    dcat:service   <$baseUri/catalogs/$catalogId/data-services/$dataServiceId> .
         """
 
         val expectedModel = ModelFactory.createDefaultModel()
@@ -119,7 +119,7 @@ class RDFHandlerTest {
             on { this.organizationCatalogBaseUri } doReturn organizationCatalogBaseUri
         }
 
-        val catalogs = handler.findAll(Lang.TURTLE)
+        val catalogs = handler.findCatalogs(Lang.TURTLE)
 
         val actualModel = ModelFactory.createDefaultModel()
         actualModel.read(StringReader(catalogs), null, Lang.TURTLE.name)
@@ -146,7 +146,7 @@ class RDFHandlerTest {
             on { findAllByCatalogIdAndStatus(catalogId, Status.PUBLISHED) } doReturn emptyList()
         }
 
-        val catalogs = handler.findById(catalogId, Lang.TURTLE)
+        val catalogs = handler.findCatalogById(catalogId, Lang.TURTLE)
 
         val actualModel = ModelFactory.createDefaultModel()
         actualModel.read(StringReader(catalogs), null, Lang.TURTLE.name)
@@ -175,7 +175,7 @@ class RDFHandlerTest {
                     <http://www.w3.org/2002/07/owl#sameAs>
                             "https://data.brreg.no/enhetsregisteret/api/enheter/$catalogId" .
             
-            <$baseUri/data-services/$dataServiceId>
+            <$baseUri/catalogs/$catalogId/data-services/$dataServiceId>
                     rdf:type                  dcat:DataService;
                     dct:accessRights          <http://access-rights.com>;
                     dct:description           "description"@en;
@@ -203,7 +203,7 @@ class RDFHandlerTest {
             <$baseUri/catalogs/$catalogId>  rdf:type  dcat:Catalog;
                     dct:publisher  <$organizationCatalogBaseUri/organizations/$catalogId>;
                     dct:title      "Data service catalog ($catalogId)"@en;
-                    dcat:service   <$baseUri/data-services/$dataServiceId> .
+                    dcat:service   <$baseUri/catalogs/$catalogId/data-services/$dataServiceId> .
         """
 
         val expectedModel = ModelFactory.createDefaultModel()
@@ -223,7 +223,7 @@ class RDFHandlerTest {
             on { this.organizationCatalogBaseUri } doReturn organizationCatalogBaseUri
         }
 
-        val catalogs = handler.findById(catalogId, Lang.TURTLE)
+        val catalogs = handler.findCatalogById(catalogId, Lang.TURTLE)
 
         val actualModel = ModelFactory.createDefaultModel()
         actualModel.read(StringReader(catalogs), null, Lang.TURTLE.name)
@@ -244,7 +244,7 @@ class RDFHandlerTest {
         }
 
         assertThrows(NotFoundException::class.java) {
-            handler.findDataServiceById(catalogId, dataServiceId, Lang.TURTLE)
+            handler.findDataServiceByCatalogIdAndDataServiceId(catalogId, dataServiceId, Lang.TURTLE)
         }
     }
 
@@ -262,7 +262,7 @@ class RDFHandlerTest {
             PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
             PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
             
-            <$baseUri/data-services/$dataServiceId>
+            <$baseUri/catalogs/$catalogId/data-services/$dataServiceId>
                     rdf:type                  dcat:DataService;
                     dct:accessRights          <http://access-rights.com>;
                     dct:description           "description"@en;
@@ -299,7 +299,7 @@ class RDFHandlerTest {
             on { this.baseUri } doReturn baseUri
         }
 
-        val dataService = handler.findDataServiceById(catalogId, dataServiceId, Lang.TURTLE)
+        val dataService = handler.findDataServiceByCatalogIdAndDataServiceId(catalogId, dataServiceId, Lang.TURTLE)
 
         val actualModel = ModelFactory.createDefaultModel()
         actualModel.read(StringReader(dataService), null, Lang.TURTLE.name)

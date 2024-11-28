@@ -28,7 +28,7 @@ class RDFController(private val handler: RDFHandler) {
         @RequestHeader(value = HttpHeaders.ACCEPT, defaultValue = TURTLE) acceptHeader: String
     ): ResponseEntity<String> {
         return getRDFLang(acceptHeader)
-            .let { handler.findAll(it) }
+            .let { handler.findCatalogs(it) }
             .let { ResponseEntity.ok(it) }
     }
 
@@ -38,7 +38,7 @@ class RDFController(private val handler: RDFHandler) {
         @PathVariable catalogId: String
     ): ResponseEntity<String> {
         return getRDFLang(acceptHeader)
-            .let { handler.findById(catalogId, it) }
+            .let { handler.findCatalogById(catalogId, it) }
             .let { ResponseEntity.ok(it) }
     }
 
@@ -48,7 +48,7 @@ class RDFController(private val handler: RDFHandler) {
         @PathVariable catalogId: String, @PathVariable dataServiceId: String
     ): ResponseEntity<String> {
         return getRDFLang(acceptHeader)
-            .let { handler.findDataServiceById(catalogId, dataServiceId, it) }
+            .let { handler.findDataServiceByCatalogIdAndDataServiceId(catalogId, dataServiceId, it) }
             .let { ResponseEntity.ok(it) }
     }
 
