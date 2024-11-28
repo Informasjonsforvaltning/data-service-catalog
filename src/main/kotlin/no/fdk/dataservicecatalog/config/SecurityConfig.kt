@@ -44,7 +44,8 @@ class SecurityConfig(@Value("\${application.cors.originPatterns}") val corsOrigi
                 it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             }
             .authorizeHttpRequests { authorize ->
-                authorize.requestMatchers(HttpMethod.GET, "/ping", "/ready", "/swagger-ui/**", "/v3/**").permitAll()
+                authorize.requestMatchers(HttpMethod.GET, "/ping", "/ready", "/catalogs/**", "/swagger-ui/**", "/v3/**")
+                    .permitAll()
                 authorize.anyRequest().authenticated()
             }
             .oauth2ResourceServer { resourceServer -> resourceServer.jwt { } }
@@ -68,8 +69,6 @@ class SecurityConfig(@Value("\${application.cors.originPatterns}") val corsOrigi
 
         return jwtDecoder
     }
-
-    companion object {
-        private val logger: Logger = LoggerFactory.getLogger(SecurityConfig::class.java)
-    }
 }
+
+private val logger: Logger = LoggerFactory.getLogger(SecurityConfig::class.java)
