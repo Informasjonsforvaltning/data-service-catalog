@@ -4,6 +4,8 @@ import no.fdk.dataservicecatalog.domain.DataService
 import no.fdk.dataservicecatalog.domain.Status
 import no.fdk.dataservicecatalog.integration.MongoDBTestcontainer
 import no.fdk.dataservicecatalog.repository.DataServiceRepository
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Tag
@@ -25,8 +27,8 @@ class DataServiceRepositoryTest(
     @Autowired val repository: DataServiceRepository
 ) {
 
-    @BeforeEach
-    fun setup() {
+    @AfterEach
+    fun cleanup() {
         operations.remove(Query(), DataService::class.java)
     }
 

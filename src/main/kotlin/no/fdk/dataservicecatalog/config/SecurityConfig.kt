@@ -44,7 +44,8 @@ class SecurityConfig(@Value("\${application.cors.originPatterns}") val corsOrigi
                 it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             }
             .authorizeHttpRequests { authorize ->
-                authorize.requestMatchers(HttpMethod.GET, "/ping", "/ready", "/swagger-ui/**", "/v3/**").permitAll()
+                authorize.requestMatchers(HttpMethod.GET, "/ping", "/ready", "/catalogs/**", "/swagger-ui/**", "/v3/**")
+                    .permitAll()
                 authorize.anyRequest().authenticated()
             }
             .oauth2ResourceServer { resourceServer -> resourceServer.jwt { } }

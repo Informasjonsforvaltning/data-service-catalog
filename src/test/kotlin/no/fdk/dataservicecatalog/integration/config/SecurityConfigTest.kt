@@ -41,7 +41,7 @@ class SecurityConfigTest(@Autowired val mockMvc: MockMvc) {
 
     @Test
     fun `should respond with unauthorized on missing jwt authentication`() {
-        mockMvc.get("/catalogs").andExpect {
+        mockMvc.get("/internal/catalogs/1234/data-services").andExpect {
             status { isUnauthorized() }
         }
     }
