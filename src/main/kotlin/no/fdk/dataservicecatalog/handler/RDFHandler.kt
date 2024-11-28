@@ -16,23 +16,21 @@ import org.springframework.stereotype.Component
 import java.io.StringWriter
 
 @Component
-class RDFHandler(private val repository: DataServiceRepository) {
+class RDFHandler(private val repository: DataServiceRepository, private val properties: ApplicationProperties) {
 
     fun findAll(lang: Lang): String {
         val dataServices = repository.findAllByStatus(Status.PUBLISHED).groupBy(DataService::catalogId)
 
-        if (dataServices.isEmpty()) {
-            return ""
-        }
+        if (dataServices.isEmpty()) return ""
 
         val model = createModel()
 
-        for (entry in dataServices) {
-            entry.key?.let { model.addCatalog(it) }
+        dataServices.forEach { (catalogId, dataServices) ->
+            catalogId?.let { model.addCatalog(it, getCatalogUri(), getOrganizationUri(), getPublisherUri()) }
 
-            entry.value.forEach { dataService ->
-                model.addDataServiceToCatalog(dataService)
-                model.addDataService(dataService)
+            dataServices.forEach { dataService ->
+                model.addDataServiceToCatalog(dataService, getCatalogUri(), getDataServiceUri())
+                model.addDataService(dataService, getDataServiceUri())
             }
         }
 
@@ -42,16 +40,21 @@ class RDFHandler(private val repository: DataServiceRepository) {
     fun findById(catalogId: String, lang: Lang): String {
         val dataServices = repository.findAllByCatalogIdAndStatus(catalogId, Status.PUBLISHED)
 
-        if (dataServices.isEmpty()) {
-            return ""
-        }
+        if (dataServices.isEmpty()) return ""
 
         val model = createModel()
 
         dataServices.forEach { dataService ->
-            dataService.catalogId?.let { model.addCatalog(it) }
-            model.addDataServiceToCatalog(dataService)
-            model.addDataService(dataService)
+            dataService.catalogId?.let {
+                model.addCatalog(
+                    it,
+                    getCatalogUri(),
+                    getOrganizationUri(),
+                    getPublisherUri()
+                )
+            }
+            model.addDataServiceToCatalog(dataService, getCatalogUri(), getDataServiceUri())
+            model.addDataService(dataService, getDataServiceUri())
         }
 
         return model.serialize(lang)
@@ -63,47 +66,69 @@ class RDFHandler(private val repository: DataServiceRepository) {
             ?: throw NotFoundException("Data Service with id: $dataServiceId not found in Catalog with id: $catalogId")
 
         val model = createModel()
-        model.addDataService(dataService)
+        model.addDataService(dataService, getDataServiceUri())
 
         return model.serialize(lang)
     }
 
     private fun createModel(): Model {
-        return ModelFactory.createDefaultModel().setNsPrefixes(
-            mapOf(
-                "dcat" to DCAT.NS, "dct" to DCTerms.NS, "rdf" to RDF.uri, "vcard" to VCARD4.NS, "foaf" to FOAF.NS
+        return ModelFactory.createDefaultModel().apply {
+            setNsPrefixes(
+                mapOf(
+                    "dcat" to DCAT.NS, "dct" to DCTerms.NS, "rdf" to RDF.uri, "vcard" to VCARD4.NS, "foaf" to FOAF.NS
+                )
             )
-        )
+        }
+    }
+
+    private fun getCatalogUri(): String {
+        return buildUri(properties.baseUri, "/catalogs/")
+    }
+
+    private fun getDataServiceUri(): String {
+        return buildUri(properties.baseUri, "/data-services/")
+    }
+
+    private fun getOrganizationUri(): String {
+        return buildUri(properties.organizationCatalogBaseUri, "/organizations/")
+    }
+
+    private fun buildUri(baseUri: String, path: String): String {
+        return "$baseUri$path"
+    }
+
+    private fun getPublisherUri(): String {
+        return "https://data.brreg.no/enhetsregisteret/api/enheter/"
     }
 }
 
-fun Model.addCatalog(catalogId: String) {
-    this.createResource(URIref.encode("/catalogs/".plus(catalogId))).addProperty(RDF.type, DCAT.Catalog)
+fun Model.addCatalog(catalogId: String, baseUri: String, organizationCatalogBaseUri: String, publisherUri: String) {
+    this.createResource(URIref.encode(baseUri.plus(catalogId))).addProperty(RDF.type, DCAT.Catalog)
         .addProperty(
             DCTerms.publisher, ResourceFactory.createResource(URIref.encode(catalogId))
         ).addProperty(
             DCTerms.title, ResourceFactory.createLangLiteral("Data service catalog ($catalogId)", "en")
         )
 
-    this.createResource(URIref.encode("/organizations/".plus(catalogId)))
+    this.createResource(URIref.encode(organizationCatalogBaseUri.plus(catalogId)))
         .addProperty(
             RDF.type, FOAF.Agent
         ).addProperty(
             DCTerms.identifier, catalogId
         ).addProperty(
-            OWL.sameAs, URIref.encode(catalogId)
+            OWL.sameAs, URIref.encode(publisherUri.plus(catalogId))
         )
 }
 
-fun Model.addDataServiceToCatalog(dataService: DataService) {
-    this.getProperty(URIref.encode("/catalogs/".plus(dataService.catalogId)))
+fun Model.addDataServiceToCatalog(dataService: DataService, catalogUri: String, dataServiceUri: String) {
+    this.getProperty(URIref.encode(catalogUri.plus(dataService.catalogId)))
         .addProperty(
-            DCAT.service, this.createResource(URIref.encode("/data-services/".plus(dataService.id)))
+            DCAT.service, this.createResource(URIref.encode(dataServiceUri.plus(dataService.id)))
         )
 }
 
-fun Model.addDataService(dataService: DataService) {
-    val dataServiceResource = this.createResource(URIref.encode("/data-services/".plus(dataService.id)))
+fun Model.addDataService(dataService: DataService, dataServiceUri: String) {
+    val dataServiceResource = this.createResource(URIref.encode(dataServiceUri.plus(dataService.id)))
         .addProperty(
             RDF.type, DCAT.DataService
         )

@@ -2,6 +2,7 @@ package no.fdk.dataservicecatalog.unit.handler
 
 import no.fdk.dataservicecatalog.domain.*
 import no.fdk.dataservicecatalog.exception.NotFoundException
+import no.fdk.dataservicecatalog.handler.ApplicationProperties
 import no.fdk.dataservicecatalog.handler.RDFHandler
 import no.fdk.dataservicecatalog.repository.DataServiceRepository
 import org.apache.jena.rdf.model.ModelFactory
@@ -22,6 +23,9 @@ class RDFHandlerTest {
     @Mock
     lateinit var repository: DataServiceRepository
 
+    @Mock
+    lateinit var properties: ApplicationProperties
+
     @InjectMocks
     lateinit var handler: RDFHandler
 
@@ -39,6 +43,9 @@ class RDFHandlerTest {
         val dataServiceId = "1234"
         val catalogId = "5678"
 
+        val baseUri = "http://base-uri.com"
+        val organizationCatalogBaseUri = "http://organization-catalog-base-uri.com"
+
         val rdf = """
             PREFIX dcat:  <http://www.w3.org/ns/dcat#>
             PREFIX dct:   <http://purl.org/dc/terms/>
@@ -46,13 +53,13 @@ class RDFHandlerTest {
             PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
             PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
 
-            </organizations/$catalogId>
+            <$organizationCatalogBaseUri/organizations/$catalogId>
                     rdf:type        foaf:Agent;
                     dct:identifier  "$catalogId";
                     <http://www.w3.org/2002/07/owl#sameAs>
-                            "$catalogId" .
+                            "https://data.brreg.no/enhetsregisteret/api/enheter/$catalogId" .
             
-            </data-services/$dataServiceId>
+            <$baseUri/data-services/$dataServiceId>
                     rdf:type                  dcat:DataService;
                     dct:accessRights          <http://access-rights.com>;
                     dct:description           "description"@en;
@@ -77,10 +84,10 @@ class RDFHandlerTest {
                     dcat:servesDataset        <http://serves-dataset.com>;
                     foaf:page                 <http://page.com> .
 
-            </catalogs/$catalogId>  rdf:type  dcat:Catalog;
+            <$baseUri/catalogs/$catalogId>  rdf:type  dcat:Catalog;
                     dct:publisher  <$catalogId>;
                     dct:title      "Data service catalog ($catalogId)"@en;
-                    dcat:service   </data-services/$dataServiceId> .
+                    dcat:service   <$baseUri/data-services/$dataServiceId> .
         """
 
         val expectedModel = ModelFactory.createDefaultModel()
@@ -88,6 +95,11 @@ class RDFHandlerTest {
 
         repository.stub {
             on { findAllByStatus(Status.PUBLISHED) } doReturn listOf(dataService(dataServiceId, catalogId))
+        }
+
+        properties.stub {
+            on { this.baseUri } doReturn baseUri
+            on { this.organizationCatalogBaseUri } doReturn organizationCatalogBaseUri
         }
 
         val actualModel = ModelFactory.createDefaultModel()
@@ -112,6 +124,9 @@ class RDFHandlerTest {
         val dataServiceId = "1234"
         val catalogId = "5678"
 
+        val baseUri = "http://base-uri.com"
+        val organizationCatalogBaseUri = "http://organization-catalog-base-uri.com"
+
         val rdf = """
             PREFIX dcat:  <http://www.w3.org/ns/dcat#>
             PREFIX dct:   <http://purl.org/dc/terms/>
@@ -119,13 +134,13 @@ class RDFHandlerTest {
             PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
             PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
 
-            </organizations/$catalogId>
+            <$organizationCatalogBaseUri/organizations/$catalogId>
                     rdf:type        foaf:Agent;
                     dct:identifier  "$catalogId";
                     <http://www.w3.org/2002/07/owl#sameAs>
-                            "$catalogId" .
+                            "https://data.brreg.no/enhetsregisteret/api/enheter/$catalogId" .
             
-            </data-services/$dataServiceId>
+            <$baseUri/data-services/$dataServiceId>
                     rdf:type                  dcat:DataService;
                     dct:accessRights          <http://access-rights.com>;
                     dct:description           "description"@en;
@@ -150,10 +165,10 @@ class RDFHandlerTest {
                     dcat:servesDataset        <http://serves-dataset.com>;
                     foaf:page                 <http://page.com> .
 
-            </catalogs/$catalogId>  rdf:type  dcat:Catalog;
+            <$baseUri/catalogs/$catalogId>  rdf:type  dcat:Catalog;
                     dct:publisher  <$catalogId>;
                     dct:title      "Data service catalog ($catalogId)"@en;
-                    dcat:service   </data-services/$dataServiceId> .
+                    dcat:service   <$baseUri/data-services/$dataServiceId> .
         """
 
         val expectedModel = ModelFactory.createDefaultModel()
@@ -166,6 +181,11 @@ class RDFHandlerTest {
                     catalogId
                 )
             )
+        }
+
+        properties.stub {
+            on { this.baseUri } doReturn baseUri
+            on { this.organizationCatalogBaseUri } doReturn organizationCatalogBaseUri
         }
 
         val actualModel = ModelFactory.createDefaultModel()
@@ -195,6 +215,8 @@ class RDFHandlerTest {
         val dataServiceId = "1234"
         val catalogId = "5678"
 
+        val baseUri = "http://base-uri.com"
+
         val rdf = """
             PREFIX dcat:  <http://www.w3.org/ns/dcat#>
             PREFIX dct:   <http://purl.org/dc/terms/>
@@ -202,7 +224,7 @@ class RDFHandlerTest {
             PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
             PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
             
-            </data-services/$dataServiceId>
+            <$baseUri/data-services/$dataServiceId>
                     rdf:type                  dcat:DataService;
                     dct:accessRights          <http://access-rights.com>;
                     dct:description           "description"@en;
@@ -233,6 +255,10 @@ class RDFHandlerTest {
 
         repository.stub {
             on { findDataServiceById(dataServiceId) } doReturn dataService(dataServiceId, catalogId)
+        }
+
+        properties.stub {
+            on { this.baseUri } doReturn baseUri
         }
 
         val actualModel = ModelFactory.createDefaultModel()

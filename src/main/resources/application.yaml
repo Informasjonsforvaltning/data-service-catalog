@@ -40,7 +40,8 @@ spring:
     problemdetails:
       enabled: true
 application:
-  prop: 1
+  base-uri: ${BASE_URI:http://localhost}
+  organization-catalog-base-uri: ${ORGANIZATION_CATALOG_BASE_URI:https://organization-catalogue.staging.fellesdatakatalog.digdir.no}
   cors:
     originPatterns: "${CORS_ORIGIN_PATTERNS}"
 
@@ -63,7 +64,6 @@ spring:
           jwk-set-uri: https://sso.staging.fellesdatakatalog.digdir.no/auth/realms/fdk/protocol/openid-connect/certs
           issuer-uri: https://sso.staging.fellesdatakatalog.digdir.no/auth/realms/fdk
 application:
-  scope: test.scope
   cors:
     originPatterns: "*"
 logging.level.no: DEBUG
@@ -80,6 +80,5 @@ spring:
           jwk-set-uri: http://localhost:5050/auth/realms/fdk/protocol/openid-connect/certs
           issuer-uri: http://localhost:5050/auth/realms/fdk
 application:
-  scope: test.scope
   cors:
     originPatterns: "*"
