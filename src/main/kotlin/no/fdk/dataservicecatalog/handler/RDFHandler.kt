@@ -102,15 +102,17 @@ class RDFHandler(private val repository: DataServiceRepository, private val prop
     }
 }
 
-fun Model.addCatalog(catalogId: String, baseUri: String, organizationCatalogBaseUri: String, publisherUri: String) {
-    this.createResource(URIref.encode(baseUri.plus(catalogId))).addProperty(RDF.type, DCAT.Catalog)
+fun Model.addCatalog(catalogId: String, baseUri: String, organizationCatalogUri: String, publisherUri: String) {
+    this.createResource(URIref.encode(baseUri.plus(catalogId)))
         .addProperty(
-            DCTerms.publisher, ResourceFactory.createResource(URIref.encode(catalogId))
+            RDF.type, DCAT.Catalog
+        ).addProperty(
+            DCTerms.publisher, ResourceFactory.createResource(URIref.encode(organizationCatalogUri.plus(catalogId)))
         ).addProperty(
             DCTerms.title, ResourceFactory.createLangLiteral("Data service catalog ($catalogId)", "en")
         )
 
-    this.createResource(URIref.encode(organizationCatalogBaseUri.plus(catalogId)))
+    this.createResource(URIref.encode(organizationCatalogUri.plus(catalogId)))
         .addProperty(
             RDF.type, FOAF.Agent
         ).addProperty(

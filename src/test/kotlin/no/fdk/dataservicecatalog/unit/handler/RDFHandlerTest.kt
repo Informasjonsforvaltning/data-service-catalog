@@ -85,7 +85,7 @@ class RDFHandlerTest {
                     foaf:page                 <http://page.com> .
 
             <$baseUri/catalogs/$catalogId>  rdf:type  dcat:Catalog;
-                    dct:publisher  <$catalogId>;
+                    dct:publisher  <$organizationCatalogBaseUri/organizations/$catalogId>;
                     dct:title      "Data service catalog ($catalogId)"@en;
                     dcat:service   <$baseUri/data-services/$dataServiceId> .
         """
@@ -166,7 +166,7 @@ class RDFHandlerTest {
                     foaf:page                 <http://page.com> .
 
             <$baseUri/catalogs/$catalogId>  rdf:type  dcat:Catalog;
-                    dct:publisher  <$catalogId>;
+                    dct:publisher  <$organizationCatalogBaseUri/organizations/$catalogId>;
                     dct:title      "Data service catalog ($catalogId)"@en;
                     dcat:service   <$baseUri/data-services/$dataServiceId> .
         """
