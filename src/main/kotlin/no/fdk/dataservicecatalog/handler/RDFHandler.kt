@@ -155,20 +155,20 @@ fun Model.addDataService(dataService: DataService, dataServiceUri: String) {
         )
     }
 
-    dataService.contactPoint?.let {
+    dataService.contactPoint?.let { point ->
         val contactPointResource = this.createResource().addProperty(
             RDF.type, VCARD4.Organization
         ).addProperty(
             VCARD4.fn, "Contact information | (${dataService.catalogId})"
         )
 
-        it.name?.takeIf(String::isNotBlank)?.let {
+        point.name?.takeIf(String::isNotBlank)?.let {
             contactPointResource.addProperty(
                 VCARD4.hasOrganizationName, ResourceFactory.createLangLiteral(it, "nb")
             )
         }
 
-        it.phone?.takeIf(String::isNotBlank)?.let {
+        point.phone?.takeIf(String::isNotBlank)?.let {
             val telephoneTypeResource = this.createResource().addProperty(
                 RDF.type, VCARD4.TelephoneType
             ).addProperty(
@@ -180,13 +180,13 @@ fun Model.addDataService(dataService: DataService, dataServiceUri: String) {
             )
         }
 
-        it.email?.takeIf(String::isNotBlank)?.let {
+        point.email?.takeIf(String::isNotBlank)?.let {
             contactPointResource.addProperty(
                 VCARD4.hasEmail, ResourceFactory.createResource(URIref.encode("mailto:$it"))
             )
         }
 
-        it.url?.takeIf(String::isNotBlank)?.let {
+        point.url?.takeIf(String::isNotBlank)?.let {
             contactPointResource.addProperty(
                 VCARD4.hasURL, ResourceFactory.createResource(URIref.encode(it))
             )

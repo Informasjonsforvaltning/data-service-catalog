@@ -4,10 +4,8 @@ import no.fdk.dataservicecatalog.domain.DataService
 import no.fdk.dataservicecatalog.domain.Status
 import no.fdk.dataservicecatalog.integration.MongoDBTestcontainer
 import no.fdk.dataservicecatalog.repository.DataServiceRepository
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
