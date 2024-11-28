@@ -19,48 +19,41 @@ import java.io.StringWriter
 class RDFHandler(private val repository: DataServiceRepository, private val properties: ApplicationProperties) {
 
     fun findAll(lang: Lang): String {
-        val dataServices = repository.findAllByStatus(Status.PUBLISHED).groupBy(DataService::catalogId)
-
-        if (dataServices.isEmpty()) return ""
-
         val model = createModel()
 
-        dataServices.forEach { (catalogId, dataServices) ->
-            catalogId?.let { model.addCatalog(it, getCatalogUri(), getOrganizationUri(), getPublisherUri()) }
+        repository.findAllByStatus(Status.PUBLISHED)
+            .groupBy(DataService::catalogId)
+            .forEach { (catalogId, dataServices) ->
+                catalogId?.let {
+                    model.addCatalog(it, getCatalogUri(), getOrganizationUri(), getPublisherUri())
+                }
 
-            dataServices.forEach { dataService ->
-                model.addDataServiceToCatalog(dataService, getCatalogUri(), getDataServiceUri())
-                model.addDataService(dataService, getDataServiceUri())
+                dataServices.forEach { dataService ->
+                    model.addDataServiceToCatalog(dataService, getCatalogUri(), getDataServiceUri())
+                    model.addDataService(dataService, getDataServiceUri())
+                }
             }
-        }
 
         return model.serialize(lang)
     }
 
     fun findById(catalogId: String, lang: Lang): String {
-        val dataServices = repository.findAllByCatalogIdAndStatus(catalogId, Status.PUBLISHED)
-
-        if (dataServices.isEmpty()) return ""
-
         val model = createModel()
 
-        dataServices.forEach { dataService ->
-            dataService.catalogId?.let {
-                model.addCatalog(
-                    it,
-                    getCatalogUri(),
-                    getOrganizationUri(),
-                    getPublisherUri()
-                )
+        repository.findAllByCatalogIdAndStatus(catalogId, Status.PUBLISHED)
+            .forEach { dataService ->
+                dataService.catalogId?.let {
+                    model.addCatalog(it, getCatalogUri(), getOrganizationUri(), getPublisherUri())
+                }
+
+                model.addDataServiceToCatalog(dataService, getCatalogUri(), getDataServiceUri())
+                model.addDataService(dataService, getDataServiceUri())
             }
-            model.addDataServiceToCatalog(dataService, getCatalogUri(), getDataServiceUri())
-            model.addDataService(dataService, getDataServiceUri())
-        }
 
         return model.serialize(lang)
     }
 
-    fun findById(catalogId: String, dataServiceId: String, lang: Lang): String {
+    fun findDataServiceById(catalogId: String, dataServiceId: String, lang: Lang): String {
         val dataService = repository.findDataServiceById(dataServiceId)
             ?.takeIf { it.catalogId == catalogId }
             ?: throw NotFoundException("Data Service with id: $dataServiceId not found in Catalog with id: $catalogId")

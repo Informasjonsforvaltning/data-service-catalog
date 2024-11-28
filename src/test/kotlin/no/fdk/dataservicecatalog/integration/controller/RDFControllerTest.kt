@@ -122,7 +122,7 @@ class RDFControllerTest(@Autowired val mockMvc: MockMvc) {
         val dataServiceId = "5678"
 
         handler.stub {
-            on { findById(catalogId, dataServiceId, Lang.N3) } doReturn "turtle"
+            on { findDataServiceById(catalogId, dataServiceId, Lang.N3) } doReturn "turtle"
         }
 
         mockMvc.get("/catalogs/$catalogId/data-services/$dataServiceId") {
@@ -141,7 +141,7 @@ class RDFControllerTest(@Autowired val mockMvc: MockMvc) {
 
         handler.stub {
             on {
-                findById(catalogId, dataServiceId, Lang.N3)
+                findDataServiceById(catalogId, dataServiceId, Lang.N3)
             } doThrow NotFoundException("Data Service $dataServiceId not found")
         }
 

@@ -7,7 +7,8 @@ import no.fdk.dataservicecatalog.handler.RDFHandler
 import no.fdk.dataservicecatalog.repository.DataServiceRepository
 import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.riot.Lang
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
@@ -30,12 +31,28 @@ class RDFHandlerTest {
     lateinit var handler: RDFHandler
 
     @Test
-    fun `find should respond with empty string`() {
+    fun `find should respond with empty turtle rdf`() {
+        val rdf = """
+            PREFIX dcat:  <http://www.w3.org/ns/dcat#>
+            PREFIX dct:   <http://purl.org/dc/terms/>
+            PREFIX foaf:  <http://xmlns.com/foaf/0.1/>
+            PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+            PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
+        """
+
+        val expectedModel = ModelFactory.createDefaultModel()
+        expectedModel.read(StringReader(rdf), null, Lang.TURTLE.name)
+
         repository.stub {
             on { findAllByStatus(Status.PUBLISHED) } doReturn emptyList()
         }
 
-        assertEquals("", handler.findAll(Lang.TURTLE))
+        val catalogs = handler.findAll(Lang.TURTLE)
+
+        val actualModel = ModelFactory.createDefaultModel()
+        actualModel.read(StringReader(catalogs), null, Lang.TURTLE.name)
+
+        assertTrue(expectedModel.isIsomorphicWith(actualModel))
     }
 
     @Test
@@ -91,7 +108,7 @@ class RDFHandlerTest {
         """
 
         val expectedModel = ModelFactory.createDefaultModel()
-        expectedModel.read(StringReader(rdf), null, "TURTLE");
+        expectedModel.read(StringReader(rdf), null, Lang.TURTLE.name)
 
         repository.stub {
             on { findAllByStatus(Status.PUBLISHED) } doReturn listOf(dataService(dataServiceId, catalogId))
@@ -102,21 +119,39 @@ class RDFHandlerTest {
             on { this.organizationCatalogBaseUri } doReturn organizationCatalogBaseUri
         }
 
+        val catalogs = handler.findAll(Lang.TURTLE)
+
         val actualModel = ModelFactory.createDefaultModel()
-        actualModel.read(StringReader(handler.findAll(Lang.TURTLE)), null, Lang.TURTLE.name)
+        actualModel.read(StringReader(catalogs), null, Lang.TURTLE.name)
 
         assertTrue(expectedModel.isIsomorphicWith(actualModel))
     }
 
     @Test
-    fun `find by id should respond with empty string`() {
+    fun `find by id should respond with empty turtle rdf`() {
         val catalogId = "1234"
+
+        val rdf = """
+            PREFIX dcat:  <http://www.w3.org/ns/dcat#>
+            PREFIX dct:   <http://purl.org/dc/terms/>
+            PREFIX foaf:  <http://xmlns.com/foaf/0.1/>
+            PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+            PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
+        """
+
+        val expectedModel = ModelFactory.createDefaultModel()
+        expectedModel.read(StringReader(rdf), null, Lang.TURTLE.name)
 
         repository.stub {
             on { findAllByCatalogIdAndStatus(catalogId, Status.PUBLISHED) } doReturn emptyList()
         }
 
-        assertEquals("", handler.findById(catalogId, Lang.TURTLE))
+        val catalogs = handler.findById(catalogId, Lang.TURTLE)
+
+        val actualModel = ModelFactory.createDefaultModel()
+        actualModel.read(StringReader(catalogs), null, Lang.TURTLE.name)
+
+        assertTrue(expectedModel.isIsomorphicWith(actualModel))
     }
 
     @Test
@@ -172,7 +207,7 @@ class RDFHandlerTest {
         """
 
         val expectedModel = ModelFactory.createDefaultModel()
-        expectedModel.read(StringReader(rdf), null, "TURTLE")
+        expectedModel.read(StringReader(rdf), null, Lang.TURTLE.name)
 
         repository.stub {
             on { findAllByCatalogIdAndStatus(catalogId, Status.PUBLISHED) } doReturn listOf(
@@ -188,8 +223,10 @@ class RDFHandlerTest {
             on { this.organizationCatalogBaseUri } doReturn organizationCatalogBaseUri
         }
 
+        val catalogs = handler.findById(catalogId, Lang.TURTLE)
+
         val actualModel = ModelFactory.createDefaultModel()
-        actualModel.read(StringReader(handler.findById(catalogId, Lang.TURTLE)), null, Lang.TURTLE.name)
+        actualModel.read(StringReader(catalogs), null, Lang.TURTLE.name)
 
         assertTrue(expectedModel.isIsomorphicWith(actualModel))
     }
@@ -201,12 +238,13 @@ class RDFHandlerTest {
 
         repository.stub {
             on { findDataServiceById(dataServiceId) } doReturn DataService(
-                id = dataServiceId, catalogId = "invalid catalog id"
+                id = dataServiceId,
+                catalogId = "invalid catalog id"
             )
         }
 
         assertThrows(NotFoundException::class.java) {
-            handler.findById(catalogId, dataServiceId, Lang.TURTLE)
+            handler.findDataServiceById(catalogId, dataServiceId, Lang.TURTLE)
         }
     }
 
@@ -261,8 +299,10 @@ class RDFHandlerTest {
             on { this.baseUri } doReturn baseUri
         }
 
+        val dataService = handler.findDataServiceById(catalogId, dataServiceId, Lang.TURTLE)
+
         val actualModel = ModelFactory.createDefaultModel()
-        actualModel.read(StringReader(handler.findById(catalogId, dataServiceId, Lang.TURTLE)), null, Lang.TURTLE.name)
+        actualModel.read(StringReader(dataService), null, Lang.TURTLE.name)
 
         assertTrue(expectedModel.isIsomorphicWith(actualModel))
     }
@@ -276,14 +316,18 @@ class RDFHandlerTest {
         endpointDescriptions = listOf("http://endpoint-description.com"),
         formats = listOf("http://format.com"),
         contactPoint = ContactPoint(
-            name = "name", phone = "phone", email = "email", url = "url"
+            name = "name",
+            phone = "phone",
+            email = "email",
+            url = "url"
         ),
         servesDataset = listOf("http://serves-dataset.com"),
         description = LanguageString("en", "description"),
         pages = listOf("http://page.com"),
         landingPage = "http://landing-page.com",
         license = License(
-            name = "name", url = "http://license.com"
+            name = "name",
+            url = "http://license.com"
         ),
         mediaTypes = listOf(
             "https://www.iana.org/assignments/media-types/application/json", "application/xml"

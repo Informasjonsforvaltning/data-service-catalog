@@ -48,7 +48,7 @@ class RDFController(private val handler: RDFHandler) {
         @PathVariable catalogId: String, @PathVariable dataServiceId: String
     ): ResponseEntity<String> {
         return getRDFLang(acceptHeader)
-            .let { handler.findById(catalogId, dataServiceId, it) }
+            .let { handler.findDataServiceById(catalogId, dataServiceId, it) }
             .let { ResponseEntity.ok(it) }
     }
 
