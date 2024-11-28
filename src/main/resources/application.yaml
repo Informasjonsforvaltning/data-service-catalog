@@ -41,7 +41,7 @@ spring:
       enabled: true
 application:
   base-uri: ${BASE_URI:http://localhost}
-  organization-catalog-base-uri: ${ORGANIZATION_CATALOG_BASE_URI:https://organization-catalogue.staging.fellesdatakatalog.digdir.no}
+  organization-catalog-base-uri: ${ORGANIZATION_CATALOG_BASE_URI:https://organization-catalog.staging.fellesdatakatalog.digdir.no}
   cors:
     originPatterns: "${CORS_ORIGIN_PATTERNS}"
 
