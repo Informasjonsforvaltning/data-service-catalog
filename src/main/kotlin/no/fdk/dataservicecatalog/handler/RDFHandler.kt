@@ -1,5 +1,6 @@
 package no.fdk.dataservicecatalog.handler
 
+import no.fdk.dataservicecatalog.ApplicationProperties
 import no.fdk.dataservicecatalog.domain.DataService
 import no.fdk.dataservicecatalog.domain.Status
 import no.fdk.dataservicecatalog.exception.NotFoundException

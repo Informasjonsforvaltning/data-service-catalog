@@ -2,7 +2,7 @@ package no.fdk.dataservicecatalog.unit.handler
 
 import no.fdk.dataservicecatalog.domain.*
 import no.fdk.dataservicecatalog.exception.NotFoundException
-import no.fdk.dataservicecatalog.handler.ApplicationProperties
+import no.fdk.dataservicecatalog.ApplicationProperties
 import no.fdk.dataservicecatalog.handler.RDFHandler
 import no.fdk.dataservicecatalog.repository.DataServiceRepository
 import org.apache.jena.rdf.model.ModelFactory

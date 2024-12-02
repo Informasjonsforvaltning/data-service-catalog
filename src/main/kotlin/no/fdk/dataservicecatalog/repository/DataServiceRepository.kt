@@ -10,6 +10,8 @@ interface DataServiceRepository : MongoRepository<DataService, String> {
 
     fun findAllByCatalogId(catalogId: String): List<DataService>
 
+    fun findAllByCatalogIdIn(catalogIds: Set<String>): List<DataService>
+
     fun findDataServiceById(dataServiceId: String): DataService?
 
     fun findAllByStatus(status: Status): List<DataService>

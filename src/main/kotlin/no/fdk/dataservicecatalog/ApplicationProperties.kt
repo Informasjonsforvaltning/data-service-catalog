@@ -1,4 +1,4 @@
-package no.fdk.dataservicecatalog.handler
+package no.fdk.dataservicecatalog
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 

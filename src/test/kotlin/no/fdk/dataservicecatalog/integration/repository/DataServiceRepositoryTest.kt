@@ -45,6 +45,22 @@ class DataServiceRepositoryTest(
     }
 
     @Test
+    fun `find all by catalog ids in`() {
+        val firstCatalogId = "123"
+        val secondCatalogId = "456"
+
+        operations.insertAll(
+            listOf(
+                DataService(catalogId = firstCatalogId),
+                DataService(catalogId = secondCatalogId),
+                DataService(catalogId = "789")
+            )
+        )
+
+        assertEquals(2, repository.findAllByCatalogIdIn(setOf(firstCatalogId, secondCatalogId)).size)
+    }
+
+    @Test
     fun `find by data service id`() {
         val dataServiceId = "1234"
 
