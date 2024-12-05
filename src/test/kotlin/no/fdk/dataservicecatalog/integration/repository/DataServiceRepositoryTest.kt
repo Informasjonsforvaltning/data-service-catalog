@@ -1,6 +1,7 @@
 package no.fdk.dataservicecatalog.integration.repository
 
 import no.fdk.dataservicecatalog.domain.DataService
+import no.fdk.dataservicecatalog.domain.LanguageString
 import no.fdk.dataservicecatalog.domain.Status
 import no.fdk.dataservicecatalog.integration.MongoDBTestcontainer
 import no.fdk.dataservicecatalog.repository.DataServiceRepository
@@ -32,16 +33,24 @@ class DataServiceRepositoryTest(
 
     @Test
     fun `find all by catalog id`() {
-        val catalogId = "1234"
+        val firstCatalogId = "123"
+        val secondCatalogId = "456"
 
-        operations.insertAll(
-            listOf(
-                DataService(catalogId = catalogId),
-                DataService(catalogId = "5678")
+        val dataService = DataService(
+            endpointUrl = "endpointUrl",
+            titles = listOf(
+                LanguageString("nb", "title")
             )
         )
 
-        assertEquals(1, repository.findAllByCatalogId(catalogId).size)
+        operations.insertAll(
+            listOf(dataService.copy(catalogId = firstCatalogId), dataService.copy(catalogId = secondCatalogId))
+        )
+
+        val dataServices = repository.findAllByCatalogId(firstCatalogId)
+
+        assertEquals(1, dataServices.count())
+        assertEquals(firstCatalogId, dataServices.first().catalogId)
     }
 
     @Test
@@ -49,38 +58,61 @@ class DataServiceRepositoryTest(
         val firstCatalogId = "123"
         val secondCatalogId = "456"
 
-        operations.insertAll(
-            listOf(
-                DataService(catalogId = firstCatalogId),
-                DataService(catalogId = secondCatalogId),
-                DataService(catalogId = "789")
+        val dataService = DataService(
+            endpointUrl = "endpointUrl",
+            titles = listOf(
+                LanguageString("nb", "title")
             )
         )
 
-        assertEquals(2, repository.findAllByCatalogIdIn(setOf(firstCatalogId, secondCatalogId)).size)
+        operations.insertAll(
+            listOf(dataService.copy(catalogId = firstCatalogId), dataService.copy(catalogId = secondCatalogId))
+        )
+
+        val dataServices = repository.findAllByCatalogIdIn(setOf(firstCatalogId))
+
+        assertEquals(1, dataServices.count())
+        assertEquals(firstCatalogId, dataServices.first().catalogId)
     }
 
     @Test
     fun `find by data service id`() {
         val dataServiceId = "1234"
 
-        operations.insert(DataService(id = dataServiceId))
+        operations.insert(
+            DataService(
+                id = dataServiceId,
+                endpointUrl = "endpointUrl",
+                titles = listOf(
+                    LanguageString("nb", "title")
+                )
+            )
+        )
 
-        assertEquals(dataServiceId, repository.findDataServiceById(dataServiceId)?.id)
+        val dataService = repository.findDataServiceById(dataServiceId)
+
+        assertEquals(dataServiceId, dataService?.id)
     }
 
     @Test
     fun `find all by status`() {
         val status = Status.PUBLISHED
 
-        operations.insertAll(
-            listOf(
-                DataService(status = Status.PUBLISHED),
-                DataService(status = Status.DRAFT)
+        val dataService = DataService(
+            endpointUrl = "endpointUrl",
+            titles = listOf(
+                LanguageString("nb", "title")
             )
         )
 
-        assertEquals(1, repository.findAllByStatus(status).size)
+        operations.insertAll(
+            listOf(dataService.copy(status = Status.PUBLISHED), dataService.copy(status = Status.DRAFT))
+        )
+
+        val dataServices = repository.findAllByStatus(status)
+
+        assertEquals(1, dataServices.count())
+        assertEquals(Status.PUBLISHED, dataServices.first().status)
     }
 
     @Test
@@ -88,13 +120,21 @@ class DataServiceRepositoryTest(
         val catalogId = "1234"
         val status = Status.PUBLISHED
 
-        operations.insertAll(
-            listOf(
-                DataService(catalogId = catalogId, status = Status.PUBLISHED),
-                DataService(catalogId = catalogId, status = Status.DRAFT)
+        val dataService = DataService(
+            catalogId = catalogId,
+            endpointUrl = "endpointUrl",
+            titles = listOf(
+                LanguageString("nb", "title")
             )
         )
 
-        assertEquals(1, repository.findAllByCatalogIdAndStatus(catalogId, status).size)
+        operations.insertAll(
+            listOf(dataService.copy(status = Status.PUBLISHED), dataService.copy(status = Status.DRAFT))
+        )
+
+        val dataServices = repository.findAllByCatalogIdAndStatus(catalogId, status)
+
+        assertEquals(1, dataServices.count())
+        assertEquals(Status.PUBLISHED, dataServices.first().status)
     }
 }

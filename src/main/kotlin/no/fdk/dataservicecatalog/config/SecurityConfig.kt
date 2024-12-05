@@ -28,7 +28,7 @@ class SecurityConfig(@Value("\${application.cors.originPatterns}") val corsOrigi
                     val config = CorsConfiguration()
                     config.allowCredentials = false
                     config.allowedOriginPatterns = corsOriginPatterns.toList()
-                    config.allowedMethods = listOf("*")
+                    config.allowedMethods = listOf("GET", "POST", "OPTIONS", "DELETE", "PATCH")
                     config.allowedHeaders = listOf("*")
                     config.maxAge = 3600L
 

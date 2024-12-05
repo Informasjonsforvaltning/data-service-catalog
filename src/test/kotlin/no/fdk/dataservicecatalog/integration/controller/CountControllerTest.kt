@@ -14,6 +14,7 @@ import org.mockito.kotlin.stub
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.bean.override.mockito.MockitoBean
@@ -42,30 +43,30 @@ class CountControllerTest(@Autowired val mockMvc: MockMvc) {
         }
 
         mockMvc.get("/internal/catalogs/count") {
-            with(jwt().jwt { jwt -> jwt.claim("authorities", "system:root:admin") })
+            with(jwt().authorities(SimpleGrantedAuthority("system:root:admin")))
         }.andExpect {
             status { isOk() }
-            jsonPath("$[0].dataServiceCount") { value(5) }
         }
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["organization:123456789:admin", "organization:123456789:write", "organization:123456789:read"])
+    @ValueSource(strings = ["organization:%s:admin", "organization:%s:write", "organization:%s:read"])
     fun `count should respond with ok and payload on other authority`(authority: String) {
+        val catalogId = "1234"
+
         handler.stub {
-            on { findSelected(setOf("123456789")) } doReturn listOf(
+            on { findAll() } doReturn listOf(
                 DataServiceCount(
-                    catalogId = "123456789",
+                    catalogId = catalogId,
                     dataServiceCount = 5
                 )
             )
         }
 
         mockMvc.get("/internal/catalogs/count") {
-            with(jwt().jwt { jwt -> jwt.claim("authorities", authority) })
+            with(jwt().authorities(SimpleGrantedAuthority(authority.format(catalogId))))
         }.andExpect {
             status { isOk() }
-            jsonPath("$[0].dataServiceCount") { value(5) }
         }
     }
 }

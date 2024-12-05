@@ -1,8 +1,8 @@
 package no.fdk.dataservicecatalog.unit.handler
 
+import no.fdk.dataservicecatalog.ApplicationProperties
 import no.fdk.dataservicecatalog.domain.*
 import no.fdk.dataservicecatalog.exception.NotFoundException
-import no.fdk.dataservicecatalog.ApplicationProperties
 import no.fdk.dataservicecatalog.handler.RDFHandler
 import no.fdk.dataservicecatalog.repository.DataServiceRepository
 import org.apache.jena.rdf.model.ModelFactory
@@ -111,7 +111,12 @@ class RDFHandlerTest {
         expectedModel.read(StringReader(rdf), null, Lang.TURTLE.name)
 
         repository.stub {
-            on { findAllByStatus(Status.PUBLISHED) } doReturn listOf(dataService(dataServiceId, catalogId))
+            on { findAllByStatus(Status.PUBLISHED) } doReturn listOf(
+                dataService().copy(
+                    id = dataServiceId,
+                    catalogId = catalogId
+                )
+            )
         }
 
         properties.stub {
@@ -211,9 +216,9 @@ class RDFHandlerTest {
 
         repository.stub {
             on { findAllByCatalogIdAndStatus(catalogId, Status.PUBLISHED) } doReturn listOf(
-                dataService(
-                    dataServiceId,
-                    catalogId
+                dataService().copy(
+                    id = dataServiceId,
+                    catalogId = catalogId
                 )
             )
         }
@@ -239,7 +244,11 @@ class RDFHandlerTest {
         repository.stub {
             on { findDataServiceById(dataServiceId) } doReturn DataService(
                 id = dataServiceId,
-                catalogId = "invalid catalog id"
+                catalogId = "invalid catalog id",
+                endpointUrl = "endpointUrl",
+                titles = listOf(
+                    LanguageString("nb", "title")
+                )
             )
         }
 
@@ -292,7 +301,10 @@ class RDFHandlerTest {
         expectedModel.read(StringReader(rdf), null, Lang.TURTLE.name)
 
         repository.stub {
-            on { findDataServiceById(dataServiceId) } doReturn dataService(dataServiceId, catalogId)
+            on { findDataServiceById(dataServiceId) } doReturn dataService().copy(
+                id = dataServiceId,
+                catalogId = catalogId
+            )
         }
 
         properties.stub {
@@ -307,9 +319,7 @@ class RDFHandlerTest {
         assertTrue(expectedModel.isIsomorphicWith(actualModel))
     }
 
-    private fun dataService(id: String, catalogId: String) = DataService(
-        id = id,
-        catalogId = catalogId,
+    private fun dataService() = DataService(
         endpointUrl = "http://example.com",
         titles = listOf(LanguageString("en", "title")),
         keywords = listOf(LanguageString("en", "keyword")),

@@ -1,5 +1,6 @@
 package no.fdk.dataservicecatalog.controller
 
+import com.fasterxml.jackson.core.JsonProcessingException
 import jakarta.validation.Valid
 import no.fdk.dataservicecatalog.domain.DataService
 import no.fdk.dataservicecatalog.domain.PatchRequest
@@ -77,7 +78,7 @@ class DataServiceController(private val handler: DataServiceHandler) {
 
     @ExceptionHandler
     fun handleMethodArgumentNotValidException(ex: MethodArgumentNotValidException): ResponseEntity<ProblemDetail> {
-        val problemDetail = ex.body
+        val problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Failed to validate content.")
 
         ex.bindingResult.fieldErrors.map { fieldError ->
             mapOf(
@@ -85,6 +86,13 @@ class DataServiceController(private val handler: DataServiceHandler) {
                 "message" to fieldError.defaultMessage
             )
         }.also { problemDetail.setProperty("errors", it) }
+
+        return ResponseEntity.of(problemDetail).build()
+    }
+
+    @ExceptionHandler
+    fun handleJsonMappingException(ex: JsonProcessingException): ResponseEntity<ProblemDetail> {
+        val problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.originalMessage)
 
         return ResponseEntity.of(problemDetail).build()
     }
