@@ -41,15 +41,15 @@ data class DataService(
     /*
     endepunktsURL (dcat:endpointURL)
      */
-    @field:NotBlank(message = "Cannot be null or blank")
-    val endpointUrl: String? = null,
+    @field:NotBlank(message = "Cannot be blank")
+    val endpointUrl: String,
 
     /*
     tittel (dct:title)
      */
     @field:Valid
-    @field:NotEmpty(message = "Cannot be null or empty")
-    val titles: List<LanguageString>? = null,
+    @field:NotEmpty(message = "Cannot be empty")
+    val titles: List<LanguageString>,
 
     /*
     emneord (dcat:keyword)
@@ -121,11 +121,11 @@ data class DataService(
 
 data class LanguageString(
 
-    @field:NotBlank(message = "Cannot be null or blank")
-    val language: String? = null,
+    @field:NotBlank(message = "Cannot be blank")
+    val language: String,
 
-    @field:NotBlank(message = "Cannot be null or blank")
-    val value: String? = null
+    @field:NotBlank(message = "Cannot be blank")
+    val value: String
 )
 
 data class ContactPoint(

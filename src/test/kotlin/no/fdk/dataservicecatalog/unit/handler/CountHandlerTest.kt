@@ -1,6 +1,7 @@
 package no.fdk.dataservicecatalog.unit.handler
 
 import no.fdk.dataservicecatalog.domain.DataService
+import no.fdk.dataservicecatalog.domain.LanguageString
 import no.fdk.dataservicecatalog.handler.CountHandler
 import no.fdk.dataservicecatalog.repository.DataServiceRepository
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -26,20 +27,18 @@ class CountHandlerTest {
         val firstCatalogId = "1234"
         val secondCatalogId = "5678"
 
+        val dataService = DataService(
+            endpointUrl = "endpointUrl",
+            titles = listOf(
+                LanguageString("nb", "title")
+            )
+        )
+
         repository.stub {
             on { findAll() } doReturn listOf(
-                DataService(
-                    id = "1111",
-                    catalogId = firstCatalogId
-                ),
-                DataService(
-                    id = "2222",
-                    catalogId = firstCatalogId
-                ),
-                DataService(
-                    id = "3333",
-                    catalogId = secondCatalogId
-                )
+                dataService.copy(id = "1111", catalogId = firstCatalogId),
+                dataService.copy(id = "2222", catalogId = firstCatalogId),
+                dataService.copy(id = "3333", catalogId = secondCatalogId)
             )
         }
 
@@ -62,20 +61,18 @@ class CountHandlerTest {
         val firstCatalogId = "1234"
         val secondCatalogId = "5678"
 
+        val dataService = DataService(
+            endpointUrl = "endpointUrl",
+            titles = listOf(
+                LanguageString("nb", "title")
+            )
+        )
+
         repository.stub {
             on { findAllByCatalogIdIn(setOf(firstCatalogId, secondCatalogId)) } doReturn listOf(
-                DataService(
-                    id = "1111",
-                    catalogId = firstCatalogId
-                ),
-                DataService(
-                    id = "2222",
-                    catalogId = firstCatalogId
-                ),
-                DataService(
-                    id = "3333",
-                    catalogId = secondCatalogId
-                )
+                dataService.copy(id = "1111", catalogId = firstCatalogId),
+                dataService.copy(id = "2222", catalogId = firstCatalogId),
+                dataService.copy(id = "3333", catalogId = secondCatalogId)
             )
         }
 

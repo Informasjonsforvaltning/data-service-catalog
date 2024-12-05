@@ -10,17 +10,16 @@ data class PatchRequest(
 
     @JsonValue
     @field:Valid
-    @field:NotEmpty(message = "Cannot be null or empty")
-    val patchOperations: List<JsonPatchOperation>? = null
+    @field:NotEmpty(message = "Cannot be empty")
+    val patchOperations: List<JsonPatchOperation>
 )
 
 data class JsonPatchOperation(
 
-    @field:NotNull(message = "Cannot be null or invalid operator")
-    val op: OpEnum? = null,
+    val op: OpEnum,
 
-    @field:NotBlank(message = "Cannot be null or blank")
-    val path: String? = null,
+    @field:NotBlank(message = "Cannot be blank")
+    val path: String,
 
     val value: Any? = null,
     val from: String? = null

@@ -126,13 +126,13 @@ fun Model.addDataService(dataService: DataService, dataServiceUri: String) {
         RDF.type, DCAT.DataService
     )
 
-    dataService.endpointUrl?.let {
+    dataService.endpointUrl.let {
         dataServiceResource.addProperty(
             DCAT.endpointURL, ResourceFactory.createResource(URIref.encode(it))
         )
     }
 
-    dataService.titles?.forEach {
+    dataService.titles.forEach {
         dataServiceResource.addProperty(
             DCTerms.title, ResourceFactory.createLangLiteral(it.value, it.language)
         )

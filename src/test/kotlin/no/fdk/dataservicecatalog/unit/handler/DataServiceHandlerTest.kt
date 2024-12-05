@@ -1,9 +1,6 @@
 package no.fdk.dataservicecatalog.unit.handler
 
-import no.fdk.dataservicecatalog.domain.DataService
-import no.fdk.dataservicecatalog.domain.JsonPatchOperation
-import no.fdk.dataservicecatalog.domain.OpEnum
-import no.fdk.dataservicecatalog.domain.PatchRequest
+import no.fdk.dataservicecatalog.domain.*
 import no.fdk.dataservicecatalog.exception.NotFoundException
 import no.fdk.dataservicecatalog.handler.DataServiceHandler
 import no.fdk.dataservicecatalog.repository.DataServiceRepository
@@ -33,7 +30,13 @@ class DataServiceHandlerTest {
 
         repository.stub {
             on { findAllByCatalogId(catalogId) } doReturn listOf(
-                DataService(catalogId = catalogId)
+                DataService(
+                    catalogId = catalogId,
+                    endpointUrl = "endpointUrl",
+                    titles = listOf(
+                        LanguageString("nb", "title")
+                    )
+                )
             )
         }
 
@@ -50,7 +53,11 @@ class DataServiceHandlerTest {
         repository.stub {
             on { findDataServiceById(dataServiceId) } doReturn DataService(
                 id = dataServiceId,
-                catalogId = catalogId
+                catalogId = catalogId,
+                endpointUrl = "endpointUrl",
+                titles = listOf(
+                    LanguageString("nb", "title")
+                )
             )
         }
 
@@ -67,7 +74,11 @@ class DataServiceHandlerTest {
         repository.stub {
             on { findDataServiceById(dataServiceId) } doReturn DataService(
                 id = dataServiceId,
-                catalogId = "invalid_catalog id"
+                catalogId = "invalid_catalog id",
+                endpointUrl = "endpointUrl",
+                titles = listOf(
+                    LanguageString("nb", "title")
+                )
             )
         }
 
@@ -80,7 +91,14 @@ class DataServiceHandlerTest {
     fun `should register data service and return id`() {
         val catalogId = "1234"
 
-        val dataServiceId = handler.register(catalogId, DataService())
+        val dataServiceId = handler.register(
+            catalogId, DataService(
+                endpointUrl = "endpointUrl",
+                titles = listOf(
+                    LanguageString("nb", "title")
+                )
+            )
+        )
 
         assertTrue(dataServiceId.isNotBlank())
 
@@ -95,7 +113,10 @@ class DataServiceHandlerTest {
         val dataService = DataService(
             id = dataServiceId,
             catalogId = catalogId,
-            endpointUrl = "endpointUrl"
+            endpointUrl = "endpointUrl",
+            titles = listOf(
+                LanguageString("nb", "title")
+            )
         )
 
         val patchedDataService = dataService.copy(
@@ -131,11 +152,24 @@ class DataServiceHandlerTest {
             on { findDataServiceById(dataServiceId) } doReturn DataService(
                 id = dataServiceId,
                 catalogId = "invalid catalog id",
+                endpointUrl = "endpointUrl",
+                titles = listOf(
+                    LanguageString("nb", "title")
+                )
             )
         }
 
         assertThrows(NotFoundException::class.java) {
-            handler.update(catalogId, dataServiceId, PatchRequest())
+            handler.update(
+                catalogId, dataServiceId, PatchRequest(
+                    patchOperations = listOf(
+                        JsonPatchOperation(
+                            op = OpEnum.REPLACE,
+                            path = "/endpointUrl",
+                        )
+                    )
+                )
+            )
         }
     }
 
@@ -148,6 +182,10 @@ class DataServiceHandlerTest {
             on { findDataServiceById(dataServiceId) } doReturn DataService(
                 id = dataServiceId,
                 catalogId = catalogId,
+                endpointUrl = "endpointUrl",
+                titles = listOf(
+                    LanguageString("nb", "title")
+                )
             )
         }
 
@@ -165,6 +203,10 @@ class DataServiceHandlerTest {
             on { findDataServiceById(dataServiceId) } doReturn DataService(
                 id = dataServiceId,
                 catalogId = "invalid catalog id",
+                endpointUrl = "endpointUrl",
+                titles = listOf(
+                    LanguageString("nb", "title")
+                )
             )
         }
 

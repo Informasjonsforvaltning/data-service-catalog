@@ -42,9 +42,7 @@ class DataServiceHandler(private val repository: DataServiceRepository) {
             ?.takeIf { it.catalogId == catalogId }
             ?: throw NotFoundException("Data Service with id: $dataServiceId not found in Catalog with id: $catalogId")
 
-        val patchedDataService = patchRequest.patchOperations?.let { operations ->
-            patchOriginal(dataService, operations)
-        } ?: dataService
+        val patchedDataService = patchOriginal(dataService, patchRequest.patchOperations)
 
         return repository.save(patchedDataService).also {
             logger.info("Updated Data Service with id: $dataServiceId in Catalog with id: $catalogId")

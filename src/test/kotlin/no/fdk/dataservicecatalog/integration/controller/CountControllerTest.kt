@@ -50,19 +50,21 @@ class CountControllerTest(@Autowired val mockMvc: MockMvc) {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["organization:123456789:admin", "organization:123456789:write", "organization:123456789:read"])
+    @ValueSource(strings = ["organization:%s:admin", "organization:%s:write", "organization:%s:read"])
     fun `count should respond with ok and payload on other authority`(authority: String) {
+        val catalogId = "123456789"
+
         handler.stub {
-            on { findSelected(setOf("123456789")) } doReturn listOf(
+            on { findSelected(setOf(catalogId)) } doReturn listOf(
                 DataServiceCount(
-                    catalogId = "123456789",
+                    catalogId = catalogId,
                     dataServiceCount = 5
                 )
             )
         }
 
         mockMvc.get("/internal/catalogs/count") {
-            with(jwt().jwt { jwt -> jwt.claim("authorities", authority) })
+            with(jwt().jwt { jwt -> jwt.claim("authorities", authority.format(catalogId)) })
         }.andExpect {
             status { isOk() }
             jsonPath("$[0].dataServiceCount") { value(5) }
