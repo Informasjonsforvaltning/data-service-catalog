@@ -91,13 +91,6 @@ class DataServiceController(private val handler: DataServiceHandler) {
     }
 
     @ExceptionHandler
-    fun handleJsonProcessingException(ex: JsonProcessingException): ResponseEntity<ProblemDetail> {
-        val problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.originalMessage)
-
-        return ResponseEntity.of(problemDetail).build()
-    }
-
-    @ExceptionHandler
     fun handleNotFoundException(ex: NotFoundException): ResponseEntity<ProblemDetail> {
         return ResponseEntity.of(ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.message)).build()
     }

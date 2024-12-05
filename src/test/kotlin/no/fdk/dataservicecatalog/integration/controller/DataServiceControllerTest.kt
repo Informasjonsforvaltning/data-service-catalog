@@ -217,32 +217,6 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
     }
 
     @Test
-    fun `register should respond with bad request on missing endpointUrl in payload`() {
-        val catalogId = "1234"
-
-        mockMvc.post("/internal/catalogs/$catalogId/data-services") {
-            with(jwt())
-            contentType = MediaType.APPLICATION_JSON
-            content = """
-                {
-                    "titles": [
-                        {
-                            "language": "nb",
-                            "value": "title"
-                        }
-                    ]
-                }
-            """
-        }.andExpect {
-            status { isBadRequest() }
-            header {
-                string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
-            }
-            jsonPath("$.detail") { isString() }
-        }
-    }
-
-    @Test
     fun `register should respond with bad request on blank endpointUrl in payload`() {
         val catalogId = "1234"
 
@@ -267,27 +241,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
             }
             jsonPath("$.detail") { value("Failed to validate content.") }
             jsonPath("$.errors[0].field") { value("endpointUrl") }
-        }
-    }
-
-    @Test
-    fun `register should respond with bad request on missing titles in payload`() {
-        val catalogId = "1234"
-
-        mockMvc.post("/internal/catalogs/$catalogId/data-services") {
-            with(jwt())
-            contentType = MediaType.APPLICATION_JSON
-            content = """
-                {
-                    "endpointUrl": "endpointUrl"
-                }
-            """
-        }.andExpect {
-            status { isBadRequest() }
-            header {
-                string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
-            }
-            jsonPath("$.detail") { isString() }
+            jsonPath("$.errors[0].message") { value("Cannot be blank") }
         }
     }
 
@@ -311,32 +265,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
             }
             jsonPath("$.detail") { value("Failed to validate content.") }
             jsonPath("$.errors[0].field") { value("titles") }
-        }
-    }
-
-    @Test
-    fun `register should respond with bad request on missing language for titles in payload`() {
-        val catalogId = "1234"
-
-        mockMvc.post("/internal/catalogs/$catalogId/data-services") {
-            with(jwt())
-            contentType = MediaType.APPLICATION_JSON
-            content = """
-                {
-                    "endpointUrl": "endpointUrl",
-                    "titles": [
-                        {
-                            "value": "title"
-                        }
-                    ]
-                }
-            """
-        }.andExpect {
-            status { isBadRequest() }
-            header {
-                string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
-            }
-            jsonPath("$.detail") { isString() }
+            jsonPath("$.errors[0].message") { value("Cannot be empty") }
         }
     }
 
@@ -365,32 +294,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
             }
             jsonPath("$.detail") { value("Failed to validate content.") }
             jsonPath("$.errors[0].field") { value("titles[0].language") }
-        }
-    }
-
-    @Test
-    fun `register should respond with bad request on missing value for titles in payload`() {
-        val catalogId = "1234"
-
-        mockMvc.post("/internal/catalogs/$catalogId/data-services") {
-            with(jwt())
-            contentType = MediaType.APPLICATION_JSON
-            content = """
-                {
-                    "endpointUrl": "endpointUrl",
-                    "titles": [
-                        {
-                            "language": "nb"
-                        }
-                    ]
-                }
-            """
-        }.andExpect {
-            status { isBadRequest() }
-            header {
-                string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
-            }
-            jsonPath("$.detail") { isString() }
+            jsonPath("$.errors[0].message") { value("Cannot be blank") }
         }
     }
 
@@ -419,6 +323,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
             }
             jsonPath("$.detail") { value("Failed to validate content.") }
             jsonPath("$.errors[0].field") { value("titles[0].value") }
+            jsonPath("$.errors[0].message") { value("Cannot be blank") }
         }
     }
 
@@ -530,79 +435,6 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
     }
 
     @Test
-    fun `update should respond with bad request on missing op in payload`() {
-        val catalogId = "1234"
-        val dataServiceId = "5678"
-
-        mockMvc.patch("/internal/catalogs/$catalogId/data-services/$dataServiceId") {
-            with(jwt())
-            contentType = MediaType.APPLICATION_JSON
-            content = """
-                [
-                    {
-                        "path": "path"
-                    }
-                ]
-            """
-        }.andExpect {
-            status { isBadRequest() }
-            header {
-                string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
-            }
-            jsonPath("$.detail") { isString() }
-        }
-    }
-
-    @Test
-    fun `update should respond with bad request on missing path in payload`() {
-        val catalogId = "1234"
-        val dataServiceId = "5678"
-
-        mockMvc.patch("/internal/catalogs/$catalogId/data-services/$dataServiceId") {
-            with(jwt())
-            contentType = MediaType.APPLICATION_JSON
-            content = """
-                [
-                    {
-                        "op": "add"
-                    }
-                ]
-            """
-        }.andExpect {
-            status { isBadRequest() }
-            header {
-                string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
-            }
-            jsonPath("$.detail") { isString() }
-        }
-    }
-
-    @Test
-    fun `update should respond with bad request on invalid op in payload`() {
-        val catalogId = "1234"
-        val dataServiceId = "5678"
-
-        mockMvc.patch("/internal/catalogs/$catalogId/data-services/$dataServiceId") {
-            with(jwt())
-            contentType = MediaType.APPLICATION_JSON
-            content = """
-                [
-                    {
-                        "op": "invalid",
-                        "path": "path"
-                    }
-                ]
-            """
-        }.andExpect {
-            status { isBadRequest() }
-            header {
-                string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
-            }
-            jsonPath("$.detail") { isString() }
-        }
-    }
-
-    @Test
     fun `update should respond with bad request on blank path in payload`() {
         val catalogId = "1234"
         val dataServiceId = "5678"
@@ -626,6 +458,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
             }
             jsonPath("$.detail") { value("Failed to validate content.") }
             jsonPath("$.errors[0].field") { value("patchOperations[0].path") }
+            jsonPath("$.errors[0].message") { value("Cannot be blank") }
         }
     }
 

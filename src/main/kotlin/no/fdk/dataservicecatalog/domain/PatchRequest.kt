@@ -16,7 +16,6 @@ data class PatchRequest(
 
 data class JsonPatchOperation(
 
-    @field:NotNull(message = "Cannot be null or invalid operator")
     val op: OpEnum,
 
     @field:NotBlank(message = "Cannot be blank")
