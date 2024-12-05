@@ -91,7 +91,7 @@ class DataServiceController(private val handler: DataServiceHandler) {
     }
 
     @ExceptionHandler
-    fun handleJsonMappingException(ex: JsonProcessingException): ResponseEntity<ProblemDetail> {
+    fun handleJsonProcessingException(ex: JsonProcessingException): ResponseEntity<ProblemDetail> {
         val problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.originalMessage)
 
         return ResponseEntity.of(problemDetail).build()
