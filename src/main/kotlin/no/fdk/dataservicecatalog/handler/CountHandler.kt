@@ -10,26 +10,22 @@ class CountHandler(private val repository: DataServiceRepository) {
     fun findAll(): List<DataServiceCount> {
         return repository.findAll()
             .groupBy { it.catalogId }
-            .mapNotNull { (catalogId, items) ->
-                catalogId?.let {
-                    DataServiceCount(
-                        catalogId = it,
-                        dataServiceCount = items.distinctBy { item -> item.id }.count()
-                    )
-                }
+            .map { (catalogId, dataServices) ->
+                DataServiceCount(
+                    catalogId = catalogId,
+                    dataServiceCount = dataServices.distinctBy { it.id }.count()
+                )
             }
     }
 
     fun findSelected(catalogIds: Set<String>): List<DataServiceCount> {
         return repository.findAllByCatalogIdIn(catalogIds)
             .groupBy { it.catalogId }
-            .mapNotNull { (catalogId, items) ->
-                catalogId?.let {
-                    DataServiceCount(
-                        catalogId = it,
-                        dataServiceCount = items.distinctBy { item -> item.id }.count()
-                    )
-                }
+            .map { (catalogId, dataServices) ->
+                DataServiceCount(
+                    catalogId = catalogId,
+                    dataServiceCount = dataServices.distinctBy { it.id }.count()
+                )
             }
     }
 }

@@ -245,6 +245,7 @@ class RDFHandlerTest {
             on { findDataServiceById(dataServiceId) } doReturn DataService(
                 id = dataServiceId,
                 catalogId = "invalid catalog id",
+                status = Status.PUBLISHED,
                 endpointUrl = "endpointUrl",
                 titles = listOf(
                     LanguageString("nb", "title")
@@ -320,6 +321,9 @@ class RDFHandlerTest {
     }
 
     private fun dataService() = DataService(
+        id = "1234",
+        catalogId = "5678",
+        status = Status.PUBLISHED,
         endpointUrl = "http://example.com",
         titles = listOf(LanguageString("en", "title")),
         keywords = listOf(LanguageString("en", "keyword")),

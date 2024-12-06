@@ -12,14 +12,14 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/internal/catalogs/count")
-class CountController(private val countHandler: CountHandler) {
+class CountController(private val handler: CountHandler) {
 
     @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
     fun findDataServicesCount(@AuthenticationPrincipal jwt: Jwt): ResponseEntity<List<DataServiceCount>> {
         val authorities: String? = jwt.claims["authorities"] as? String
 
         return if (authorities?.contains("system:root:admin") == true) {
-            ResponseEntity.ok(countHandler.findAll())
+            ResponseEntity.ok(handler.findAll())
         } else {
             val regex = Regex("""[0-9]{9}""")
 
@@ -29,7 +29,7 @@ class CountController(private val countHandler: CountHandler) {
                 ?.toSet()
                 ?: emptySet())
 
-            ResponseEntity.ok(countHandler.findSelected(ids))
+            ResponseEntity.ok(handler.findSelected(ids))
         }
     }
 }
