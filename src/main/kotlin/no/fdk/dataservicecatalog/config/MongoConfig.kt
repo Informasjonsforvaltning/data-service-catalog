@@ -15,10 +15,7 @@ import org.springframework.data.mongodb.core.index.Index
 
 @Configuration
 @EnableMongoAuditing
-class MongoConfig {
-
-    @Value("\${spring.data.mongodb.database}")
-    private lateinit var database: String
+class MongoConfig(@Value("\${spring.data.mongodb.database}") private val database: String) {
 
     @Bean
     fun mongoTemplate(mongoClient: MongoClient): MongoOperations {

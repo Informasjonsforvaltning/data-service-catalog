@@ -35,7 +35,7 @@ inline fun <reified T> applyPatch(
         return originalObject
     }
 
-    with(jacksonObjectMapper().registerModules(JavaTimeModule())) {
+    with(jacksonObjectMapper().registerModule(JavaTimeModule())) {
         val changes = Json.createReader(StringReader(writeValueAsString(operations))).readArray()
         val original = Json.createReader(StringReader(writeValueAsString(originalObject))).readObject()
 

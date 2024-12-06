@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException
 import jakarta.validation.Valid
 import no.fdk.dataservicecatalog.domain.DataService
 import no.fdk.dataservicecatalog.domain.PatchRequest
+import no.fdk.dataservicecatalog.domain.RegisterDataService
 import no.fdk.dataservicecatalog.exception.BadRequestException
 import no.fdk.dataservicecatalog.exception.InternalServerErrorException
 import no.fdk.dataservicecatalog.exception.NotFoundException
@@ -40,9 +41,9 @@ class DataServiceController(private val handler: DataServiceHandler) {
     @PreAuthorize(WRITE)
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun registerDataServiceByCatalogId(
-        @PathVariable catalogId: String, @Valid @RequestBody dataService: DataService
+        @PathVariable catalogId: String, @Valid @RequestBody registerDataService: RegisterDataService
     ): ResponseEntity<Void> {
-        return handler.register(catalogId, dataService)
+        return handler.register(catalogId, registerDataService)
             .let {
                 ResponseEntity
                     .created(URI("/internal/catalogs/${catalogId}/data-services/${it}"))
@@ -86,6 +87,13 @@ class DataServiceController(private val handler: DataServiceHandler) {
                 "message" to fieldError.defaultMessage
             )
         }.also { problemDetail.setProperty("errors", it) }
+
+        return ResponseEntity.of(problemDetail).build()
+    }
+
+    @ExceptionHandler
+    fun handleMethodArgumentNotValidException(ex: JsonProcessingException): ResponseEntity<ProblemDetail> {
+        val problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.originalMessage)
 
         return ResponseEntity.of(problemDetail).build()
     }

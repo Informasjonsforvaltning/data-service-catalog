@@ -2,6 +2,7 @@ package no.fdk.dataservicecatalog.unit.handler
 
 import no.fdk.dataservicecatalog.domain.DataService
 import no.fdk.dataservicecatalog.domain.LanguageString
+import no.fdk.dataservicecatalog.domain.Status
 import no.fdk.dataservicecatalog.handler.CountHandler
 import no.fdk.dataservicecatalog.repository.DataServiceRepository
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -28,6 +29,9 @@ class CountHandlerTest {
         val secondCatalogId = "5678"
 
         val dataService = DataService(
+            id = "1111",
+            catalogId = firstCatalogId,
+            status = Status.PUBLISHED,
             endpointUrl = "endpointUrl",
             titles = listOf(
                 LanguageString("nb", "title")
@@ -36,8 +40,8 @@ class CountHandlerTest {
 
         repository.stub {
             on { findAll() } doReturn listOf(
-                dataService.copy(id = "1111", catalogId = firstCatalogId),
-                dataService.copy(id = "2222", catalogId = firstCatalogId),
+                dataService,
+                dataService.copy(id = "2222"),
                 dataService.copy(id = "3333", catalogId = secondCatalogId)
             )
         }
@@ -62,6 +66,9 @@ class CountHandlerTest {
         val secondCatalogId = "5678"
 
         val dataService = DataService(
+            id = "1111",
+            catalogId = firstCatalogId,
+            status = Status.PUBLISHED,
             endpointUrl = "endpointUrl",
             titles = listOf(
                 LanguageString("nb", "title")
@@ -70,8 +77,8 @@ class CountHandlerTest {
 
         repository.stub {
             on { findAllByCatalogIdIn(setOf(firstCatalogId, secondCatalogId)) } doReturn listOf(
-                dataService.copy(id = "1111", catalogId = firstCatalogId),
-                dataService.copy(id = "2222", catalogId = firstCatalogId),
+                dataService,
+                dataService.copy(id = "2222"),
                 dataService.copy(id = "3333", catalogId = secondCatalogId)
             )
         }

@@ -69,6 +69,9 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
 
         handler.stub {
             on { findById(catalogId, dataServiceId) } doReturn DataService(
+                id = dataServiceId,
+                catalogId = catalogId,
+                status = Status.PUBLISHED,
                 endpointUrl = "endpointUrl",
                 titles = listOf(
                     LanguageString(language = "nb", value = "title")
@@ -122,7 +125,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
         val catalogId = "1234"
         val dataServiceId = "5678"
 
-        val dataService = DataService(
+        val registerDataService = RegisterDataService(
             endpointUrl = "endpointUrl",
             titles = listOf(
                 LanguageString("nb", "title")
@@ -130,7 +133,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
         )
 
         handler.stub {
-            on { register(catalogId, dataService) } doReturn dataServiceId
+            on { register(catalogId, registerDataService) } doReturn dataServiceId
         }
 
         mockMvc.post("/internal/catalogs/$catalogId/data-services") {
@@ -182,7 +185,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
     fun `register should respond with not found on exception`() {
         val catalogId = "1234"
 
-        val dataService = DataService(
+        val registerDataService = RegisterDataService(
             endpointUrl = "endpointUrl",
             titles = listOf(
                 LanguageString("nb", "title")
@@ -190,7 +193,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
         )
 
         handler.stub {
-            on { register(catalogId, dataService) } doThrow NotFoundException("Catalog $catalogId not found")
+            on { register(catalogId, registerDataService) } doThrow NotFoundException("Catalog $catalogId not found")
         }
 
         mockMvc.post("/internal/catalogs/$catalogId/data-services") {
@@ -334,6 +337,9 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
         val dataServiceId = "5678"
 
         val dataService = DataService(
+            id = dataServiceId,
+            catalogId = catalogId,
+            status = Status.PUBLISHED,
             endpointUrl = "endpointUrl",
             titles = listOf(
                 LanguageString("nb", "title")
