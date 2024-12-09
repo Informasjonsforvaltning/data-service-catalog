@@ -34,6 +34,10 @@ spring:
         jwt:
           jwk-set-uri: ${SSO_HOST}/auth/realms/fdk
           issuer-uri: ${SSO_HOST}/auth/realms/fdk/protocol/openid-connect/certs
+          audiences: dataservice-catalog
+          authorities-claim-name: authorities
+          authority-prefix: ""
+          authorities-claim-delimiter: ","
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
   mvc:
