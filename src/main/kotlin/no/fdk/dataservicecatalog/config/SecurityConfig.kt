@@ -3,16 +3,12 @@ package no.fdk.dataservicecatalog.config
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
-import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator
-import org.springframework.security.oauth2.jwt.*
-import org.springframework.security.oauth2.jwt.JwtClaimNames.AUD
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.web.cors.CorsConfiguration
 
@@ -22,7 +18,7 @@ class SecurityConfig(@Value("\${application.cors.originPatterns}") private val c
 
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
-        http
+        return http
             .cors { cors ->
                 cors.configurationSource { _ ->
                     val config = CorsConfiguration()
@@ -49,25 +45,7 @@ class SecurityConfig(@Value("\${application.cors.originPatterns}") private val c
                 authorize.anyRequest().authenticated()
             }
             .oauth2ResourceServer { resourceServer -> resourceServer.jwt { } }
-
-        return http.build()
-    }
-
-    @Bean
-    fun jwtDecoder(properties: OAuth2ResourceServerProperties): JwtDecoder? {
-        val jwtDecoder = NimbusJwtDecoder
-            .withJwkSetUri(properties.jwt.jwkSetUri)
             .build()
-
-        jwtDecoder.setJwtValidator(
-            DelegatingOAuth2TokenValidator(
-                JwtTimestampValidator(),
-                JwtIssuerValidator(properties.jwt.issuerUri),
-                JwtClaimValidator(AUD) { aud: List<String> -> aud.contains("data-service-catalog") }
-            )
-        )
-
-        return jwtDecoder
     }
 }
 

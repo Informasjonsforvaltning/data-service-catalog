@@ -3,10 +3,7 @@ package no.fdk.dataservicecatalog.domain
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotEmpty
-import org.springframework.data.annotation.CreatedDate
-import org.springframework.data.annotation.Id
-import org.springframework.data.annotation.LastModifiedDate
-import org.springframework.data.annotation.Version
+import org.springframework.data.annotation.*
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDateTime
 
@@ -28,6 +25,9 @@ data class DataService(
 
     @LastModifiedDate
     val modified: LocalDateTime? = null,
+
+    @LastModifiedBy
+    val modifiedBy: User? = null,
 
     @Version
     val version: Int? = null,
