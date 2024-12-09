@@ -37,6 +37,9 @@ class DataServiceRepositoryTest(
         val secondCatalogId = "456"
 
         val dataService = DataService(
+            id = "1111",
+            catalogId = firstCatalogId,
+            status = Status.PUBLISHED,
             endpointUrl = "endpointUrl",
             titles = listOf(
                 LanguageString("nb", "title")
@@ -44,7 +47,7 @@ class DataServiceRepositoryTest(
         )
 
         operations.insertAll(
-            listOf(dataService.copy(catalogId = firstCatalogId), dataService.copy(catalogId = secondCatalogId))
+            listOf(dataService, dataService.copy(id = "2222", catalogId = secondCatalogId))
         )
 
         val dataServices = repository.findAllByCatalogId(firstCatalogId)
@@ -59,6 +62,9 @@ class DataServiceRepositoryTest(
         val secondCatalogId = "456"
 
         val dataService = DataService(
+            id = "1111",
+            catalogId = firstCatalogId,
+            status = Status.PUBLISHED,
             endpointUrl = "endpointUrl",
             titles = listOf(
                 LanguageString("nb", "title")
@@ -66,7 +72,7 @@ class DataServiceRepositoryTest(
         )
 
         operations.insertAll(
-            listOf(dataService.copy(catalogId = firstCatalogId), dataService.copy(catalogId = secondCatalogId))
+            listOf(dataService, dataService.copy(id = "2222", catalogId = secondCatalogId))
         )
 
         val dataServices = repository.findAllByCatalogIdIn(setOf(firstCatalogId))
@@ -77,11 +83,14 @@ class DataServiceRepositoryTest(
 
     @Test
     fun `find by data service id`() {
-        val dataServiceId = "1234"
+        val catalogId = "1234"
+        val dataServiceId = "5678"
 
         operations.insert(
             DataService(
                 id = dataServiceId,
+                catalogId = catalogId,
+                status = Status.PUBLISHED,
                 endpointUrl = "endpointUrl",
                 titles = listOf(
                     LanguageString("nb", "title")
@@ -96,9 +105,13 @@ class DataServiceRepositoryTest(
 
     @Test
     fun `find all by status`() {
+        val catalogId = "1234"
         val status = Status.PUBLISHED
 
         val dataService = DataService(
+            id = "1111",
+            catalogId = catalogId,
+            status = status,
             endpointUrl = "endpointUrl",
             titles = listOf(
                 LanguageString("nb", "title")
@@ -106,7 +119,7 @@ class DataServiceRepositoryTest(
         )
 
         operations.insertAll(
-            listOf(dataService.copy(status = Status.PUBLISHED), dataService.copy(status = Status.DRAFT))
+            listOf(dataService, dataService.copy(id = "2222", status = Status.DRAFT))
         )
 
         val dataServices = repository.findAllByStatus(status)
@@ -121,7 +134,9 @@ class DataServiceRepositoryTest(
         val status = Status.PUBLISHED
 
         val dataService = DataService(
+            id = "1111",
             catalogId = catalogId,
+            status = status,
             endpointUrl = "endpointUrl",
             titles = listOf(
                 LanguageString("nb", "title")
@@ -129,7 +144,7 @@ class DataServiceRepositoryTest(
         )
 
         operations.insertAll(
-            listOf(dataService.copy(status = Status.PUBLISHED), dataService.copy(status = Status.DRAFT))
+            listOf(dataService, dataService.copy(id = "2222", status = Status.DRAFT))
         )
 
         val dataServices = repository.findAllByCatalogIdAndStatus(catalogId, status)

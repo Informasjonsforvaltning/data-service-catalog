@@ -31,7 +31,9 @@ class DataServiceHandlerTest {
         repository.stub {
             on { findAllByCatalogId(catalogId) } doReturn listOf(
                 DataService(
+                    id = "5678",
                     catalogId = catalogId,
+                    status = Status.PUBLISHED,
                     endpointUrl = "endpointUrl",
                     titles = listOf(
                         LanguageString("nb", "title")
@@ -54,6 +56,7 @@ class DataServiceHandlerTest {
             on { findDataServiceById(dataServiceId) } doReturn DataService(
                 id = dataServiceId,
                 catalogId = catalogId,
+                status = Status.PUBLISHED,
                 endpointUrl = "endpointUrl",
                 titles = listOf(
                     LanguageString("nb", "title")
@@ -75,6 +78,7 @@ class DataServiceHandlerTest {
             on { findDataServiceById(dataServiceId) } doReturn DataService(
                 id = dataServiceId,
                 catalogId = "invalid_catalog id",
+                status = Status.PUBLISHED,
                 endpointUrl = "endpointUrl",
                 titles = listOf(
                     LanguageString("nb", "title")
@@ -92,7 +96,7 @@ class DataServiceHandlerTest {
         val catalogId = "1234"
 
         val dataServiceId = handler.register(
-            catalogId, DataService(
+            catalogId, RegisterDataService(
                 endpointUrl = "endpointUrl",
                 titles = listOf(
                     LanguageString("nb", "title")
@@ -113,6 +117,7 @@ class DataServiceHandlerTest {
         val dataService = DataService(
             id = dataServiceId,
             catalogId = catalogId,
+            status = Status.PUBLISHED,
             endpointUrl = "endpointUrl",
             titles = listOf(
                 LanguageString("nb", "title")
@@ -152,6 +157,7 @@ class DataServiceHandlerTest {
             on { findDataServiceById(dataServiceId) } doReturn DataService(
                 id = dataServiceId,
                 catalogId = "invalid catalog id",
+                status = Status.PUBLISHED,
                 endpointUrl = "endpointUrl",
                 titles = listOf(
                     LanguageString("nb", "title")
@@ -182,6 +188,7 @@ class DataServiceHandlerTest {
             on { findDataServiceById(dataServiceId) } doReturn DataService(
                 id = dataServiceId,
                 catalogId = catalogId,
+                status = Status.PUBLISHED,
                 endpointUrl = "endpointUrl",
                 titles = listOf(
                     LanguageString("nb", "title")
@@ -203,6 +210,7 @@ class DataServiceHandlerTest {
             on { findDataServiceById(dataServiceId) } doReturn DataService(
                 id = dataServiceId,
                 catalogId = "invalid catalog id",
+                status = Status.PUBLISHED,
                 endpointUrl = "endpointUrl",
                 titles = listOf(
                     LanguageString("nb", "title")

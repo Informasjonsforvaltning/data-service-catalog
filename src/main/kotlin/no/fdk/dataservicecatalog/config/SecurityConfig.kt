@@ -18,7 +18,7 @@ import org.springframework.web.cors.CorsConfiguration
 
 @Configuration
 @EnableMethodSecurity
-class SecurityConfig(@Value("\${application.cors.originPatterns}") val corsOriginPatterns: Array<String>) {
+class SecurityConfig(@Value("\${application.cors.originPatterns}") private val corsOriginPatterns: Array<String>) {
 
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {

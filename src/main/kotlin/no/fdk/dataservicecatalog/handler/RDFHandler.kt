@@ -24,9 +24,10 @@ class RDFHandler(private val repository: DataServiceRepository, private val prop
     fun findCatalogs(lang: Lang): String {
         val model = createModel()
 
-        repository.findAllByStatus(Status.PUBLISHED).groupBy(DataService::catalogId)
+        repository.findAllByStatus(Status.PUBLISHED)
+            .groupBy(DataService::catalogId)
             .forEach { (catalogId, dataServices) ->
-                catalogId?.let { id ->
+                catalogId.let { id ->
                     model.addCatalog(id, getCatalogUri(), getOrganizationUri(), getPublisherUri())
 
                     dataServices.forEach { dataService ->
@@ -42,38 +43,46 @@ class RDFHandler(private val repository: DataServiceRepository, private val prop
     fun findCatalogById(catalogId: String, lang: Lang): String {
         val model = createModel()
 
-        repository.findAllByCatalogIdAndStatus(catalogId, Status.PUBLISHED).forEach { dataService ->
-            dataService.catalogId?.let { id ->
-                model.addCatalog(id, getCatalogUri(), getOrganizationUri(), getPublisherUri())
-                model.addDataServiceToCatalog(dataService, getCatalogUri(), getDataServiceUri(id))
-                model.addDataService(dataService, getDataServiceUri(id))
+        repository.findAllByCatalogIdAndStatus(catalogId, Status.PUBLISHED)
+            .forEach { dataService ->
+                dataService.catalogId.let { id ->
+                    model.addCatalog(id, getCatalogUri(), getOrganizationUri(), getPublisherUri())
+                    model.addDataServiceToCatalog(dataService, getCatalogUri(), getDataServiceUri(id))
+                    model.addDataService(dataService, getDataServiceUri(id))
+                }
             }
-        }
 
         return model.serialize(lang)
     }
 
     fun findDataServiceByCatalogIdAndDataServiceId(catalogId: String, dataServiceId: String, lang: Lang): String {
-        val dataService = repository.findDataServiceById(dataServiceId)?.takeIf { it.catalogId == catalogId }
+        val dataService = repository.findDataServiceById(dataServiceId)
+            ?.takeIf { it.catalogId == catalogId }
             ?: throw NotFoundException("Data Service with id: $dataServiceId not found in Catalog with id: $catalogId")
 
         val model = createModel()
 
-        dataService.catalogId?.let { id ->
-            model.addDataService(dataService, getDataServiceUri(id))
-        }
+        dataService.catalogId
+            .let { id ->
+                model.addDataService(dataService, getDataServiceUri(id))
+            }
 
         return model.serialize(lang)
     }
 
     private fun createModel(): Model {
-        return ModelFactory.createDefaultModel().apply {
-            setNsPrefixes(
-                mapOf(
-                    "dcat" to DCAT.NS, "dct" to DCTerms.NS, "rdf" to RDF.uri, "vcard" to VCARD4.NS, "foaf" to FOAF.NS
+        return ModelFactory.createDefaultModel()
+            .apply {
+                setNsPrefixes(
+                    mapOf(
+                        "dcat" to DCAT.NS,
+                        "dct" to DCTerms.NS,
+                        "rdf" to RDF.uri,
+                        "vcard" to VCARD4.NS,
+                        "foaf" to FOAF.NS
+                    )
                 )
-            )
-        }
+            }
     }
 
     private fun getCatalogUri(): String {

@@ -2,6 +2,7 @@ package no.fdk.dataservicecatalog.handler
 
 import no.fdk.dataservicecatalog.domain.DataService
 import no.fdk.dataservicecatalog.domain.PatchRequest
+import no.fdk.dataservicecatalog.domain.RegisterDataService
 import no.fdk.dataservicecatalog.domain.Status
 import no.fdk.dataservicecatalog.exception.NotFoundException
 import no.fdk.dataservicecatalog.repository.DataServiceRepository
@@ -23,14 +24,29 @@ class DataServiceHandler(private val repository: DataServiceRepository) {
             ?: throw NotFoundException("Data Service with id: $dataServiceId not found in Catalog with id: $catalogId")
     }
 
-    fun register(catalogId: String, dataService: DataService): String {
+    fun register(catalogId: String, registerDataService: RegisterDataService): String {
         val id = UUID.randomUUID().toString()
 
         repository.insert(
-            dataService.copy(
+            DataService(
                 id = id,
                 catalogId = catalogId,
-                status = dataService.status ?: Status.DRAFT
+                status = registerDataService.status ?: Status.DRAFT,
+                endpointUrl = registerDataService.endpointUrl,
+                titles = registerDataService.titles,
+                keywords = registerDataService.keywords,
+                endpointDescriptions = registerDataService.endpointDescriptions,
+                formats = registerDataService.formats,
+                contactPoint = registerDataService.contactPoint,
+                themes = registerDataService.themes,
+                servesDataset = registerDataService.servesDataset,
+                description = registerDataService.description,
+                pages = registerDataService.pages,
+                landingPage = registerDataService.landingPage,
+                license = registerDataService.license,
+                mediaTypes = registerDataService.mediaTypes,
+                accessRights = registerDataService.accessRights,
+                type = registerDataService.type
             )
         )
 

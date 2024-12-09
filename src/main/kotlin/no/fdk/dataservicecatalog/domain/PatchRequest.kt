@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonValue
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotEmpty
-import jakarta.validation.constraints.NotNull
 
 data class PatchRequest(
 

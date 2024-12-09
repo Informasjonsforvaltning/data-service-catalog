@@ -1,6 +1,5 @@
 package no.fdk.dataservicecatalog.domain
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotEmpty
@@ -22,7 +21,7 @@ data class DataService(
     identifikator (dct:identifier)
      */
     @Id
-    val id: String? = null,
+    val id: String,
 
     @CreatedDate
     val created: LocalDateTime? = null,
@@ -31,30 +30,25 @@ data class DataService(
     val modified: LocalDateTime? = null,
 
     @Version
-    @JsonIgnore
     val version: Int? = null,
 
-    val catalogId: String? = null,
+    val catalogId: String,
 
-    val status: Status? = null,
+    val status: Status,
 
     /*
     endepunktsURL (dcat:endpointURL)
      */
-    @field:NotBlank(message = "Cannot be blank")
     val endpointUrl: String,
 
     /*
     tittel (dct:title)
      */
-    @field:Valid
-    @field:NotEmpty(message = "Cannot be empty")
     val titles: List<LanguageString>,
 
     /*
     emneord (dcat:keyword)
      */
-    @field:Valid
     val keywords: List<LanguageString>? = null,
 
     /*
@@ -85,7 +79,6 @@ data class DataService(
     /*
     beskrivelse (dct:description)
      */
-    @field:Valid
     val description: LanguageString? = null,
 
     /*
@@ -116,6 +109,46 @@ data class DataService(
     /*
     type (dct:type)
      */
+    val type: String? = null
+)
+
+data class RegisterDataService(
+
+    val status: Status? = null,
+
+    @field:NotBlank(message = "Cannot be blank")
+    val endpointUrl: String,
+
+    @field:Valid
+    @field:NotEmpty(message = "Cannot be empty")
+    val titles: List<LanguageString>,
+
+    @field:Valid
+    val keywords: List<LanguageString>? = null,
+
+    val endpointDescriptions: List<String>? = null,
+
+    val formats: List<String>? = null,
+
+    val contactPoint: ContactPoint? = null,
+
+    val themes: List<String>? = null,
+
+    val servesDataset: List<String>? = null,
+
+    @field:Valid
+    val description: LanguageString? = null,
+
+    val pages: List<String>? = null,
+
+    val landingPage: String? = null,
+
+    val license: License? = null,
+
+    val mediaTypes: List<String>? = null,
+
+    val accessRights: String? = null,
+
     val type: String? = null
 )
 
