@@ -248,7 +248,7 @@ class RDFHandlerTest {
                 status = Status.PUBLISHED,
                 endpointUrl = "endpointUrl",
                 titles = listOf(
-                    LanguageString("nb", "title")
+                    LocalizedStrings(nb = "title")
                 )
             )
         }
@@ -325,8 +325,8 @@ class RDFHandlerTest {
         catalogId = "5678",
         status = Status.PUBLISHED,
         endpointUrl = "http://example.com",
-        titles = listOf(LanguageString("en", "title")),
-        keywords = listOf(LanguageString("en", "keyword")),
+        titles = listOf(LocalizedStrings(en = "title")),
+        keywords = listOf(LocalizedStrings(en = "keyword")),
         endpointDescriptions = listOf("http://endpoint-description.com"),
         formats = listOf("http://format.com"),
         contactPoint = ContactPoint(
@@ -336,7 +336,7 @@ class RDFHandlerTest {
             url = "url"
         ),
         servesDataset = listOf("http://serves-dataset.com"),
-        description = LanguageString("en", "description"),
+        description = LocalizedStrings(en = "description"),
         pages = listOf("http://page.com"),
         landingPage = "http://landing-page.com",
         license = License(

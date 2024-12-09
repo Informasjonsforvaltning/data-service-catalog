@@ -1,7 +1,7 @@
 package no.fdk.dataservicecatalog.unit.handler
 
 import no.fdk.dataservicecatalog.domain.DataService
-import no.fdk.dataservicecatalog.domain.LanguageString
+import no.fdk.dataservicecatalog.domain.LocalizedStrings
 import no.fdk.dataservicecatalog.domain.Status
 import no.fdk.dataservicecatalog.handler.CountHandler
 import no.fdk.dataservicecatalog.repository.DataServiceRepository
@@ -34,7 +34,7 @@ class CountHandlerTest {
             status = Status.PUBLISHED,
             endpointUrl = "endpointUrl",
             titles = listOf(
-                LanguageString("nb", "title")
+                LocalizedStrings(nb = "title")
             )
         )
 
@@ -71,7 +71,7 @@ class CountHandlerTest {
             status = Status.PUBLISHED,
             endpointUrl = "endpointUrl",
             titles = listOf(
-                LanguageString("nb", "title")
+                LocalizedStrings(nb = "title")
             )
         )
 
