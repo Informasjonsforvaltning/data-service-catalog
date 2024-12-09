@@ -74,7 +74,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
                 status = Status.PUBLISHED,
                 endpointUrl = "endpointUrl",
                 titles = listOf(
-                    LanguageString(language = "nb", value = "title")
+                    LocalizedStrings(nb = "title")
                 )
             )
         }
@@ -128,7 +128,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
         val registerDataService = RegisterDataService(
             endpointUrl = "endpointUrl",
             titles = listOf(
-                LanguageString("nb", "title")
+                LocalizedStrings(nb = "title")
             )
         )
 
@@ -144,8 +144,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
                     "endpointUrl": "endpointUrl",
                     "titles": [
                         {
-                            "language": "nb",
-                            "value": "title"
+                            "nb": "title"
                         }
                     ]
                 }
@@ -170,8 +169,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
                     "endpointUrl": "endpointUrl",
                     "titles": [
                         {
-                            "language": "nb",
-                            "value": "title"
+                            "nb": "title"
                         }
                     ]
                 }
@@ -188,7 +186,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
         val registerDataService = RegisterDataService(
             endpointUrl = "endpointUrl",
             titles = listOf(
-                LanguageString("nb", "title")
+                LocalizedStrings(nb = "title")
             )
         )
 
@@ -204,8 +202,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
                     "endpointUrl": "endpointUrl",
                     "titles": [
                         {
-                            "language": "nb",
-                            "value": "title"
+                            "nb": "title"
                         }
                     ]
                 }
@@ -231,8 +228,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
                     "endpointUrl": "",
                     "titles": [
                         {
-                            "language": "nb",
-                            "value": "title"
+                            "nb": "title"
                         }
                     ]
                 }
@@ -272,64 +268,6 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
         }
     }
 
-    @Test
-    fun `register should respond with bad request on blank language for titles in payload`() {
-        val catalogId = "1234"
-
-        mockMvc.post("/internal/catalogs/$catalogId/data-services") {
-            with(jwt())
-            contentType = MediaType.APPLICATION_JSON
-            content = """
-                {
-                    "endpointUrl": "endpointUrl",
-                    "titles": [
-                        {
-                            "language": "",
-                            "value": "title"
-                        }
-                    ]
-                }
-            """
-        }.andExpect {
-            status { isBadRequest() }
-            header {
-                string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
-            }
-            jsonPath("$.detail") { value("Failed to validate content.") }
-            jsonPath("$.errors[0].field") { value("titles[0].language") }
-            jsonPath("$.errors[0].message") { value("Cannot be blank") }
-        }
-    }
-
-    @Test
-    fun `register should respond with bad request on blank value for titles in payload`() {
-        val catalogId = "1234"
-
-        mockMvc.post("/internal/catalogs/$catalogId/data-services") {
-            with(jwt())
-            contentType = MediaType.APPLICATION_JSON
-            content = """
-                {
-                    "endpointUrl": "endpointUrl",
-                    "titles": [
-                        {
-                            "language": "nb",
-                            "value": ""
-                        }
-                    ]
-                }
-            """
-        }.andExpect {
-            status { isBadRequest() }
-            header {
-                string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
-            }
-            jsonPath("$.detail") { value("Failed to validate content.") }
-            jsonPath("$.errors[0].field") { value("titles[0].value") }
-            jsonPath("$.errors[0].message") { value("Cannot be blank") }
-        }
-    }
-
     @ParameterizedTest
     @ValueSource(strings = ["organization:%s:admin", "organization:%s:write"])
     fun `update should respond with ok and payload`(authority: String) {
@@ -342,7 +280,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
             status = Status.PUBLISHED,
             endpointUrl = "endpointUrl",
             titles = listOf(
-                LanguageString("nb", "title")
+                LocalizedStrings(nb = "title")
             )
         )
 

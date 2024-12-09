@@ -36,7 +36,7 @@ class DataServiceHandlerTest {
                     status = Status.PUBLISHED,
                     endpointUrl = "endpointUrl",
                     titles = listOf(
-                        LanguageString("nb", "title")
+                        LocalizedStrings(nb = "title")
                     )
                 )
             )
@@ -59,7 +59,7 @@ class DataServiceHandlerTest {
                 status = Status.PUBLISHED,
                 endpointUrl = "endpointUrl",
                 titles = listOf(
-                    LanguageString("nb", "title")
+                    LocalizedStrings(nb = "title")
                 )
             )
         }
@@ -81,7 +81,7 @@ class DataServiceHandlerTest {
                 status = Status.PUBLISHED,
                 endpointUrl = "endpointUrl",
                 titles = listOf(
-                    LanguageString("nb", "title")
+                    LocalizedStrings(nb = "title")
                 )
             )
         }
@@ -99,7 +99,7 @@ class DataServiceHandlerTest {
             catalogId, RegisterDataService(
                 endpointUrl = "endpointUrl",
                 titles = listOf(
-                    LanguageString("nb", "title")
+                    LocalizedStrings(nb = "title")
                 )
             )
         )
@@ -120,7 +120,7 @@ class DataServiceHandlerTest {
             status = Status.PUBLISHED,
             endpointUrl = "endpointUrl",
             titles = listOf(
-                LanguageString("nb", "title")
+                LocalizedStrings(nb = "title")
             )
         )
 
@@ -160,7 +160,7 @@ class DataServiceHandlerTest {
                 status = Status.PUBLISHED,
                 endpointUrl = "endpointUrl",
                 titles = listOf(
-                    LanguageString("nb", "title")
+                    LocalizedStrings(nb = "title")
                 )
             )
         }
@@ -191,7 +191,7 @@ class DataServiceHandlerTest {
                 status = Status.PUBLISHED,
                 endpointUrl = "endpointUrl",
                 titles = listOf(
-                    LanguageString("nb", "title")
+                    LocalizedStrings(nb = "title")
                 )
             )
         }
@@ -213,7 +213,7 @@ class DataServiceHandlerTest {
                 status = Status.PUBLISHED,
                 endpointUrl = "endpointUrl",
                 titles = listOf(
-                    LanguageString("nb", "title")
+                    LocalizedStrings(nb = "title")
                 )
             )
         }

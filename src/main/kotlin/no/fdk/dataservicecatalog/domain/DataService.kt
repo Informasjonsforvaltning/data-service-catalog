@@ -1,6 +1,5 @@
 package no.fdk.dataservicecatalog.domain
 
-import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotEmpty
 import org.springframework.data.annotation.CreatedDate
@@ -44,12 +43,12 @@ data class DataService(
     /*
     tittel (dct:title)
      */
-    val titles: List<LanguageString>,
+    val titles: List<LocalizedStrings>,
 
     /*
     emneord (dcat:keyword)
      */
-    val keywords: List<LanguageString>? = null,
+    val keywords: List<LocalizedStrings>? = null,
 
     /*
     endepunktsbeskrivelse (dcat:endpointDescription)
@@ -79,7 +78,7 @@ data class DataService(
     /*
     beskrivelse (dct:description)
      */
-    val description: LanguageString? = null,
+    val description: LocalizedStrings? = null,
 
     /*
     dokumentasjon (foaf:page)
@@ -119,12 +118,10 @@ data class RegisterDataService(
     @field:NotBlank(message = "Cannot be blank")
     val endpointUrl: String,
 
-    @field:Valid
     @field:NotEmpty(message = "Cannot be empty")
-    val titles: List<LanguageString>,
+    val titles: List<LocalizedStrings>,
 
-    @field:Valid
-    val keywords: List<LanguageString>? = null,
+    val keywords: List<LocalizedStrings>? = null,
 
     val endpointDescriptions: List<String>? = null,
 
@@ -136,8 +133,7 @@ data class RegisterDataService(
 
     val servesDataset: List<String>? = null,
 
-    @field:Valid
-    val description: LanguageString? = null,
+    val description: LocalizedStrings? = null,
 
     val pages: List<String>? = null,
 
@@ -152,13 +148,10 @@ data class RegisterDataService(
     val type: String? = null
 )
 
-data class LanguageString(
-
-    @field:NotBlank(message = "Cannot be blank")
-    val language: String,
-
-    @field:NotBlank(message = "Cannot be blank")
-    val value: String
+data class LocalizedStrings(
+    val nb: String? = null,
+    val nn: String? = null,
+    val en: String? = null,
 )
 
 data class ContactPoint(

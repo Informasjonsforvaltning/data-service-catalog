@@ -141,16 +141,32 @@ fun Model.addDataService(dataService: DataService, dataServiceUri: String) {
         )
     }
 
-    dataService.titles.forEach {
-        dataServiceResource.addProperty(
-            DCTerms.title, ResourceFactory.createLangLiteral(it.value, it.language)
-        )
+    dataService.titles.forEach { title ->
+        listOf(
+            "nb" to title.nb,
+            "nn" to title.nn,
+            "en" to title.en,
+        ).forEach { (lang, value) ->
+            value?.let {
+                dataServiceResource.addProperty(
+                    DCTerms.title, ResourceFactory.createLangLiteral(it, lang)
+                )
+            }
+        }
     }
 
-    dataService.keywords?.forEach {
-        dataServiceResource.addProperty(
-            DCAT.keyword, ResourceFactory.createLangLiteral(it.value, it.language)
-        )
+    dataService.keywords?.forEach { keyword ->
+        listOf(
+            "nb" to keyword.nb,
+            "nn" to keyword.nn,
+            "en" to keyword.en,
+        ).forEach { (lang, value) ->
+            value?.let {
+                dataServiceResource.addProperty(
+                    DCAT.keyword, ResourceFactory.createLangLiteral(it, lang)
+                )
+            }
+        }
     }
 
     dataService.endpointDescriptions?.filter(FileUtils::isURI)?.forEach {
@@ -219,10 +235,18 @@ fun Model.addDataService(dataService: DataService, dataServiceUri: String) {
         )
     }
 
-    dataService.description?.let {
-        dataServiceResource.addProperty(
-            DCTerms.description, ResourceFactory.createLangLiteral(it.value, it.language)
-        )
+    dataService.description?.let { description ->
+        listOf(
+            "nb" to description.nb,
+            "nn" to description.nn,
+            "en" to description.en,
+        ).forEach { (lang, value) ->
+            value?.let {
+                dataServiceResource.addProperty(
+                    DCTerms.description, ResourceFactory.createLangLiteral(it, lang)
+                )
+            }
+        }
     }
 
     dataService.pages?.filter(FileUtils::isURI)?.forEach {
