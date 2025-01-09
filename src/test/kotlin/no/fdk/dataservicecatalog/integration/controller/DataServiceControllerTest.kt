@@ -73,9 +73,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
                 catalogId = catalogId,
                 status = Status.PUBLISHED,
                 endpointUrl = "endpointUrl",
-                titles = listOf(
-                    LocalizedStrings(nb = "title")
-                )
+                titles = LocalizedStrings(nb = "title")
             )
         }
 
@@ -127,9 +125,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
 
         val registerDataService = RegisterDataService(
             endpointUrl = "endpointUrl",
-            titles = listOf(
-                LocalizedStrings(nb = "title")
-            )
+            titles = LocalizedStrings(nb = "title")
         )
 
         handler.stub {
@@ -142,11 +138,9 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
             content = """
                 {
                     "endpointUrl": "endpointUrl",
-                    "titles": [
-                        {
-                            "nb": "title"
-                        }
-                    ]
+                    "titles": {
+                        "nb": "title"
+                    }
                 }
             """
         }.andExpect {
@@ -167,11 +161,9 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
             content = """
                 {
                     "endpointUrl": "endpointUrl",
-                    "titles": [
-                        {
-                            "nb": "title"
-                        }
-                    ]
+                    "titles": {
+                        "nb": "title"
+                    }
                 }
             """
         }.andExpect {
@@ -185,9 +177,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
 
         val registerDataService = RegisterDataService(
             endpointUrl = "endpointUrl",
-            titles = listOf(
-                LocalizedStrings(nb = "title")
-            )
+            titles = LocalizedStrings(nb = "title")
         )
 
         handler.stub {
@@ -200,11 +190,9 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
             content = """
                 {
                     "endpointUrl": "endpointUrl",
-                    "titles": [
-                        {
-                            "nb": "title"
-                        }
-                    ]
+                    "titles": {
+                        "nb": "title"
+                    }
                 }
             """
         }.andExpect {
@@ -226,11 +214,9 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
             content = """
                 {
                     "endpointUrl": "",
-                    "titles": [
-                        {
-                            "nb": "title"
-                        }
-                    ]
+                    "titles": {
+                        "nb": "title"
+                    }
                 }
             """
         }.andExpect {
@@ -245,7 +231,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
     }
 
     @Test
-    fun `register should respond with bad request on empty titles in payload`() {
+    fun `register should respond with bad request on missing titles in payload`() {
         val catalogId = "1234"
 
         mockMvc.post("/internal/catalogs/$catalogId/data-services") {
@@ -254,7 +240,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
             content = """
                 {
                     "endpointUrl": "endpointUrl",
-                    "titles": []
+                    "titles": null
                 }
             """
         }.andExpect {
@@ -262,9 +248,6 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
             header {
                 string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
             }
-            jsonPath("$.detail") { value("Failed to validate content.") }
-            jsonPath("$.errors[0].field") { value("titles") }
-            jsonPath("$.errors[0].message") { value("Cannot be empty") }
         }
     }
 
@@ -279,9 +262,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
             catalogId = catalogId,
             status = Status.PUBLISHED,
             endpointUrl = "endpointUrl",
-            titles = listOf(
-                LocalizedStrings(nb = "title")
-            )
+            titles = LocalizedStrings(nb = "title")
         )
 
         val patchRequest = PatchRequest(

@@ -33,7 +33,7 @@ class MongoConfigTest {
     fun setup() {
         SecurityContextHolder.setContext(securityContext)
 
-        config = MongoConfig("database")
+        config = MongoConfig()
     }
 
     @Test

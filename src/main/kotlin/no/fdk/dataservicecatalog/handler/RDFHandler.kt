@@ -141,7 +141,7 @@ fun Model.addDataService(dataService: DataService, dataServiceUri: String) {
         )
     }
 
-    dataService.titles.forEach { title ->
+    dataService.titles.let { title ->
         listOf(
             "nb" to title.nb,
             "nn" to title.nn,

@@ -33,9 +33,7 @@ class CountHandlerTest {
             catalogId = firstCatalogId,
             status = Status.PUBLISHED,
             endpointUrl = "endpointUrl",
-            titles = listOf(
-                LocalizedStrings(nb = "title")
-            )
+            titles = LocalizedStrings(nb = "title")
         )
 
         repository.stub {
@@ -70,9 +68,7 @@ class CountHandlerTest {
             catalogId = firstCatalogId,
             status = Status.PUBLISHED,
             endpointUrl = "endpointUrl",
-            titles = listOf(
-                LocalizedStrings(nb = "title")
-            )
+            titles = LocalizedStrings(nb = "title")
         )
 
         repository.stub {
