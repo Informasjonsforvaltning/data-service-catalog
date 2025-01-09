@@ -247,7 +247,7 @@ class RDFHandlerTest {
                 catalogId = "invalid catalog id",
                 status = Status.PUBLISHED,
                 endpointUrl = "endpointUrl",
-                titles = LocalizedStrings(nb = "title")
+                title = LocalizedStrings(nb = "title")
             )
         }
 
@@ -323,7 +323,7 @@ class RDFHandlerTest {
         catalogId = "5678",
         status = Status.PUBLISHED,
         endpointUrl = "http://example.com",
-        titles = LocalizedStrings(en = "title"),
+        title = LocalizedStrings(en = "title"),
         keywords = listOf(LocalizedStrings(en = "keyword")),
         endpointDescriptions = listOf("http://endpoint-description.com"),
         formats = listOf("http://format.com"),

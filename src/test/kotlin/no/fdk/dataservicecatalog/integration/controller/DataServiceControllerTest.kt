@@ -73,7 +73,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
                 catalogId = catalogId,
                 status = Status.PUBLISHED,
                 endpointUrl = "endpointUrl",
-                titles = LocalizedStrings(nb = "title")
+                title = LocalizedStrings(nb = "title")
             )
         }
 
@@ -125,7 +125,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
 
         val registerDataService = RegisterDataService(
             endpointUrl = "endpointUrl",
-            titles = LocalizedStrings(nb = "title")
+            title = LocalizedStrings(nb = "title")
         )
 
         handler.stub {
@@ -138,7 +138,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
             content = """
                 {
                     "endpointUrl": "endpointUrl",
-                    "titles": {
+                    "title": {
                         "nb": "title"
                     }
                 }
@@ -161,7 +161,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
             content = """
                 {
                     "endpointUrl": "endpointUrl",
-                    "titles": {
+                    "title": {
                         "nb": "title"
                     }
                 }
@@ -177,7 +177,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
 
         val registerDataService = RegisterDataService(
             endpointUrl = "endpointUrl",
-            titles = LocalizedStrings(nb = "title")
+            title = LocalizedStrings(nb = "title")
         )
 
         handler.stub {
@@ -190,7 +190,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
             content = """
                 {
                     "endpointUrl": "endpointUrl",
-                    "titles": {
+                    "title": {
                         "nb": "title"
                     }
                 }
@@ -214,7 +214,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
             content = """
                 {
                     "endpointUrl": "",
-                    "titles": {
+                    "title": {
                         "nb": "title"
                     }
                 }
@@ -231,7 +231,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
     }
 
     @Test
-    fun `register should respond with bad request on missing titles in payload`() {
+    fun `register should respond with bad request on missing title in payload`() {
         val catalogId = "1234"
 
         mockMvc.post("/internal/catalogs/$catalogId/data-services") {
@@ -240,7 +240,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
             content = """
                 {
                     "endpointUrl": "endpointUrl",
-                    "titles": null
+                    "title": null
                 }
             """
         }.andExpect {
@@ -262,14 +262,14 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
             catalogId = catalogId,
             status = Status.PUBLISHED,
             endpointUrl = "endpointUrl",
-            titles = LocalizedStrings(nb = "title")
+            title = LocalizedStrings(nb = "title")
         )
 
         val patchRequest = PatchRequest(
             listOf(
                 JsonPatchOperation(
                     op = OpEnum.REMOVE,
-                    path = "titles"
+                    path = "title"
                 )
             )
         )
@@ -285,7 +285,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
                 [
                     {
                         "op": "remove",
-                        "path": "titles"
+                        "path": "title"
                     }
                 ]
             """
@@ -324,7 +324,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
             listOf(
                 JsonPatchOperation(
                     op = OpEnum.REMOVE,
-                    path = "titles"
+                    path = "title"
                 )
             )
         )
@@ -346,7 +346,7 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
                 [
                     {
                         "op": "remove",
-                        "path": "titles"
+                        "path": "title"
                     }
                 ]
             """

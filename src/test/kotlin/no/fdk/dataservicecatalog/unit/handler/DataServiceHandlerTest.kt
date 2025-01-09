@@ -35,7 +35,7 @@ class DataServiceHandlerTest {
                     catalogId = catalogId,
                     status = Status.PUBLISHED,
                     endpointUrl = "endpointUrl",
-                    titles = LocalizedStrings(nb = "title")
+                    title = LocalizedStrings(nb = "title")
                 )
             )
         }
@@ -56,7 +56,7 @@ class DataServiceHandlerTest {
                 catalogId = catalogId,
                 status = Status.PUBLISHED,
                 endpointUrl = "endpointUrl",
-                titles = LocalizedStrings(nb = "title")
+                title = LocalizedStrings(nb = "title")
             )
         }
 
@@ -76,7 +76,7 @@ class DataServiceHandlerTest {
                 catalogId = "invalid_catalog id",
                 status = Status.PUBLISHED,
                 endpointUrl = "endpointUrl",
-                titles = LocalizedStrings(nb = "title")
+                title = LocalizedStrings(nb = "title")
             )
         }
 
@@ -92,7 +92,7 @@ class DataServiceHandlerTest {
         val dataServiceId = handler.register(
             catalogId, RegisterDataService(
                 endpointUrl = "endpointUrl",
-                titles = LocalizedStrings(nb = "title")
+                title = LocalizedStrings(nb = "title")
             )
         )
 
@@ -111,7 +111,7 @@ class DataServiceHandlerTest {
             catalogId = catalogId,
             status = Status.PUBLISHED,
             endpointUrl = "endpointUrl",
-            titles = LocalizedStrings(nb = "title")
+            title = LocalizedStrings(nb = "title")
         )
 
         val patchedDataService = dataService.copy(
@@ -149,7 +149,7 @@ class DataServiceHandlerTest {
                 catalogId = "invalid catalog id",
                 status = Status.PUBLISHED,
                 endpointUrl = "endpointUrl",
-                titles = LocalizedStrings(nb = "title")
+                title = LocalizedStrings(nb = "title")
             )
         }
 
@@ -178,7 +178,7 @@ class DataServiceHandlerTest {
                 catalogId = catalogId,
                 status = Status.PUBLISHED,
                 endpointUrl = "endpointUrl",
-                titles = LocalizedStrings(nb = "title")
+                title = LocalizedStrings(nb = "title")
             )
         }
 
@@ -198,7 +198,7 @@ class DataServiceHandlerTest {
                 catalogId = "invalid catalog id",
                 status = Status.PUBLISHED,
                 endpointUrl = "endpointUrl",
-                titles = LocalizedStrings(nb = "title")
+                title = LocalizedStrings(nb = "title")
             )
         }
 
