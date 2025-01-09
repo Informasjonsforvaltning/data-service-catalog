@@ -33,7 +33,7 @@ class DataServiceHandler(private val repository: DataServiceRepository) {
                 catalogId = catalogId,
                 status = registerDataService.status ?: Status.DRAFT,
                 endpointUrl = registerDataService.endpointUrl,
-                titles = registerDataService.titles,
+                title = registerDataService.title,
                 keywords = registerDataService.keywords,
                 endpointDescriptions = registerDataService.endpointDescriptions,
                 formats = registerDataService.formats,

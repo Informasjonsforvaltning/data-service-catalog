@@ -41,9 +41,7 @@ class DataServiceRepositoryTest(
             catalogId = firstCatalogId,
             status = Status.PUBLISHED,
             endpointUrl = "endpointUrl",
-            titles = listOf(
-                LocalizedStrings(nb = "title")
-            )
+            title = LocalizedStrings(nb = "title")
         )
 
         operations.insertAll(
@@ -66,9 +64,7 @@ class DataServiceRepositoryTest(
             catalogId = firstCatalogId,
             status = Status.PUBLISHED,
             endpointUrl = "endpointUrl",
-            titles = listOf(
-                LocalizedStrings(nb = "title")
-            )
+            title = LocalizedStrings(nb = "title")
         )
 
         operations.insertAll(
@@ -92,9 +88,7 @@ class DataServiceRepositoryTest(
                 catalogId = catalogId,
                 status = Status.PUBLISHED,
                 endpointUrl = "endpointUrl",
-                titles = listOf(
-                    LocalizedStrings(nb = "title")
-                )
+                title = LocalizedStrings(nb = "title")
             )
         )
 
@@ -113,9 +107,7 @@ class DataServiceRepositoryTest(
             catalogId = catalogId,
             status = status,
             endpointUrl = "endpointUrl",
-            titles = listOf(
-                LocalizedStrings(nb = "title")
-            )
+            title = LocalizedStrings(nb = "title")
         )
 
         operations.insertAll(
@@ -138,9 +130,7 @@ class DataServiceRepositoryTest(
             catalogId = catalogId,
             status = status,
             endpointUrl = "endpointUrl",
-            titles = listOf(
-                LocalizedStrings(nb = "title")
-            )
+            title = LocalizedStrings(nb = "title")
         )
 
         operations.insertAll(

@@ -1,7 +1,6 @@
 package no.fdk.dataservicecatalog.domain
 
 import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.NotEmpty
 import org.springframework.data.annotation.*
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDateTime
@@ -43,7 +42,7 @@ data class DataService(
     /*
     tittel (dct:title)
      */
-    val titles: List<LocalizedStrings>,
+    val title: LocalizedStrings,
 
     /*
     emneord (dcat:keyword)
@@ -118,8 +117,7 @@ data class RegisterDataService(
     @field:NotBlank(message = "Cannot be blank")
     val endpointUrl: String,
 
-    @field:NotEmpty(message = "Cannot be empty")
-    val titles: List<LocalizedStrings>,
+    val title: LocalizedStrings,
 
     val keywords: List<LocalizedStrings>? = null,
 
