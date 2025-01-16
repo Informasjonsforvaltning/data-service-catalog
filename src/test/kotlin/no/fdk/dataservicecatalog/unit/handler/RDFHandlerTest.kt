@@ -328,7 +328,7 @@ class RDFHandlerTest {
         endpointDescriptions = listOf("http://endpoint-description.com"),
         formats = listOf("http://format.com"),
         contactPoint = ContactPoint(
-            name = "name",
+            organizationUnit = "name",
             phone = "phone",
             email = "email",
             url = "url"
