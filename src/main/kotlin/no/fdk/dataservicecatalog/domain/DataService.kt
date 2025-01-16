@@ -153,7 +153,7 @@ data class LocalizedStrings(
 )
 
 data class ContactPoint(
-    val name: String? = null,
+    val organizationUnit: String? = null,
     val phone: String? = null,
     val email: String? = null,
     val url: String? = null

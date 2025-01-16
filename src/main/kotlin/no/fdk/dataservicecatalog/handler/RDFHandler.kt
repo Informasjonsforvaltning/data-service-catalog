@@ -188,7 +188,7 @@ fun Model.addDataService(dataService: DataService, dataServiceUri: String) {
             VCARD4.fn, "Contact information | (${dataService.catalogId})"
         )
 
-        point.name?.takeIf(String::isNotBlank)?.let {
+        point.organizationUnit?.takeIf(String::isNotBlank)?.let {
             contactPointResource.addProperty(
                 VCARD4.hasOrganizationName, ResourceFactory.createLangLiteral(it, "nb")
             )
