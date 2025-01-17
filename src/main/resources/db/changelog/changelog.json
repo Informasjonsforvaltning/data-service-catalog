@@ -1,0 +1,124 @@
+{
+  "databaseChangeLog": [
+    {
+      "changeSet": {
+        "id": "1",
+        "author": "liquibase",
+        "comment": "Create person collection",
+        "changes": [
+          {
+            "createCollection": {
+              "collectionName": "person",
+              "options": {
+                "$rawJson": {
+                  "validator": {
+                    "$jsonSchema": {
+                      "bsonType": "object",
+                      "required": [
+                        "name"
+                      ],
+                      "properties": {
+                        "name": {
+                          "bsonType": "string",
+                          "description": "The Name"
+                        }
+                      }
+                    }
+                  },
+                  "validationAction": "error",
+                  "validationLevel": "strict"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "changeSet": {
+        "id": "2",
+        "author": "liquibase",
+        "comment": "Insert person",
+        "changes": [
+          {
+            "insertOne": {
+              "collectionName": "person",
+              "document": {
+                "$rawJson": {
+                  "name": "Person"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "changeSet": {
+        "id": "3",
+        "author": "liquibase",
+        "comment": "Create newPerson collection",
+        "changes": [
+          {
+            "createCollection": {
+              "collectionName": "newPerson",
+              "options": {
+                "$rawJson": {
+                  "validator": {
+                    "$jsonSchema": {
+                      "bsonType": "object",
+                      "required": [
+                        "newName"
+                      ],
+                      "properties": {
+                        "name": {
+                          "bsonType": "string",
+                          "description": "The Name"
+                        }
+                      }
+                    }
+                  },
+                  "validationAction": "error",
+                  "validationLevel": "strict"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "changeSet": {
+        "id": "4",
+        "author": "liquibase",
+        "comment": "Migrate persons from person to newPerson",
+        "changes": [
+          {
+            "runCommand": {
+              "command": {
+                "$rawJson": {
+                  "aggregate": "person",
+                  "pipeline": [
+                    {
+                      "$match": {}
+                    },
+                    {
+                      "$project": {
+                        "newName": "$name",
+                        "_id": 0
+                      }
+                    },
+                    {
+                      "$out": "newPerson"
+                    }
+                  ],
+                  "cursor": {}
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
