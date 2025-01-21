@@ -324,7 +324,7 @@ class RDFHandlerTest {
         status = Status.PUBLISHED,
         endpointUrl = "http://example.com",
         title = LocalizedStrings(en = "title"),
-        keywords = listOf(LocalizedStrings(en = "keyword")),
+        keywords = LocalizedStringLists(en = listOf("keyword")),
         endpointDescriptions = listOf("http://endpoint-description.com"),
         formats = listOf("http://format.com"),
         contactPoint = ContactPoint(
