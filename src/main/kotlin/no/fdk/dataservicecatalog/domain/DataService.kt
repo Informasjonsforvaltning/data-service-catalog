@@ -47,7 +47,7 @@ data class DataService(
     /*
     emneord (dcat:keyword)
      */
-    val keywords: List<LocalizedStrings>? = null,
+    val keywords: LocalizedStringLists? = null,
 
     /*
     endepunktsbeskrivelse (dcat:endpointDescription)
@@ -119,7 +119,7 @@ data class RegisterDataService(
 
     val title: LocalizedStrings,
 
-    val keywords: List<LocalizedStrings>? = null,
+    val keywords: LocalizedStringLists? = null,
 
     val endpointDescriptions: List<String>? = null,
 
@@ -150,6 +150,12 @@ data class LocalizedStrings(
     val nb: String? = null,
     val nn: String? = null,
     val en: String? = null,
+)
+
+data class LocalizedStringLists(
+    val nb: List<String>? = null,
+    val nn: List<String>? = null,
+    val en: List<String>? = null,
 )
 
 data class ContactPoint(

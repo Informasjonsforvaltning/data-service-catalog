@@ -155,13 +155,13 @@ fun Model.addDataService(dataService: DataService, dataServiceUri: String) {
         }
     }
 
-    dataService.keywords?.forEach { keyword ->
+    dataService.keywords?.let { keyword ->
         listOf(
             "nb" to keyword.nb,
             "nn" to keyword.nn,
             "en" to keyword.en,
         ).forEach { (lang, value) ->
-            value?.let {
+            value?.forEach {
                 dataServiceResource.addProperty(
                     DCAT.keyword, ResourceFactory.createLangLiteral(it, lang)
                 )
