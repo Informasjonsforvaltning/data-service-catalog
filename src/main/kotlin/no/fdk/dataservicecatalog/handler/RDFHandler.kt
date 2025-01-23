@@ -261,7 +261,7 @@ fun Model.addDataService(dataService: DataService, dataServiceUri: String) {
         )
     }
 
-    dataService.license?.url?.takeIf(FileUtils::isURI)?.let {
+    dataService.license?.takeIf(FileUtils::isURI)?.let {
         dataServiceResource.addProperty(
             DCTerms.license, ResourceFactory.createResource(URIref.encode(it))
         )

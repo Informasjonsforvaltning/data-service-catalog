@@ -337,10 +337,7 @@ class RDFHandlerTest {
         description = LocalizedStrings(en = "description"),
         pages = listOf("http://page.com"),
         landingPage = "http://landing-page.com",
-        license = License(
-            name = "name",
-            url = "http://license.com"
-        ),
+        license = "http://license.com",
         mediaTypes = listOf("https://www.iana.org/assignments/media-types/application/json"),
         accessRights = "http://access-rights.com",
         type = "http://type.com"
