@@ -92,7 +92,7 @@ data class DataService(
     /*
     lisens (dct:license)
      */
-    val license: License? = null,
+    val license: String? = null,
 
     /*
     medietype (dcat:mediaType)
@@ -137,7 +137,7 @@ data class RegisterDataService(
 
     val landingPage: String? = null,
 
-    val license: License? = null,
+    val license: String? = null,
 
     val mediaTypes: List<String>? = null,
 
@@ -162,11 +162,6 @@ data class ContactPoint(
     val organizationUnit: String? = null,
     val phone: String? = null,
     val email: String? = null,
-    val url: String? = null
-)
-
-data class License(
-    val name: String? = null,
     val url: String? = null
 )
 
