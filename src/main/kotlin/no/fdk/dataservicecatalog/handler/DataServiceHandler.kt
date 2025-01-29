@@ -3,7 +3,6 @@ package no.fdk.dataservicecatalog.handler
 import no.fdk.dataservicecatalog.domain.DataService
 import no.fdk.dataservicecatalog.domain.PatchRequest
 import no.fdk.dataservicecatalog.domain.RegisterDataService
-import no.fdk.dataservicecatalog.domain.Status
 import no.fdk.dataservicecatalog.exception.NotFoundException
 import no.fdk.dataservicecatalog.repository.DataServiceRepository
 import org.slf4j.Logger
@@ -31,7 +30,7 @@ class DataServiceHandler(private val repository: DataServiceRepository) {
             DataService(
                 id = id,
                 catalogId = catalogId,
-                status = registerDataService.status ?: Status.DRAFT,
+                status = registerDataService.status,
                 endpointUrl = registerDataService.endpointUrl,
                 title = registerDataService.title,
                 keywords = registerDataService.keywords,

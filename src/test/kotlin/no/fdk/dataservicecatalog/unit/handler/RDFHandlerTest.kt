@@ -44,7 +44,7 @@ class RDFHandlerTest {
         expectedModel.read(StringReader(rdf), null, Lang.TURTLE.name)
 
         repository.stub {
-            on { findAllByStatus(Status.PUBLISHED) } doReturn emptyList()
+            on { findAllByPublished(true) } doReturn emptyList()
         }
 
         val catalogs = handler.findCatalogs(Lang.TURTLE)
@@ -69,6 +69,7 @@ class RDFHandlerTest {
             PREFIX foaf:  <http://xmlns.com/foaf/0.1/>
             PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
             PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
+            PREFIX adms:  <http://www.w3.org/ns/adms#>
 
             <$organizationCatalogBaseUri/organizations/$catalogId>
                     rdf:type        foaf:Agent;
@@ -84,6 +85,7 @@ class RDFHandlerTest {
                     dct:license               <http://license.com>;
                     dct:title                 "title"@en;
                     dct:type                  <http://type.com>;
+                    adms:status               <http://publications.europa.eu/resource/authority/distribution-status/DEVELOP>;
                     dcat:contactPoint         [ rdf:type                   vcard:Organization;
                                                 vcard:fn                   "Contact information | (5678)";
                                                 vcard:hasEmail             <mailto:email>;
@@ -111,7 +113,7 @@ class RDFHandlerTest {
         expectedModel.read(StringReader(rdf), null, Lang.TURTLE.name)
 
         repository.stub {
-            on { findAllByStatus(Status.PUBLISHED) } doReturn listOf(
+            on { findAllByPublished(true) } doReturn listOf(
                 dataService().copy(
                     id = dataServiceId,
                     catalogId = catalogId
@@ -148,7 +150,7 @@ class RDFHandlerTest {
         expectedModel.read(StringReader(rdf), null, Lang.TURTLE.name)
 
         repository.stub {
-            on { findAllByCatalogIdAndStatus(catalogId, Status.PUBLISHED) } doReturn emptyList()
+            on { findAllByCatalogIdAndPublished(catalogId, true) } doReturn emptyList()
         }
 
         val catalogs = handler.findCatalogById(catalogId, Lang.TURTLE)
@@ -173,6 +175,7 @@ class RDFHandlerTest {
             PREFIX foaf:  <http://xmlns.com/foaf/0.1/>
             PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
             PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
+            PREFIX adms:  <http://www.w3.org/ns/adms#>
 
             <$organizationCatalogBaseUri/organizations/$catalogId>
                     rdf:type        foaf:Agent;
@@ -188,6 +191,7 @@ class RDFHandlerTest {
                     dct:license               <http://license.com>;
                     dct:title                 "title"@en;
                     dct:type                  <http://type.com>;
+                    adms:status               <http://publications.europa.eu/resource/authority/distribution-status/DEVELOP>;
                     dcat:contactPoint         [ rdf:type                   vcard:Organization;
                                                 vcard:fn                   "Contact information | (5678)";
                                                 vcard:hasEmail             <mailto:email>;
@@ -215,7 +219,7 @@ class RDFHandlerTest {
         expectedModel.read(StringReader(rdf), null, Lang.TURTLE.name)
 
         repository.stub {
-            on { findAllByCatalogIdAndStatus(catalogId, Status.PUBLISHED) } doReturn listOf(
+            on { findAllByCatalogIdAndPublished(catalogId, true) } doReturn listOf(
                 dataService().copy(
                     id = dataServiceId,
                     catalogId = catalogId
@@ -245,7 +249,8 @@ class RDFHandlerTest {
             on { findDataServiceById(dataServiceId) } doReturn DataService(
                 id = dataServiceId,
                 catalogId = "invalid catalog id",
-                status = Status.PUBLISHED,
+                published = true,
+                status = null,
                 endpointUrl = "endpointUrl",
                 title = LocalizedStrings(nb = "title")
             )
@@ -269,6 +274,7 @@ class RDFHandlerTest {
             PREFIX foaf:  <http://xmlns.com/foaf/0.1/>
             PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
             PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
+            PREFIX adms:  <http://www.w3.org/ns/adms#>
             
             <$baseUri/catalogs/$catalogId/data-services/$dataServiceId>
                     rdf:type                  dcat:DataService;
@@ -278,6 +284,7 @@ class RDFHandlerTest {
                     dct:license               <http://license.com>;
                     dct:title                 "title"@en;
                     dct:type                  <http://type.com>;
+                    adms:status               <http://publications.europa.eu/resource/authority/distribution-status/DEVELOP>;
                     dcat:contactPoint         [ rdf:type                   vcard:Organization;
                                                 vcard:fn                   "Contact information | (5678)";
                                                 vcard:hasEmail             <mailto:email>;
@@ -321,7 +328,8 @@ class RDFHandlerTest {
     private fun dataService() = DataService(
         id = "1234",
         catalogId = "5678",
-        status = Status.PUBLISHED,
+        published = true,
+        status = "http://publications.europa.eu/resource/authority/distribution-status/DEVELOP",
         endpointUrl = "http://example.com",
         title = LocalizedStrings(en = "title"),
         keywords = LocalizedStringLists(en = listOf("keyword")),

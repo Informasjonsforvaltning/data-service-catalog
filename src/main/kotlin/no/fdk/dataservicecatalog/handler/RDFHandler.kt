@@ -2,8 +2,8 @@ package no.fdk.dataservicecatalog.handler
 
 import no.fdk.dataservicecatalog.ApplicationProperties
 import no.fdk.dataservicecatalog.domain.DataService
-import no.fdk.dataservicecatalog.domain.Status
 import no.fdk.dataservicecatalog.exception.NotFoundException
+import no.fdk.dataservicecatalog.rdf.ADMS
 import no.fdk.dataservicecatalog.repository.DataServiceRepository
 import org.apache.jena.rdf.model.Model
 import org.apache.jena.rdf.model.ModelFactory
@@ -24,7 +24,7 @@ class RDFHandler(private val repository: DataServiceRepository, private val prop
     fun findCatalogs(lang: Lang): String {
         val model = createModel()
 
-        repository.findAllByStatus(Status.PUBLISHED)
+        repository.findAllByPublished(true)
             .groupBy(DataService::catalogId)
             .forEach { (catalogId, dataServices) ->
                 catalogId.let { id ->
@@ -43,7 +43,7 @@ class RDFHandler(private val repository: DataServiceRepository, private val prop
     fun findCatalogById(catalogId: String, lang: Lang): String {
         val model = createModel()
 
-        repository.findAllByCatalogIdAndStatus(catalogId, Status.PUBLISHED)
+        repository.findAllByCatalogIdAndPublished(catalogId, true)
             .forEach { dataService ->
                 dataService.catalogId.let { id ->
                     model.addCatalog(id, getCatalogUri(), getOrganizationUri(), getPublisherUri())
@@ -220,6 +220,12 @@ fun Model.addDataService(dataService: DataService, dataServiceUri: String) {
 
         dataServiceResource.addProperty(
             DCAT.contactPoint, contactPointResource
+        )
+    }
+
+    dataService.status?.takeIf(String::isNotBlank)?.let {
+        dataServiceResource.addProperty(
+            ADMS.status, ResourceFactory.createResource(URIref.encode(it))
         )
     }
 
