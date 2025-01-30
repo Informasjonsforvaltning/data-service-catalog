@@ -5,6 +5,7 @@ import no.fdk.dataservicecatalog.exception.NotFoundException
 import no.fdk.dataservicecatalog.handler.DataServiceHandler
 import no.fdk.dataservicecatalog.repository.DataServiceRepository
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
@@ -15,6 +16,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 
+@Tag("unit")
 @ExtendWith(MockitoExtension::class)
 class DataServiceHandlerTest {
 

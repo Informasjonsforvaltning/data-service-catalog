@@ -109,7 +109,12 @@ data class DataService(
     /*
     type (dct:type)
      */
-    val type: String? = null
+    val type: String? = null,
+
+    /*
+    tilgjengelighet (dcatap:availability)
+     */
+    val availability: String? = null,
 )
 
 data class RegisterDataService(
@@ -145,7 +150,9 @@ data class RegisterDataService(
 
     val accessRights: String? = null,
 
-    val type: String? = null
+    val type: String? = null,
+
+    val availability: String? = null,
 )
 
 data class LocalizedStrings(
