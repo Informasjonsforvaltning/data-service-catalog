@@ -235,7 +235,7 @@
                     <!--suppress UnresolvedMavenProperty -->
                     <argLine>${surefire.jacoco.args}</argLine>
                     <groups>unit</groups>
-                    <excludedGroups>contract</excludedGroups>
+                    <excludedGroups>integration</excludedGroups>
                     <includes>
                         <include>**/*.java</include>
                     </includes>

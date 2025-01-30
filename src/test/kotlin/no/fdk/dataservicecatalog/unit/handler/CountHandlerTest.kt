@@ -5,6 +5,7 @@ import no.fdk.dataservicecatalog.domain.LocalizedStrings
 import no.fdk.dataservicecatalog.handler.CountHandler
 import no.fdk.dataservicecatalog.repository.DataServiceRepository
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
@@ -13,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.stub
 
+@Tag("unit")
 @ExtendWith(MockitoExtension::class)
 class CountHandlerTest {
 

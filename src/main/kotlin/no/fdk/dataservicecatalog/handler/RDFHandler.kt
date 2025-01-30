@@ -4,6 +4,7 @@ import no.fdk.dataservicecatalog.ApplicationProperties
 import no.fdk.dataservicecatalog.domain.DataService
 import no.fdk.dataservicecatalog.exception.NotFoundException
 import no.fdk.dataservicecatalog.rdf.ADMS
+import no.fdk.dataservicecatalog.rdf.DCATAP
 import no.fdk.dataservicecatalog.repository.DataServiceRepository
 import org.apache.jena.rdf.model.Model
 import org.apache.jena.rdf.model.ModelFactory
@@ -80,7 +81,8 @@ class RDFHandler(private val repository: DataServiceRepository, private val prop
                         "rdf" to RDF.uri,
                         "vcard" to VCARD4.NS,
                         "foaf" to FOAF.NS,
-                        "adms" to ADMS.NS
+                        "adms" to ADMS.NS,
+                        "dcatap" to DCATAP.NS
                     )
                 )
             }
@@ -227,6 +229,12 @@ fun Model.addDataService(dataService: DataService, dataServiceUri: String) {
     dataService.status?.takeIf(String::isNotBlank)?.let {
         dataServiceResource.addProperty(
             ADMS.status, ResourceFactory.createResource(URIref.encode(it))
+        )
+    }
+
+    dataService.availability?.takeIf(String::isNotBlank)?.let {
+        dataServiceResource.addProperty(
+            DCATAP.availability, ResourceFactory.createResource(URIref.encode(it))
         )
     }
 

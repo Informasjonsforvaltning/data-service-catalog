@@ -9,6 +9,7 @@ import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.riot.Lang
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
@@ -18,6 +19,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.stub
 import java.io.StringReader
 
+@Tag("unit")
 @ExtendWith(MockitoExtension::class)
 class RDFHandlerTest {
 
@@ -70,6 +72,7 @@ class RDFHandlerTest {
             PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
             PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
             PREFIX adms:  <http://www.w3.org/ns/adms#>
+            PREFIX dcatap: <http://data.europa.eu/r5r/>
 
             <$organizationCatalogBaseUri/organizations/$catalogId>
                     rdf:type        foaf:Agent;
@@ -85,6 +88,7 @@ class RDFHandlerTest {
                     dct:license               <http://license.com>;
                     dct:title                 "title"@en;
                     dct:type                  <http://type.com>;
+                    dcatap:availability       <http://publications.europa.eu/resource/authority/planned-availability/STABLE>;
                     adms:status               <http://publications.europa.eu/resource/authority/distribution-status/DEVELOP>;
                     dcat:contactPoint         [ rdf:type                   vcard:Organization;
                                                 vcard:fn                   "Contact information | (5678)";
@@ -176,6 +180,7 @@ class RDFHandlerTest {
             PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
             PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
             PREFIX adms:  <http://www.w3.org/ns/adms#>
+            PREFIX dcatap: <http://data.europa.eu/r5r/>
 
             <$organizationCatalogBaseUri/organizations/$catalogId>
                     rdf:type        foaf:Agent;
@@ -191,6 +196,7 @@ class RDFHandlerTest {
                     dct:license               <http://license.com>;
                     dct:title                 "title"@en;
                     dct:type                  <http://type.com>;
+                    dcatap:availability       <http://publications.europa.eu/resource/authority/planned-availability/STABLE>;
                     adms:status               <http://publications.europa.eu/resource/authority/distribution-status/DEVELOP>;
                     dcat:contactPoint         [ rdf:type                   vcard:Organization;
                                                 vcard:fn                   "Contact information | (5678)";
@@ -275,6 +281,7 @@ class RDFHandlerTest {
             PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
             PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
             PREFIX adms:  <http://www.w3.org/ns/adms#>
+            PREFIX dcatap: <http://data.europa.eu/r5r/>
             
             <$baseUri/catalogs/$catalogId/data-services/$dataServiceId>
                     rdf:type                  dcat:DataService;
@@ -284,6 +291,7 @@ class RDFHandlerTest {
                     dct:license               <http://license.com>;
                     dct:title                 "title"@en;
                     dct:type                  <http://type.com>;
+                    dcatap:availability       <http://publications.europa.eu/resource/authority/planned-availability/STABLE>;
                     adms:status               <http://publications.europa.eu/resource/authority/distribution-status/DEVELOP>;
                     dcat:contactPoint         [ rdf:type                   vcard:Organization;
                                                 vcard:fn                   "Contact information | (5678)";
@@ -348,6 +356,7 @@ class RDFHandlerTest {
         license = "http://license.com",
         mediaTypes = listOf("https://www.iana.org/assignments/media-types/application/json"),
         accessRights = "http://access-rights.com",
-        type = "http://type.com"
+        type = "http://type.com",
+        availability = "http://publications.europa.eu/resource/authority/planned-availability/STABLE"
     )
 }
