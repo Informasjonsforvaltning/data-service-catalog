@@ -24,8 +24,8 @@ class MongoConfigTest(@Autowired val operations: MongoOperations) {
         val indexOps = operations.indexOps(DataService::class.java)
 
         assertTrue(hasIndex(indexOps, listOf("catalogId")))
-        assertTrue(hasIndex(indexOps, listOf("status")))
-        assertTrue(hasIndex(indexOps, listOf("catalogId", "status")))
+        assertTrue(hasIndex(indexOps, listOf("published")))
+        assertTrue(hasIndex(indexOps, listOf("catalogId", "published")))
     }
 
     private fun hasIndex(indexOps: IndexOperations, name: List<String>) =

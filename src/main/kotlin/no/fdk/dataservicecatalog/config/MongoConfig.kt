@@ -25,9 +25,9 @@ class MongoConfig : AuditorAware<User> {
     fun configureIndexes(mongoOperations: MongoOperations): Boolean {
         val indexOps = mongoOperations.indexOps(DataService::class.java)
 
-        indexOps.ensureIndex(Index().on("catalogId", Sort.Direction.ASC).on("status", Sort.Direction.ASC))
+        indexOps.ensureIndex(Index().on("catalogId", Sort.Direction.ASC).on("published", Sort.Direction.ASC))
 
-        indexOps.ensureIndex(CompoundIndexDefinition(Document().append("catalogId", 1).append("status", 1)))
+        indexOps.ensureIndex(CompoundIndexDefinition(Document().append("catalogId", 1).append("published", 1)))
 
         return true
     }

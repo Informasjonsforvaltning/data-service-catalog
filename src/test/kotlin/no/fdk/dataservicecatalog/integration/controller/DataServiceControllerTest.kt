@@ -71,7 +71,8 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
             on { findById(catalogId, dataServiceId) } doReturn DataService(
                 id = dataServiceId,
                 catalogId = catalogId,
-                status = Status.PUBLISHED,
+                published = true,
+                status = null,
                 endpointUrl = "endpointUrl",
                 title = LocalizedStrings(nb = "title")
             )
@@ -260,7 +261,8 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
         val dataService = DataService(
             id = dataServiceId,
             catalogId = catalogId,
-            status = Status.PUBLISHED,
+            published = true,
+            status = null,
             endpointUrl = "endpointUrl",
             title = LocalizedStrings(nb = "title")
         )

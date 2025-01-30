@@ -2,7 +2,6 @@ package no.fdk.dataservicecatalog.integration.repository
 
 import no.fdk.dataservicecatalog.domain.DataService
 import no.fdk.dataservicecatalog.domain.LocalizedStrings
-import no.fdk.dataservicecatalog.domain.Status
 import no.fdk.dataservicecatalog.integration.MongoDBTestcontainer
 import no.fdk.dataservicecatalog.repository.DataServiceRepository
 import org.junit.jupiter.api.AfterEach
@@ -39,7 +38,8 @@ class DataServiceRepositoryTest(
         val dataService = DataService(
             id = "1111",
             catalogId = firstCatalogId,
-            status = Status.PUBLISHED,
+            published = true,
+            status = null,
             endpointUrl = "endpointUrl",
             title = LocalizedStrings(nb = "title")
         )
@@ -62,7 +62,8 @@ class DataServiceRepositoryTest(
         val dataService = DataService(
             id = "1111",
             catalogId = firstCatalogId,
-            status = Status.PUBLISHED,
+            published = true,
+            status = null,
             endpointUrl = "endpointUrl",
             title = LocalizedStrings(nb = "title")
         )
@@ -86,7 +87,8 @@ class DataServiceRepositoryTest(
             DataService(
                 id = dataServiceId,
                 catalogId = catalogId,
-                status = Status.PUBLISHED,
+                published = true,
+                status = null,
                 endpointUrl = "endpointUrl",
                 title = LocalizedStrings(nb = "title")
             )
@@ -98,48 +100,48 @@ class DataServiceRepositoryTest(
     }
 
     @Test
-    fun `find all by status`() {
+    fun `find all by published status`() {
         val catalogId = "1234"
-        val status = Status.PUBLISHED
 
         val dataService = DataService(
             id = "1111",
             catalogId = catalogId,
-            status = status,
+            published = true,
+            status = null,
             endpointUrl = "endpointUrl",
             title = LocalizedStrings(nb = "title")
         )
 
         operations.insertAll(
-            listOf(dataService, dataService.copy(id = "2222", status = Status.DRAFT))
+            listOf(dataService, dataService.copy(id = "2222", published = false))
         )
 
-        val dataServices = repository.findAllByStatus(status)
+        val dataServices = repository.findAllByPublished(true)
 
         assertEquals(1, dataServices.count())
-        assertEquals(Status.PUBLISHED, dataServices.first().status)
+        assertEquals(true, dataServices.first().published)
     }
 
     @Test
-    fun `find all by catalog id and status`() {
+    fun `find all by catalog id and published status`() {
         val catalogId = "1234"
-        val status = Status.PUBLISHED
 
         val dataService = DataService(
             id = "1111",
             catalogId = catalogId,
-            status = status,
+            published = true,
+            status = null,
             endpointUrl = "endpointUrl",
             title = LocalizedStrings(nb = "title")
         )
 
         operations.insertAll(
-            listOf(dataService, dataService.copy(id = "2222", status = Status.DRAFT))
+            listOf(dataService, dataService.copy(id = "2222", published = false))
         )
 
-        val dataServices = repository.findAllByCatalogIdAndStatus(catalogId, status)
+        val dataServices = repository.findAllByCatalogIdAndPublished(catalogId, true)
 
         assertEquals(1, dataServices.count())
-        assertEquals(Status.PUBLISHED, dataServices.first().status)
+        assertEquals(true, dataServices.first().published)
     }
 }

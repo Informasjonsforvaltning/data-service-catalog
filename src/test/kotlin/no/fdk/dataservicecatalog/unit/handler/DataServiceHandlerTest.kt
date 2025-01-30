@@ -33,7 +33,8 @@ class DataServiceHandlerTest {
                 DataService(
                     id = "5678",
                     catalogId = catalogId,
-                    status = Status.PUBLISHED,
+                    published = true,
+                    status = null,
                     endpointUrl = "endpointUrl",
                     title = LocalizedStrings(nb = "title")
                 )
@@ -54,7 +55,8 @@ class DataServiceHandlerTest {
             on { findDataServiceById(dataServiceId) } doReturn DataService(
                 id = dataServiceId,
                 catalogId = catalogId,
-                status = Status.PUBLISHED,
+                published = true,
+                status = null,
                 endpointUrl = "endpointUrl",
                 title = LocalizedStrings(nb = "title")
             )
@@ -74,7 +76,8 @@ class DataServiceHandlerTest {
             on { findDataServiceById(dataServiceId) } doReturn DataService(
                 id = dataServiceId,
                 catalogId = "invalid_catalog id",
-                status = Status.PUBLISHED,
+                published = true,
+                status = null,
                 endpointUrl = "endpointUrl",
                 title = LocalizedStrings(nb = "title")
             )
@@ -109,7 +112,8 @@ class DataServiceHandlerTest {
         val dataService = DataService(
             id = dataServiceId,
             catalogId = catalogId,
-            status = Status.PUBLISHED,
+            published = true,
+            status = null,
             endpointUrl = "endpointUrl",
             title = LocalizedStrings(nb = "title")
         )
@@ -147,7 +151,8 @@ class DataServiceHandlerTest {
             on { findDataServiceById(dataServiceId) } doReturn DataService(
                 id = dataServiceId,
                 catalogId = "invalid catalog id",
-                status = Status.PUBLISHED,
+                published = true,
+                status = null,
                 endpointUrl = "endpointUrl",
                 title = LocalizedStrings(nb = "title")
             )
@@ -176,7 +181,8 @@ class DataServiceHandlerTest {
             on { findDataServiceById(dataServiceId) } doReturn DataService(
                 id = dataServiceId,
                 catalogId = catalogId,
-                status = Status.PUBLISHED,
+                published = true,
+                status = null,
                 endpointUrl = "endpointUrl",
                 title = LocalizedStrings(nb = "title")
             )
@@ -196,7 +202,8 @@ class DataServiceHandlerTest {
             on { findDataServiceById(dataServiceId) } doReturn DataService(
                 id = dataServiceId,
                 catalogId = "invalid catalog id",
-                status = Status.PUBLISHED,
+                published = true,
+                status = null,
                 endpointUrl = "endpointUrl",
                 title = LocalizedStrings(nb = "title")
             )

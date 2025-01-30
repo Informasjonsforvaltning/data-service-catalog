@@ -18,6 +18,8 @@ data class DataService(
     @Id
     val id: String,
 
+    val published: Boolean = false,
+
     @CreatedDate
     val created: LocalDateTime? = null,
 
@@ -32,7 +34,7 @@ data class DataService(
 
     val catalogId: String,
 
-    val status: Status,
+    val status: String?,
 
     /*
     endepunktsURL (dcat:endpointURL)
@@ -112,7 +114,7 @@ data class DataService(
 
 data class RegisterDataService(
 
-    val status: Status? = null,
+    val status: String? = null,
 
     @field:NotBlank(message = "Cannot be blank")
     val endpointUrl: String,
@@ -164,7 +166,3 @@ data class ContactPoint(
     val email: String? = null,
     val url: String? = null
 )
-
-enum class Status {
-    DRAFT, PUBLISHED
-}
