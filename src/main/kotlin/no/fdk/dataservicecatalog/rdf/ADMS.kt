@@ -5,8 +5,8 @@ import org.apache.jena.rdf.model.ResourceFactory
 
 class ADMS {
     companion object {
-        const val uri = "http://www.w3.org/ns/adms#"
+        const val NS = "http://www.w3.org/ns/adms#"
 
-        val status: Property = ResourceFactory.createProperty("${uri}status")
+        val status: Property = ResourceFactory.createProperty("${NS}status")
     }
 }

@@ -79,7 +79,8 @@ class RDFHandler(private val repository: DataServiceRepository, private val prop
                         "dct" to DCTerms.NS,
                         "rdf" to RDF.uri,
                         "vcard" to VCARD4.NS,
-                        "foaf" to FOAF.NS
+                        "foaf" to FOAF.NS,
+                        "adms" to ADMS.NS
                     )
                 )
             }
