@@ -115,6 +115,11 @@ data class DataService(
     tilgjengelighet (dcatap:availability)
      */
     val availability: String? = null,
+
+    /*
+    versjon (dcat:version)
+    */
+    val versions: List<String>? = null,
 )
 
 data class RegisterDataService(
@@ -153,6 +158,8 @@ data class RegisterDataService(
     val type: String? = null,
 
     val availability: String? = null,
+
+    val versions: List<String>? = null,
 )
 
 data class LocalizedStrings(

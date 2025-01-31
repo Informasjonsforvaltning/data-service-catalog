@@ -85,6 +85,7 @@ class RDFHandlerTest {
                     dct:accessRights          <http://access-rights.com>;
                     dct:description           "description"@en;
                     dct:format                <http://format.com>;
+                    dcat:version              "1.0.1" , "2.0.0.beta";
                     dct:license               <http://license.com>;
                     dct:title                 "title"@en;
                     dct:type                  <http://type.com>;
@@ -193,6 +194,7 @@ class RDFHandlerTest {
                     dct:accessRights          <http://access-rights.com>;
                     dct:description           "description"@en;
                     dct:format                <http://format.com>;
+                    dcat:version              "1.0.1" , "2.0.0.beta";
                     dct:license               <http://license.com>;
                     dct:title                 "title"@en;
                     dct:type                  <http://type.com>;
@@ -288,6 +290,7 @@ class RDFHandlerTest {
                     dct:accessRights          <http://access-rights.com>;
                     dct:description           "description"@en;
                     dct:format                <http://format.com>;
+                    dcat:version              "1.0.1" , "2.0.0.beta";
                     dct:license               <http://license.com>;
                     dct:title                 "title"@en;
                     dct:type                  <http://type.com>;
@@ -357,6 +360,7 @@ class RDFHandlerTest {
         mediaTypes = listOf("https://www.iana.org/assignments/media-types/application/json"),
         accessRights = "http://access-rights.com",
         type = "http://type.com",
-        availability = "http://publications.europa.eu/resource/authority/planned-availability/STABLE"
+        availability = "http://publications.europa.eu/resource/authority/planned-availability/STABLE",
+        versions = listOf("1.0.1", "2.0.0.beta"),
     )
 }

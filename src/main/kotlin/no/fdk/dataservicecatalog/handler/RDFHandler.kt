@@ -238,6 +238,12 @@ fun Model.addDataService(dataService: DataService, dataServiceUri: String) {
         )
     }
 
+    dataService.versions?.filter(String::isNotBlank)?.forEach {
+        dataServiceResource.addProperty(
+            ResourceFactory.createProperty("${DCAT.NS}version"), it
+        )
+    }
+
     dataService.themes?.filter(FileUtils::isURI)?.forEach {
         dataServiceResource.addProperty(
             DCAT.theme, ResourceFactory.createResource(URIref.encode(it))
