@@ -45,7 +45,9 @@ class DataServiceHandler(private val repository: DataServiceRepository) {
                 license = registerDataService.license,
                 mediaTypes = registerDataService.mediaTypes,
                 accessRights = registerDataService.accessRights,
-                type = registerDataService.type
+                type = registerDataService.type,
+                availability = registerDataService.availability,
+                versions = registerDataService.versions
             )
         )
 
