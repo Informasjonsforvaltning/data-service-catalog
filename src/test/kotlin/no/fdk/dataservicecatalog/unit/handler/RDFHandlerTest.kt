@@ -73,6 +73,7 @@ class RDFHandlerTest {
             PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
             PREFIX adms:  <http://www.w3.org/ns/adms#>
             PREFIX dcatap: <http://data.europa.eu/r5r/>
+            PREFIX cv:    <http://data.europa.eu/m8g/>
 
             <$organizationCatalogBaseUri/organizations/$catalogId>
                     rdf:type        foaf:Agent;
@@ -98,6 +99,14 @@ class RDFHandlerTest {
                                                                              vcard:hasValue  <tel:phone>
                                                                            ];
                                                 vcard:hasURL               <url>
+                                              ];
+                    cv:hasCost                [ rdf:type         cv:Cost;
+                                                dct:description  "med doc"@nb;
+                                                foaf:page        <https://gebyr-doc.no>
+                                              ];
+                    cv:hasCost                [ rdf:type     cv:Cost;
+                                                cv:currency  <http://publications.europa.eu/resource/authority/currency/EUR>;
+                                                cv:hasValue  "125.57"^^<http://www.w3.org/2001/XMLSchema#double>
                                               ];
                     dcat:endpointDescription  <http://endpoint-description.com>;
                     dcat:endpointURL          <http://example.com>;
@@ -181,6 +190,7 @@ class RDFHandlerTest {
             PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
             PREFIX adms:  <http://www.w3.org/ns/adms#>
             PREFIX dcatap: <http://data.europa.eu/r5r/>
+            PREFIX cv:    <http://data.europa.eu/m8g/>
 
             <$organizationCatalogBaseUri/organizations/$catalogId>
                     rdf:type        foaf:Agent;
@@ -206,6 +216,14 @@ class RDFHandlerTest {
                                                                              vcard:hasValue  <tel:phone>
                                                                            ];
                                                 vcard:hasURL               <url>
+                                              ];
+                    cv:hasCost                [ rdf:type         cv:Cost;
+                                                dct:description  "med doc"@nb;
+                                                foaf:page        <https://gebyr-doc.no>
+                                              ];
+                    cv:hasCost                [ rdf:type     cv:Cost;
+                                                cv:currency  <http://publications.europa.eu/resource/authority/currency/EUR>;
+                                                cv:hasValue  "125.57"^^<http://www.w3.org/2001/XMLSchema#double>
                                               ];
                     dcat:endpointDescription  <http://endpoint-description.com>;
                     dcat:endpointURL          <http://example.com>;
@@ -282,6 +300,7 @@ class RDFHandlerTest {
             PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
             PREFIX adms:  <http://www.w3.org/ns/adms#>
             PREFIX dcatap: <http://data.europa.eu/r5r/>
+            PREFIX cv:    <http://data.europa.eu/m8g/>
             
             <$baseUri/catalogs/$catalogId/data-services/$dataServiceId>
                     rdf:type                  dcat:DataService;
@@ -301,6 +320,14 @@ class RDFHandlerTest {
                                                                              vcard:hasValue  <tel:phone>
                                                                            ];
                                                 vcard:hasURL               <url>
+                                              ];
+                    cv:hasCost                [ rdf:type         cv:Cost;
+                                                dct:description  "med doc"@nb;
+                                                foaf:page        <https://gebyr-doc.no>
+                                              ];
+                    cv:hasCost                [ rdf:type     cv:Cost;
+                                                cv:currency  <http://publications.europa.eu/resource/authority/currency/EUR>;
+                                                cv:hasValue  "125.57"^^<http://www.w3.org/2001/XMLSchema#double>
                                               ];
                     dcat:endpointDescription  <http://endpoint-description.com>;
                     dcat:endpointURL          <http://example.com>;
@@ -357,6 +384,10 @@ class RDFHandlerTest {
         mediaTypes = listOf("https://www.iana.org/assignments/media-types/application/json"),
         accessRights = "http://access-rights.com",
         type = "http://type.com",
-        availability = "http://publications.europa.eu/resource/authority/planned-availability/STABLE"
+        availability = "http://publications.europa.eu/resource/authority/planned-availability/STABLE",
+        costs = listOf(
+            Cost(value = 125.57, currency = "http://publications.europa.eu/resource/authority/currency/EUR"),
+            Cost(description = LocalizedStrings(nb = "med doc"), documentation = listOf("https://gebyr-doc.no"))
+        ),
     )
 }

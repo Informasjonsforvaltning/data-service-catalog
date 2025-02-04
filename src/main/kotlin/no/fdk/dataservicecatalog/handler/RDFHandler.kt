@@ -2,12 +2,16 @@ package no.fdk.dataservicecatalog.handler
 
 import no.fdk.dataservicecatalog.ApplicationProperties
 import no.fdk.dataservicecatalog.domain.DataService
+import no.fdk.dataservicecatalog.domain.LocalizedStrings
 import no.fdk.dataservicecatalog.exception.NotFoundException
 import no.fdk.dataservicecatalog.rdf.ADMS
+import no.fdk.dataservicecatalog.rdf.CV
 import no.fdk.dataservicecatalog.rdf.DCATAP
 import no.fdk.dataservicecatalog.repository.DataServiceRepository
 import org.apache.jena.rdf.model.Model
 import org.apache.jena.rdf.model.ModelFactory
+import org.apache.jena.rdf.model.Property
+import org.apache.jena.rdf.model.Resource
 import org.apache.jena.rdf.model.ResourceFactory
 import org.apache.jena.riot.Lang
 import org.apache.jena.sparql.vocabulary.FOAF
@@ -82,7 +86,8 @@ class RDFHandler(private val repository: DataServiceRepository, private val prop
                         "vcard" to VCARD4.NS,
                         "foaf" to FOAF.NS,
                         "adms" to ADMS.NS,
-                        "dcatap" to DCATAP.NS
+                        "dcatap" to DCATAP.NS,
+                        "cv" to CV.NS
                     )
                 )
             }
@@ -145,17 +150,7 @@ fun Model.addDataService(dataService: DataService, dataServiceUri: String) {
     }
 
     dataService.title.let { title ->
-        listOf(
-            "nb" to title.nb,
-            "nn" to title.nn,
-            "en" to title.en,
-        ).forEach { (lang, value) ->
-            value?.let {
-                dataServiceResource.addProperty(
-                    DCTerms.title, ResourceFactory.createLangLiteral(it, lang)
-                )
-            }
-        }
+        dataServiceResource.addLangLiteralFromLocalizedStrings(title, DCTerms.title)
     }
 
     dataService.keywords?.let { keyword ->
@@ -251,17 +246,7 @@ fun Model.addDataService(dataService: DataService, dataServiceUri: String) {
     }
 
     dataService.description?.let { description ->
-        listOf(
-            "nb" to description.nb,
-            "nn" to description.nn,
-            "en" to description.en,
-        ).forEach { (lang, value) ->
-            value?.let {
-                dataServiceResource.addProperty(
-                    DCTerms.description, ResourceFactory.createLangLiteral(it, lang)
-                )
-            }
-        }
+        dataServiceResource.addLangLiteralFromLocalizedStrings(description, DCTerms.description)
     }
 
     dataService.pages?.filter(FileUtils::isURI)?.forEach {
@@ -303,6 +288,35 @@ fun Model.addDataService(dataService: DataService, dataServiceUri: String) {
             DCTerms.type, ResourceFactory.createResource(URIref.encode(it))
         )
     }
+
+    dataService.costs?.forEach { cost ->
+        val costResource = this.createResource()
+            .addProperty(RDF.type, CV.Cost)
+
+        cost.value?.let {
+            costResource.addProperty(
+                CV.hasValue, ResourceFactory.createTypedLiteral(it)
+            )
+        }
+
+        cost.description?.let { description ->
+            costResource.addLangLiteralFromLocalizedStrings(description, DCTerms.description)
+        }
+
+        cost.documentation?.filter(FileUtils::isURI)?.forEach {
+            costResource.addProperty(
+                FOAF.page, ResourceFactory.createResource(URIref.encode(it))
+            )
+        }
+
+        cost.currency?.takeIf(FileUtils::isURI)?.let {
+            costResource.addProperty(
+                CV.currency, ResourceFactory.createResource(URIref.encode(it))
+            )
+        }
+
+        dataServiceResource.addProperty(CV.hasCost, costResource)
+    }
 }
 
 fun Model.serialize(lang: Lang): String {
@@ -310,6 +324,18 @@ fun Model.serialize(lang: Lang): String {
     this.write(stringWriter, lang.name)
 
     return stringWriter.buffer.toString()
+}
+
+private fun Resource.addLangLiteralFromLocalizedStrings(localizedStrings: LocalizedStrings, predicate: Property) {
+    listOf(
+        "nb" to localizedStrings.nb,
+        "nn" to localizedStrings.nn,
+        "en" to localizedStrings.en,
+    ).forEach { (lang, value) ->
+        value?.let {
+            addProperty(predicate, ResourceFactory.createLangLiteral(it, lang))
+        }
+    }
 }
 
 private val logger: Logger = LoggerFactory.getLogger(RDFHandler::class.java)

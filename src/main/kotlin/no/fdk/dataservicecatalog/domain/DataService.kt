@@ -115,6 +115,11 @@ data class DataService(
     tilgjengelighet (dcatap:availability)
      */
     val availability: String? = null,
+
+    /*
+    har gebyr (cv:hasCost)
+    */
+    val costs: List<Cost>? = null,
 )
 
 data class RegisterDataService(
@@ -153,6 +158,8 @@ data class RegisterDataService(
     val type: String? = null,
 
     val availability: String? = null,
+
+    val costs: List<Cost>? = null,
 )
 
 data class LocalizedStrings(
@@ -172,4 +179,11 @@ data class ContactPoint(
     val phone: String? = null,
     val email: String? = null,
     val url: String? = null
+)
+
+data class Cost(
+    val value: Double? = null,
+    val description: LocalizedStrings? = null,
+    val documentation: List<String>? = null,
+    val currency: String? = null
 )
