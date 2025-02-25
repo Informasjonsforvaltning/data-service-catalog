@@ -80,8 +80,9 @@ class DataServiceHandler(private val repository: DataServiceRepository) {
     fun publish(catalogId: String, dataServiceId: String) {
         val dataService = (repository.findDataServiceById(dataServiceId)
             ?.takeIf { it.catalogId == catalogId }
-            ?.also { if (it.published) throw BadRequestException("Data Service with id: $dataServiceId is already published") }
             ?: throw NotFoundException("Data Service with id: $dataServiceId not found in Catalog with id: $catalogId"))
+
+        if (dataService.published) throw BadRequestException("Data Service with id: $dataServiceId is already published")
 
         repository.save(dataService.copy(published = true, publishedDate = LocalDateTime.now()))
 
@@ -91,8 +92,9 @@ class DataServiceHandler(private val repository: DataServiceRepository) {
     fun unpublish(catalogId: String, dataServiceId: String) {
         val dataService = (repository.findDataServiceById(dataServiceId)
             ?.takeIf { it.catalogId == catalogId }
-            ?.also { if (!it.published) throw BadRequestException("Data Service with id: $dataServiceId not published") }
             ?: throw NotFoundException("Data Service with id: $dataServiceId not found in Catalog with id: $catalogId"))
+
+        if (!dataService.published) throw BadRequestException("Data Service with id: $dataServiceId not published")
 
         repository.save(dataService.copy(published = false, publishedDate = null))
 
