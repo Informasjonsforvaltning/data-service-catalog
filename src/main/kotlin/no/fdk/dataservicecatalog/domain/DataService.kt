@@ -20,6 +20,8 @@ data class DataService(
 
     val published: Boolean = false,
 
+    val publishedDate: LocalDateTime? = null,
+
     @CreatedDate
     val created: LocalDateTime? = null,
 

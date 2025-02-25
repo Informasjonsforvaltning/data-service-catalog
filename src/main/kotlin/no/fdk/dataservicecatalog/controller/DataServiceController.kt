@@ -65,6 +65,24 @@ class DataServiceController(private val handler: DataServiceHandler) {
     }
 
     @PreAuthorize(WRITE)
+    @PostMapping("/{dataServiceId}/publish")
+    fun publishDataService(
+        @PathVariable catalogId: String,
+        @PathVariable dataServiceId: String,
+    ): ResponseEntity<Void> =
+        handler.publish(catalogId, dataServiceId)
+            .let { ResponseEntity.ok().build() }
+
+    @PreAuthorize(WRITE)
+    @PostMapping("/{dataServiceId}/unpublish")
+    fun unpublishDataService(
+        @PathVariable catalogId: String,
+        @PathVariable dataServiceId: String,
+    ): ResponseEntity<Void> =
+        handler.unpublish(catalogId, dataServiceId)
+            .let { ResponseEntity.ok().build() }
+
+    @PreAuthorize(WRITE)
     @DeleteMapping("/{dataServiceId}")
     fun deleteDataServiceByCatalogIdAndDataServiceId(
         @PathVariable catalogId: String, @PathVariable dataServiceId: String
