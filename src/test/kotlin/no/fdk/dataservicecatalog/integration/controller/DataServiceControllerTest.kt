@@ -4,6 +4,7 @@ import no.fdk.dataservicecatalog.config.JacksonConfig
 import no.fdk.dataservicecatalog.config.SecurityConfig
 import no.fdk.dataservicecatalog.controller.DataServiceController
 import no.fdk.dataservicecatalog.domain.*
+import no.fdk.dataservicecatalog.exception.BadRequestException
 import no.fdk.dataservicecatalog.exception.NotFoundException
 import no.fdk.dataservicecatalog.handler.DataServiceHandler
 import org.junit.jupiter.api.Tag
@@ -431,6 +432,124 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
                 string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
             }
             jsonPath("$.detail") { value("Data Service $dataServiceId not found") }
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["organization:%s:admin", "organization:%s:write"])
+    fun `publish should respond with ok`(authority: String) {
+        val catalogId = "1234"
+        val dataServiceId = "5678"
+
+        mockMvc.post("/internal/catalogs/$catalogId/data-services/$dataServiceId/publish") {
+            with(jwt().authorities(SimpleGrantedAuthority(authority.format(catalogId))))
+        }.andExpect {
+            status { isOk() }
+        }
+    }
+
+    @Test
+    fun `publish should respond with forbidden on invalid authority`() {
+        val catalogId = "1234"
+        val dataServiceId = "5678"
+
+        mockMvc.post("/internal/catalogs/$catalogId/data-services/$dataServiceId/publish") {
+            with(jwt().authorities(SimpleGrantedAuthority("invalid")))
+        }.andExpect {
+            status { isForbidden() }
+        }
+    }
+
+    @Test
+    fun `publish should respond with not found on exception`() {
+        val catalogId = "1234"
+        val dataServiceId = "5678"
+
+        handler.stub {
+            on { publish(catalogId, dataServiceId) } doThrow NotFoundException("Data Service $dataServiceId not found")
+        }
+
+        mockMvc.post("/internal/catalogs/$catalogId/data-services/$dataServiceId/publish") {
+            with(jwt().authorities(SimpleGrantedAuthority("organization:$catalogId:admin")))
+        }.andExpect {
+            status { isNotFound() }
+            jsonPath("$.detail") { value("Data Service $dataServiceId not found") }
+        }
+    }
+
+    @Test
+    fun `publish should respond with bad request on exception`() {
+        val catalogId = "1234"
+        val dataServiceId = "5678"
+
+        handler.stub {
+            on { publish(catalogId, dataServiceId) } doThrow BadRequestException("Data Service $dataServiceId already published")
+        }
+
+        mockMvc.post("/internal/catalogs/$catalogId/data-services/$dataServiceId/publish") {
+            with(jwt().authorities(SimpleGrantedAuthority("organization:$catalogId:admin")))
+        }.andExpect {
+            status { isBadRequest() }
+            jsonPath("$.detail") { value("Data Service $dataServiceId already published") }
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["organization:%s:admin", "organization:%s:write"])
+    fun `unpublish should respond with ok`(authority: String) {
+        val catalogId = "1234"
+        val dataServiceId = "5678"
+
+        mockMvc.post("/internal/catalogs/$catalogId/data-services/$dataServiceId/unpublish") {
+            with(jwt().authorities(SimpleGrantedAuthority(authority.format(catalogId))))
+        }.andExpect {
+            status { isOk() }
+        }
+    }
+
+    @Test
+    fun `unpublish should respond with forbidden on invalid authority`() {
+        val catalogId = "1234"
+        val dataServiceId = "5678"
+
+        mockMvc.post("/internal/catalogs/$catalogId/data-services/$dataServiceId/unpublish") {
+            with(jwt().authorities(SimpleGrantedAuthority("invalid")))
+        }.andExpect {
+            status { isForbidden() }
+        }
+    }
+
+    @Test
+    fun `unpublish should respond with not found on exception`() {
+        val catalogId = "1234"
+        val dataServiceId = "5678"
+
+        handler.stub {
+            on { unpublish(catalogId, dataServiceId) } doThrow NotFoundException("Data Service $dataServiceId not found")
+        }
+
+        mockMvc.post("/internal/catalogs/$catalogId/data-services/$dataServiceId/unpublish") {
+            with(jwt().authorities(SimpleGrantedAuthority("organization:$catalogId:admin")))
+        }.andExpect {
+            status { isNotFound() }
+            jsonPath("$.detail") { value("Data Service $dataServiceId not found") }
+        }
+    }
+
+    @Test
+    fun `unpublish should respond with bad request on exception`() {
+        val catalogId = "1234"
+        val dataServiceId = "5678"
+
+        handler.stub {
+            on { unpublish(catalogId, dataServiceId) } doThrow BadRequestException("Data Service $dataServiceId not published")
+        }
+
+        mockMvc.post("/internal/catalogs/$catalogId/data-services/$dataServiceId/unpublish") {
+            with(jwt().authorities(SimpleGrantedAuthority("organization:$catalogId:admin")))
+        }.andExpect {
+            status { isBadRequest() }
+            jsonPath("$.detail") { value("Data Service $dataServiceId not published") }
         }
     }
 }

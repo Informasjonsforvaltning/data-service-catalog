@@ -3,11 +3,13 @@ package no.fdk.dataservicecatalog.handler
 import no.fdk.dataservicecatalog.domain.DataService
 import no.fdk.dataservicecatalog.domain.PatchRequest
 import no.fdk.dataservicecatalog.domain.RegisterDataService
+import no.fdk.dataservicecatalog.exception.BadRequestException
 import no.fdk.dataservicecatalog.exception.NotFoundException
 import no.fdk.dataservicecatalog.repository.DataServiceRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
+import java.time.LocalDateTime
 import java.util.*
 
 @Component
@@ -73,6 +75,30 @@ class DataServiceHandler(private val repository: DataServiceRepository) {
         repository.delete(dataService)
 
         logger.info("Deleted Data Service with id: $dataServiceId in Catalog with id: $catalogId")
+    }
+
+    fun publish(catalogId: String, dataServiceId: String) {
+        val dataService = (repository.findDataServiceById(dataServiceId)
+            ?.takeIf { it.catalogId == catalogId }
+            ?: throw NotFoundException("Data Service with id: $dataServiceId not found in Catalog with id: $catalogId"))
+
+        if (dataService.published) throw BadRequestException("Data Service with id: $dataServiceId is already published")
+
+        repository.save(dataService.copy(published = true, publishedDate = LocalDateTime.now()))
+
+        logger.info("Published Data Service with id: $dataServiceId in Catalog with id: $catalogId")
+    }
+
+    fun unpublish(catalogId: String, dataServiceId: String) {
+        val dataService = (repository.findDataServiceById(dataServiceId)
+            ?.takeIf { it.catalogId == catalogId }
+            ?: throw NotFoundException("Data Service with id: $dataServiceId not found in Catalog with id: $catalogId"))
+
+        if (!dataService.published) throw BadRequestException("Data Service with id: $dataServiceId not published")
+
+        repository.save(dataService.copy(published = false, publishedDate = null))
+
+        logger.info("Unpublished Data Service with id: $dataServiceId in Catalog with id: $catalogId")
     }
 }
 
