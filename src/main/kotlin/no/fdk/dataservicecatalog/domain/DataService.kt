@@ -164,6 +164,46 @@ data class RegisterDataService(
     val costs: List<Cost>? = null,
 )
 
+data class ImportDataService(
+    val id: String,
+
+    val status: String? = null,
+
+    val endpointUrl: String? = null,
+
+    val title: LocalizedStrings? = null,
+
+    val keywords: LocalizedStringLists? = null,
+
+    val endpointDescriptions: List<String>? = null,
+
+    val formats: List<String>? = null,
+
+    val contactPoint: ContactPoint? = null,
+
+    val themes: List<String>? = null,
+
+    val servesDataset: List<String>? = null,
+
+    val description: LocalizedStrings? = null,
+
+    val pages: List<String>? = null,
+
+    val landingPage: String? = null,
+
+    val license: String? = null,
+
+    val mediaTypes: List<String>? = null,
+
+    val accessRights: String? = null,
+
+    val type: String? = null,
+
+    val availability: String? = null,
+
+    val costs: List<Cost>? = null,
+)
+
 data class LocalizedStrings(
     val nb: String? = null,
     val nn: String? = null,
