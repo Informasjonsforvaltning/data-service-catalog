@@ -4,14 +4,19 @@ import io.swagger.parser.OpenAPIParser
 import no.fdk.dataservicecatalog.domain.ExtractionRecord
 import no.fdk.dataservicecatalog.domain.ImportResult
 import no.fdk.dataservicecatalog.domain.ImportResultStatus
+import no.fdk.dataservicecatalog.exception.BadRequestException
+import no.fdk.dataservicecatalog.exception.NotFoundException
+import no.fdk.dataservicecatalog.exception.OpenApiParseException
 import no.fdk.dataservicecatalog.repository.DataServiceRepository
 import no.fdk.dataservicecatalog.repository.ImportResultRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
+import org.springframework.http.ProblemDetail
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
-import org.springframework.web.server.ResponseStatusException
+import org.springframework.web.bind.annotation.ExceptionHandler
 import java.time.LocalDateTime
 import java.util.*
 
@@ -26,11 +31,12 @@ class ImportHandler(
 
         val openAPI = parseResult.openAPI
 
-        if (parseResult.messages.isNotEmpty() || openAPI == null) {
-            parseResult.messages.forEach(System.out::println)
+        if (parseResult.messages.isNotEmpty()) {
+            throw OpenApiParseException(parseResult.messages)
+        }
 
-            logger.error("Error parsing OpenAPI import...")
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "...")
+        if (openAPI == null) {
+            throw OpenApiParseException(messages = null)
         }
 
         return ImportResult(

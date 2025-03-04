@@ -5,10 +5,12 @@ import no.fdk.dataservicecatalog.config.SecurityConfig
 import no.fdk.dataservicecatalog.controller.ImportController
 import no.fdk.dataservicecatalog.domain.ImportResult
 import no.fdk.dataservicecatalog.domain.ImportResultStatus
+import no.fdk.dataservicecatalog.exception.OpenApiParseException
 import no.fdk.dataservicecatalog.handler.ImportHandler
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.stub
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -55,6 +57,29 @@ class ImportControllerTest(@Autowired val mockMvc: MockMvc) {
         }.andExpect {
             status { isCreated() }
             header { string("Location", "/import/$catalogId/results/$resultId") }
+        }
+    }
+
+    @Test
+    fun `import openAPI should respond with bad request on invalid payload`() {
+        val catalogId = "1234"
+
+        handler.stub {
+            on { importOpenApi(catalogId, "{}") } doThrow OpenApiParseException(listOf("attribute info is missing"))
+        }
+
+        mockMvc.post("/import/$catalogId")
+        {
+            contentType = MediaType.APPLICATION_JSON
+            content = "{}"
+            with(jwt().authorities(SimpleGrantedAuthority("organization:%s:admin".format(catalogId))))
+        }.andExpect {
+            status { isBadRequest() }
+            header {
+                string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
+            }
+            jsonPath("$.detail") { value("Failed to parse OpenAPI.") }
+            jsonPath("$.errors[0].message") { value("attribute info is missing") }
         }
     }
 
