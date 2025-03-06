@@ -44,12 +44,7 @@ class ImportController(private val importHandler: ImportHandler) {
 
     @ExceptionHandler
     fun handleOpenApiParseException(ex: OpenApiParseException): ResponseEntity<ProblemDetail> {
-        val problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Failed to parse OpenAPI.")
-
-        if (ex.messages.isNotEmpty()) {
-            val errors = ex.messages.map { message -> mapOf("message" to message) }
-            problemDetail.setProperty("errors", errors)
-        }
+        val problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.message)
 
         return ResponseEntity.of(problemDetail).build()
     }

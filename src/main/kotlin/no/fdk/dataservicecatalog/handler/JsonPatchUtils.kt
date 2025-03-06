@@ -1,7 +1,6 @@
 package no.fdk.dataservicecatalog.handler
 
 import com.fasterxml.jackson.core.JsonProcessingException
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -46,15 +45,16 @@ inline fun <reified T> applyPatch(
 }
 
 fun validateOperations(operations: List<JsonPatchOperation>) {
-    val invalidPaths = listOf("/id", "/catalogId", "/created", "/modified", "/modifiedBy", "/version", "/published", "/publishedDate")
+    val invalidPaths =
+        listOf("/id", "/catalogId", "/created", "/modified", "/modifiedBy", "/version", "/published", "/publishedDate")
 
     if (operations.any { it.path in invalidPaths }) {
         throw BadRequestException("Patch of paths $invalidPaths is not permitted")
     }
 }
 
-inline fun <reified T> createPatchOperations(originalObject: T, updatedObject: T, mapper: ObjectMapper): List<JsonPatchOperation> =
-    with(mapper) {
+inline fun <reified T> createPatchOperations(originalObject: T, updatedObject: T): List<JsonPatchOperation> =
+    with(jacksonObjectMapper().registerModule(JavaTimeModule())) {
         val original = Json.createReader(StringReader(writeValueAsString(originalObject))).readObject()
         val updated = Json.createReader(StringReader(writeValueAsString(updatedObject))).readObject()
 

@@ -1,72 +1,65 @@
 package no.fdk.dataservicecatalog.handler
 
-import io.swagger.parser.OpenAPIParser
-import no.fdk.dataservicecatalog.domain.ExtractionRecord
+import io.swagger.v3.parser.core.models.SwaggerParseResult
 import no.fdk.dataservicecatalog.domain.ImportResult
 import no.fdk.dataservicecatalog.domain.ImportResultStatus
-import no.fdk.dataservicecatalog.exception.BadRequestException
-import no.fdk.dataservicecatalog.exception.NotFoundException
+import no.fdk.dataservicecatalog.domain.allOperations
 import no.fdk.dataservicecatalog.exception.OpenApiParseException
-import no.fdk.dataservicecatalog.repository.DataServiceRepository
-import no.fdk.dataservicecatalog.repository.ImportResultRepository
+import no.fdk.dataservicecatalog.service.ImportOpenApiService
+import no.fdk.dataservicecatalog.service.ImportResultService
+import no.fdk.dataservicecatalog.service.ImportService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.data.repository.findByIdOrNull
-import org.springframework.http.HttpStatus
-import org.springframework.http.ProblemDetail
-import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
-import org.springframework.web.bind.annotation.ExceptionHandler
-import java.time.LocalDateTime
-import java.util.*
 
 @Service
 class ImportHandler(
-    private val dataServiceRepository: DataServiceRepository,
-    private val importResultRepository: ImportResultRepository
+    private val importService: ImportService,
+    private val importResultService: ImportResultService,
+    private val importOpenApiService: ImportOpenApiService
 ) {
+    fun importOpenApi(catalogId: String, specification: String): ImportResult {
+        val parseResult: SwaggerParseResult
 
-    fun importOpenApi(catalogId: String, dataService: String): ImportResult {
-        val parseResult = OpenAPIParser().readContents(dataService, null, null)
-
-        val openAPI = parseResult.openAPI
-
-        if (parseResult.messages.isNotEmpty()) {
-            throw OpenApiParseException(parseResult.messages)
+        try {
+            parseResult = importOpenApiService.parse(specification)
+        } catch (ex: Exception) {
+            logger.error("Unexpected error during OpenAPI import for catalog: $catalogId", ex)
+            throw OpenApiParseException("Unexpected error during OpenAPI import")
         }
 
-        if (openAPI == null) {
-            throw OpenApiParseException(messages = null)
+        val openAPI = parseResult.openAPI ?: throw OpenApiParseException("Error parsing OpenAPI import")
+
+        if (openAPI.servers.size > 1) {
+            throw OpenApiParseException("Attribute servers must be exactly one")
         }
 
-        return ImportResult(
-            id = UUID.randomUUID().toString(),
-            created = LocalDateTime.now(),
-            catalogId = catalogId,
-            status = ImportResultStatus.COMPLETED
-        )
+        val externalId = parseResult.openAPI.servers.first().url
+
+        val dataService = importResultService.findDataServiceIdByExternalId(externalId)
+            ?.let { importService.findDataService(it) }
+            ?: importService.createDataService(externalId, catalogId)
+
+        val importResult = importOpenApiService.extract(parseResult, dataService)
+
+        return if (importResult.status == ImportResultStatus.FAILED) {
+            importResultService.save(importResult)
+        } else {
+            importResult.extractionRecords.firstOrNull()
+                ?.let { applyPatch(dataService, it.allOperations) }
+                ?.let { importService.save(it) }
+                ?.also { logger.info("Updated data service (${it.id}) in catalog: $catalogId") }
+
+            importResultService.save(importResult)
+        }
     }
 
     fun getResults(catalogId: String): List<ImportResult> {
-        return importResultRepository.findAllByCatalogId(catalogId);
+        return importResultService.getResults(catalogId);
     }
 
     fun getResult(statusId: String): ImportResult? {
-        return importResultRepository.findByIdOrNull(statusId)
-    }
-
-    private fun saveImportResult(
-        catalogId: String, extractionRecords: List<ExtractionRecord>, status: ImportResultStatus
-    ): ImportResult {
-        return importResultRepository.save(
-            ImportResult(
-                id = UUID.randomUUID().toString(),
-                created = LocalDateTime.now(),
-                catalogId = catalogId,
-                status = status,
-                extractionRecords = extractionRecords
-            )
-        )
+        return importResultService.getResult(statusId)
     }
 }
 

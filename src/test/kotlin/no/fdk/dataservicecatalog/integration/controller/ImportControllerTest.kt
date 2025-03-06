@@ -36,12 +36,14 @@ class ImportControllerTest(@Autowired val mockMvc: MockMvc) {
     lateinit var handler: ImportHandler
 
     @Test
-    fun `import openAPI should respond with created and payload`() {
+    fun `import openAPI should respond with created`() {
+        val specification = "specification"
+
         val catalogId = "1234"
         val resultId = "5678"
 
         handler.stub {
-            on { importOpenApi(catalogId, "{}") } doReturn ImportResult(
+            on { importOpenApi(catalogId, specification) } doReturn ImportResult(
                 id = resultId,
                 created = LocalDateTime.now(),
                 catalogId = catalogId,
@@ -52,7 +54,7 @@ class ImportControllerTest(@Autowired val mockMvc: MockMvc) {
         mockMvc.post("/import/$catalogId")
         {
             contentType = MediaType.APPLICATION_JSON
-            content = "{}"
+            content = specification
             with(jwt().authorities(SimpleGrantedAuthority("organization:%s:admin".format(catalogId))))
         }.andExpect {
             status { isCreated() }
@@ -61,17 +63,19 @@ class ImportControllerTest(@Autowired val mockMvc: MockMvc) {
     }
 
     @Test
-    fun `import openAPI should respond with bad request on invalid payload`() {
+    fun `import openAPI should respond with bad request on exception`() {
+        val specification = "specification"
+
         val catalogId = "1234"
 
         handler.stub {
-            on { importOpenApi(catalogId, "{}") } doThrow OpenApiParseException(listOf("attribute info is missing"))
+            on { importOpenApi(catalogId, specification) } doThrow OpenApiParseException("Failed to parse OpenAPI.")
         }
 
         mockMvc.post("/import/$catalogId")
         {
             contentType = MediaType.APPLICATION_JSON
-            content = "{}"
+            content = specification
             with(jwt().authorities(SimpleGrantedAuthority("organization:%s:admin".format(catalogId))))
         }.andExpect {
             status { isBadRequest() }
@@ -79,7 +83,6 @@ class ImportControllerTest(@Autowired val mockMvc: MockMvc) {
                 string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
             }
             jsonPath("$.detail") { value("Failed to parse OpenAPI.") }
-            jsonPath("$.errors[0].message") { value("attribute info is missing") }
         }
     }
 
@@ -90,7 +93,7 @@ class ImportControllerTest(@Autowired val mockMvc: MockMvc) {
         mockMvc.post("/import/$catalogId")
         {
             contentType = MediaType.APPLICATION_JSON
-            content = "{}"
+            content = "specification"
             with(jwt().authorities(SimpleGrantedAuthority("invalid")))
         }.andExpect {
             status { isForbidden() }
