@@ -20,7 +20,6 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.stub
-import java.time.LocalDateTime
 
 @Tag("unit")
 @ExtendWith(MockitoExtension::class)
@@ -49,7 +48,7 @@ class ImportHandlerTest {
         }
 
         assertThrows<OpenApiParseException> {
-            handler.importOpenApi(catalogId, "placeholder")
+            handler.importOpenApi(catalogId, "specification")
         }
     }
 
@@ -57,14 +56,11 @@ class ImportHandlerTest {
     fun `should throw exception if too many servers in open api`() {
         val catalogId = "1234"
 
-        val firstServer = Server()
-        firstServer.url = "firstExternalId"
-
-        val secondServer = Server()
-        secondServer.url = "secondExternalId"
+        val server = Server()
+        server.url = "https://example.com"
 
         val openAPI = OpenAPI()
-        openAPI.servers = listOf(firstServer, secondServer)
+        openAPI.servers = listOf(server, server)
 
         val parseResult = SwaggerParseResult()
         parseResult.openAPI = openAPI
@@ -74,7 +70,29 @@ class ImportHandlerTest {
         }
 
         assertThrows<OpenApiParseException> {
-            handler.importOpenApi(catalogId, "placeholder")
+            handler.importOpenApi(catalogId, "specification")
+        }
+    }
+
+    @Test
+    fun `should throw exception on invalid url for servers in open api`() {
+        val catalogId = "1234"
+
+        val server = Server()
+        server.url = "example.com"
+
+        val openAPI = OpenAPI()
+        openAPI.servers = listOf(server)
+
+        val parseResult = SwaggerParseResult()
+        parseResult.openAPI = openAPI
+
+        importOpenApiService.stub {
+            on { parse(any()) } doReturn parseResult
+        }
+
+        assertThrows<OpenApiParseException> {
+            handler.importOpenApi(catalogId, "specification")
         }
     }
 
@@ -84,7 +102,7 @@ class ImportHandlerTest {
 
         val catalogId = "catalogId"
         val internalId = "internalId"
-        val externalId = "externalId"
+        val externalId = "https://example.com"
 
         val server = Server()
         server.url = externalId
@@ -107,7 +125,7 @@ class ImportHandlerTest {
         )
 
         importResultService.stub {
-            on { findDataServiceIdByExternalId(externalId) } doReturn internalId
+            on { findDataServiceIdByCatalogIdAndExternalId(catalogId, externalId) } doReturn internalId
         }
 
         importService.stub {
@@ -116,7 +134,6 @@ class ImportHandlerTest {
 
         val importResult = ImportResult(
             id = "",
-            created = LocalDateTime.now(),
             catalogId = catalogId,
             status = ImportResultStatus.COMPLETED,
             extractionRecords = listOf(
@@ -151,7 +168,7 @@ class ImportHandlerTest {
 
         val catalogId = "catalogId"
         val internalId = "internalId"
-        val externalId = "externalId"
+        val externalId = "https://example.com"
 
         val server = Server()
         server.url = externalId
@@ -174,7 +191,7 @@ class ImportHandlerTest {
         )
 
         importResultService.stub {
-            on { findDataServiceIdByExternalId(externalId) } doReturn null
+            on { findDataServiceIdByCatalogIdAndExternalId(catalogId, externalId) } doReturn null
         }
 
         importService.stub {
@@ -183,7 +200,6 @@ class ImportHandlerTest {
 
         val importResult = ImportResult(
             id = "",
-            created = LocalDateTime.now(),
             catalogId = catalogId,
             status = ImportResultStatus.COMPLETED,
             extractionRecords = listOf(
@@ -218,7 +234,7 @@ class ImportHandlerTest {
 
         val catalogId = "catalogId"
         val internalId = "internalId"
-        val externalId = "externalId"
+        val externalId = "https://example.com"
 
         val server = Server()
         server.url = externalId
@@ -241,7 +257,7 @@ class ImportHandlerTest {
         )
 
         importResultService.stub {
-            on { findDataServiceIdByExternalId(externalId) } doReturn null
+            on { findDataServiceIdByCatalogIdAndExternalId(catalogId, externalId) } doReturn null
         }
 
         importService.stub {
@@ -250,7 +266,6 @@ class ImportHandlerTest {
 
         val importResult = ImportResult(
             id = "",
-            created = LocalDateTime.now(),
             catalogId = catalogId,
             status = ImportResultStatus.FAILED,
             extractionRecords = listOf(

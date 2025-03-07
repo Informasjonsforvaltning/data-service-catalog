@@ -17,9 +17,13 @@ class ImportResultService(private val importResultRepository: ImportResultReposi
         return importResultRepository.findByIdOrNull(statusId)
     }
 
-    fun findDataServiceIdByExternalId(externalId: String): String? {
+    fun findDataServiceIdByCatalogIdAndExternalId(catalogId: String, externalId: String): String? {
         return importResultRepository
-            .findFirstByStatusAndExtractionRecordsExternalId(ImportResultStatus.COMPLETED, externalId)
+            .findFirstByStatusAndCatalogIdAndExtractionRecordsExternalId(
+                ImportResultStatus.COMPLETED,
+                catalogId,
+                externalId
+            )
             ?.extractionRecords
             ?.firstOrNull { it.externalId == externalId }
             ?.internalId

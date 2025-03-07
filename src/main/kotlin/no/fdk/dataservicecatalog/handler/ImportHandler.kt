@@ -1,6 +1,5 @@
 package no.fdk.dataservicecatalog.handler
 
-import io.swagger.v3.parser.core.models.SwaggerParseResult
 import no.fdk.dataservicecatalog.domain.ImportResult
 import no.fdk.dataservicecatalog.domain.ImportResultStatus
 import no.fdk.dataservicecatalog.domain.allOperations
@@ -11,6 +10,9 @@ import no.fdk.dataservicecatalog.service.ImportService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.net.URI
+import java.net.URISyntaxException
+
 
 @Service
 class ImportHandler(
@@ -19,14 +21,7 @@ class ImportHandler(
     private val importOpenApiService: ImportOpenApiService
 ) {
     fun importOpenApi(catalogId: String, specification: String): ImportResult {
-        val parseResult: SwaggerParseResult
-
-        try {
-            parseResult = importOpenApiService.parse(specification)
-        } catch (ex: Exception) {
-            logger.error("Unexpected error during OpenAPI import for catalog: $catalogId", ex)
-            throw OpenApiParseException("Unexpected error during OpenAPI import")
-        }
+        val parseResult = importOpenApiService.parse(specification)
 
         val openAPI = parseResult.openAPI ?: throw OpenApiParseException("Error parsing OpenAPI import")
 
@@ -36,7 +31,17 @@ class ImportHandler(
 
         val externalId = parseResult.openAPI.servers.first().url
 
-        val dataService = importResultService.findDataServiceIdByExternalId(externalId)
+        try {
+            val uri = URI(externalId)
+
+            if (!uri.isAbsolute || uri.scheme == null) {
+                throw OpenApiParseException("Attribute servers has invalid URL: $externalId")
+            }
+        } catch (e: URISyntaxException) {
+            throw OpenApiParseException("Attribute servers has invalid URL: $externalId")
+        }
+
+        val dataService = importResultService.findDataServiceIdByCatalogIdAndExternalId(catalogId, externalId)
             ?.let { importService.findDataService(it) }
             ?: importService.createDataService(externalId, catalogId)
 

@@ -5,7 +5,6 @@ import io.swagger.v3.parser.core.models.SwaggerParseResult
 import no.fdk.dataservicecatalog.domain.*
 import no.fdk.dataservicecatalog.handler.createPatchOperations
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 import java.util.*
 
 @Service
@@ -18,19 +17,11 @@ class ImportOpenApiService {
     fun extract(parseResult: SwaggerParseResult, originalDataService: DataService): ImportResult {
         val dataServiceExtraction = parseResult.extract(originalDataService)
 
-        return if (dataServiceExtraction.hasError) {
-            createImportResult(
-                originalDataService.catalogId,
-                dataServiceExtraction.extractionRecord,
-                ImportResultStatus.FAILED
-            )
-        } else {
-            createImportResult(
-                originalDataService.catalogId,
-                dataServiceExtraction.extractionRecord,
-                ImportResultStatus.COMPLETED
-            )
-        }
+        return createImportResult(
+            originalDataService.catalogId,
+            dataServiceExtraction.extractionRecord,
+            if (dataServiceExtraction.hasError) ImportResultStatus.FAILED else ImportResultStatus.COMPLETED
+        )
     }
 
     private fun createImportResult(
@@ -40,7 +31,6 @@ class ImportOpenApiService {
     ): ImportResult {
         return ImportResult(
             id = UUID.randomUUID().toString(),
-            created = LocalDateTime.now(),
             catalogId = catalogId,
             status = status,
             extractionRecords = listOf(extractionRecord)
