@@ -45,9 +45,18 @@ inline fun <reified T> applyPatch(
 }
 
 fun validateOperations(operations: List<JsonPatchOperation>) {
-    val invalidPaths = listOf("/id", "/catalogId", "/created", "/modified", "/modifiedBy", "/version", "/published", "/publishedDate")
+    val invalidPaths =
+        listOf("/id", "/catalogId", "/created", "/modified", "/modifiedBy", "/version", "/published", "/publishedDate")
 
     if (operations.any { it.path in invalidPaths }) {
         throw BadRequestException("Patch of paths $invalidPaths is not permitted")
     }
 }
+
+inline fun <reified T> createPatchOperations(originalObject: T, updatedObject: T): List<JsonPatchOperation> =
+    with(jacksonObjectMapper().registerModule(JavaTimeModule())) {
+        val original = Json.createReader(StringReader(writeValueAsString(originalObject))).readObject()
+        val updated = Json.createReader(StringReader(writeValueAsString(updatedObject))).readObject()
+
+        return readValue(Json.createDiff(original, updated).toString())
+    }
