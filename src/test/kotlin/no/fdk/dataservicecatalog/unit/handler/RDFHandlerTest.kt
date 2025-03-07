@@ -92,9 +92,8 @@ class RDFHandlerTest {
                     dcatap:availability       <http://publications.europa.eu/resource/authority/planned-availability/STABLE>;
                     adms:status               <http://publications.europa.eu/resource/authority/distribution-status/DEVELOP>;
                     dcat:contactPoint         [ rdf:type                   vcard:Organization;
-                                                vcard:fn                   "Contact information | (5678)";
+                                                vcard:fn                   "name"@en;
                                                 vcard:hasEmail             <mailto:email>;
-                                                vcard:hasOrganizationName  "name"@nb;
                                                 vcard:hasTelephone         [ rdf:type        vcard:TelephoneType;
                                                                              vcard:hasValue  <tel:phone>
                                                                            ];
@@ -209,9 +208,8 @@ class RDFHandlerTest {
                     dcatap:availability       <http://publications.europa.eu/resource/authority/planned-availability/STABLE>;
                     adms:status               <http://publications.europa.eu/resource/authority/distribution-status/DEVELOP>;
                     dcat:contactPoint         [ rdf:type                   vcard:Organization;
-                                                vcard:fn                   "Contact information | (5678)";
+                                                vcard:fn                   "name"@en;
                                                 vcard:hasEmail             <mailto:email>;
-                                                vcard:hasOrganizationName  "name"@nb;
                                                 vcard:hasTelephone         [ rdf:type        vcard:TelephoneType;
                                                                              vcard:hasValue  <tel:phone>
                                                                            ];
@@ -301,7 +299,7 @@ class RDFHandlerTest {
             PREFIX adms:  <http://www.w3.org/ns/adms#>
             PREFIX dcatap: <http://data.europa.eu/r5r/>
             PREFIX cv:    <http://data.europa.eu/m8g/>
-            
+
             <$baseUri/catalogs/$catalogId/data-services/$dataServiceId>
                     rdf:type                  dcat:DataService;
                     dct:accessRights          <http://access-rights.com>;
@@ -313,9 +311,8 @@ class RDFHandlerTest {
                     dcatap:availability       <http://publications.europa.eu/resource/authority/planned-availability/STABLE>;
                     adms:status               <http://publications.europa.eu/resource/authority/distribution-status/DEVELOP>;
                     dcat:contactPoint         [ rdf:type                   vcard:Organization;
-                                                vcard:fn                   "Contact information | (5678)";
+                                                vcard:fn                   "name"@en;
                                                 vcard:hasEmail             <mailto:email>;
-                                                vcard:hasOrganizationName  "name"@nb;
                                                 vcard:hasTelephone         [ rdf:type        vcard:TelephoneType;
                                                                              vcard:hasValue  <tel:phone>
                                                                            ];
@@ -371,7 +368,7 @@ class RDFHandlerTest {
         endpointDescriptions = listOf("http://endpoint-description.com"),
         formats = listOf("http://format.com"),
         contactPoint = ContactPoint(
-            organizationUnit = "name",
+            name = LocalizedStrings(en = "name"),
             phone = "phone",
             email = "email",
             url = "url"
