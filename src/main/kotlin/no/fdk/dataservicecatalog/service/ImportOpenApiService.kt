@@ -44,11 +44,13 @@ class ImportOpenApiService {
 private val EMAIL_REGEX = Regex("""^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$""")
 
 fun SwaggerParseResult.extract(originalDataService: DataService): DataServiceExtraction {
+    val description = openAPI.extractDescription()
     val contactPoint = openAPI.extractContactPoint()
 
     val updatedDataService = originalDataService.copy(
         endpointUrl = openAPI.servers.first().url,
         title = LocalizedStrings(en = openAPI?.info?.title),
+        description = description.first,
         contactPoint = contactPoint.first
     )
 
@@ -62,6 +64,7 @@ fun SwaggerParseResult.extract(originalDataService: DataService): DataServiceExt
 
     issues.addAll(
         listOf(
+            description.second,
             contactPoint.second
         ).flatten()
     )
@@ -77,6 +80,13 @@ fun SwaggerParseResult.extract(originalDataService: DataService): DataServiceExt
     )
 
     return DataServiceExtraction(updatedDataService, extractionRecord)
+}
+
+private fun OpenAPI.extractDescription(): Pair<LocalizedStrings?, List<Issue>> {
+    return info?.description
+        ?.takeIf { it.isNotBlank() }
+        ?.let { LocalizedStrings(en = it) to emptyList() }
+        ?: (null to emptyList())
 }
 
 private fun OpenAPI.extractContactPoint(): Pair<ContactPoint?, List<Issue>> {

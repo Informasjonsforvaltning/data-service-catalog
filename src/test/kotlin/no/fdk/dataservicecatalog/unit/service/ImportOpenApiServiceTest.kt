@@ -10,6 +10,56 @@ import org.junit.jupiter.api.Test
 class ImportOpenApiServiceTest {
 
     @Test
+    fun `should extract description`() {
+        val specification = """
+            {
+                "openapi": "3.1.0",
+                "info": {
+                    "version": "1.0",
+                    "title": "title",
+                    "description": "description"
+                },
+                "servers": [
+                    {
+                        "url": "https://example.com"
+                    }
+                ],
+                "paths": {}
+            }
+        """.trimIndent()
+
+        val parseResult = OpenAPIParser().readContents(specification, null, null)
+
+        val dataService = DataService(
+            id = "id",
+            catalogId = "catalogId",
+            endpointUrl = "endpointUrl",
+            title = LocalizedStrings()
+        )
+
+        val dataServiceExtraction = parseResult.extract(dataService)
+
+        assertEquals(
+            LocalizedStrings(nb = null, nn = null, en = "description"),
+            dataServiceExtraction.dataService.description!!
+        )
+
+        dataServiceExtraction.extractionRecord.extractResult.let { result ->
+            assertEquals(3, result.operations.size)
+
+            assertTrue(result.operations.any {
+                it.op == OpEnum.REPLACE && it.path == "/description" && it.value == mapOf(
+                    "nb" to null,
+                    "nn" to null,
+                    "en" to "description"
+                )
+            })
+
+            assertTrue(result.issues.isEmpty())
+        }
+    }
+
+    @Test
     fun `should extract contact point`() {
         val specification = """
             {
@@ -63,9 +113,7 @@ class ImportOpenApiServiceTest {
                     "url" to null
                 )
             })
-        }
 
-        dataServiceExtraction.extractionRecord.extractResult.let { result ->
             assertEquals(1, result.issues.size)
 
             assertTrue(result.issues.any {
