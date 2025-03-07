@@ -44,30 +44,22 @@ class ImportOpenApiService {
 private val EMAIL_REGEX = Regex("""^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$""")
 
 fun SwaggerParseResult.extract(originalDataService: DataService): DataServiceExtraction {
+    val title = openAPI.extractTitle()
     val description = openAPI.extractDescription()
     val contactPoint = openAPI.extractContactPoint()
 
     val updatedDataService = originalDataService.copy(
         endpointUrl = openAPI.servers.first().url,
-        title = LocalizedStrings(en = openAPI?.info?.title),
+        title = title.first,
         description = description.first,
         contactPoint = contactPoint.first
     )
 
-    val issues = mutableListOf<Issue>()
-
-    messages
-        .filter { !it.contains("paths") }
-        .forEach {
-            issues.add(Issue(IssueType.ERROR, it))
-        }
-
-    issues.addAll(
-        listOf(
-            description.second,
-            contactPoint.second
-        ).flatten()
-    )
+    val issues = listOf(
+        title.second,
+        description.second,
+        contactPoint.second
+    ).flatten()
 
     val operations = createPatchOperations(originalDataService, updatedDataService)
 
@@ -80,6 +72,24 @@ fun SwaggerParseResult.extract(originalDataService: DataService): DataServiceExt
     )
 
     return DataServiceExtraction(updatedDataService, extractionRecord)
+}
+
+private fun OpenAPI.extractTitle(): Pair<LocalizedStrings, List<Issue>> {
+    val issues = mutableListOf<Issue>()
+
+    val title = info?.title
+
+    when {
+        title == null -> {
+            issues.add(Issue(IssueType.ERROR, "attribute info.title is missing"))
+        }
+
+        title.isBlank() -> {
+            issues.add(Issue(IssueType.ERROR, "attribute info.title is blank"))
+        }
+    }
+
+    return LocalizedStrings(en = title?.takeIf { it.isNotBlank() }) to issues
 }
 
 private fun OpenAPI.extractDescription(): Pair<LocalizedStrings?, List<Issue>> {

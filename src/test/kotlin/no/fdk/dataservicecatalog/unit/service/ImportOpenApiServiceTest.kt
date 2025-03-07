@@ -10,10 +10,54 @@ import org.junit.jupiter.api.Test
 class ImportOpenApiServiceTest {
 
     @Test
+    fun `should extract title`() {
+        val specification = """
+            {
+                "info": {
+                    "version": "1.0",
+                    "title": "title",
+                    "description": "description"
+                },
+                "servers": [
+                    {
+                        "url": "https://example.com"
+                    }
+                ],
+                "paths": {}
+            }
+        """.trimIndent()
+
+        val parseResult = OpenAPIParser().readContents(specification, null, null)
+
+        val dataService = DataService(
+            id = "id",
+            catalogId = "catalogId",
+            endpointUrl = "endpointUrl",
+            title = LocalizedStrings()
+        )
+
+        val dataServiceExtraction = parseResult.extract(dataService)
+
+        assertEquals(
+            LocalizedStrings(nb = null, nn = null, en = "title"),
+            dataServiceExtraction.dataService.title
+        )
+
+        dataServiceExtraction.extractionRecord.extractResult.let { result ->
+            assertEquals(3, result.operations.size)
+
+            assertTrue(result.operations.any {
+                it.op == OpEnum.REPLACE && it.path == "/title/en" && it.value == "title"
+            })
+
+            assertTrue(result.issues.isEmpty())
+        }
+    }
+
+    @Test
     fun `should extract description`() {
         val specification = """
             {
-                "openapi": "3.1.0",
                 "info": {
                     "version": "1.0",
                     "title": "title",
