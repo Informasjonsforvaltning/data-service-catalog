@@ -182,14 +182,10 @@ fun Model.addDataService(dataService: DataService, dataServiceUri: String) {
     dataService.contactPoint?.let { point ->
         val contactPointResource = this.createResource().addProperty(
             RDF.type, VCARD4.Organization
-        ).addProperty(
-            VCARD4.fn, "Contact information | (${dataService.catalogId})"
         )
 
-        point.organizationUnit?.takeIf(String::isNotBlank)?.let {
-            contactPointResource.addProperty(
-                VCARD4.hasOrganizationName, ResourceFactory.createLangLiteral(it, "nb")
-            )
+        point.name?.let { name ->
+            contactPointResource.addLangLiteralFromLocalizedStrings(name, VCARD4.fn)
         }
 
         point.phone?.takeIf(String::isNotBlank)?.let {

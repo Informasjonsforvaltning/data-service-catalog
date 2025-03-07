@@ -177,7 +177,7 @@ data class LocalizedStringLists(
 )
 
 data class ContactPoint(
-    val organizationUnit: String? = null,
+    val name: LocalizedStrings? = null,
     val phone: String? = null,
     val email: String? = null,
     val url: String? = null
