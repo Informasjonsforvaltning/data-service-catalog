@@ -1,8 +1,6 @@
 package no.fdk.dataservicecatalog.handler
 
-import no.fdk.dataservicecatalog.domain.ImportResult
-import no.fdk.dataservicecatalog.domain.ImportResultStatus
-import no.fdk.dataservicecatalog.domain.allOperations
+import no.fdk.dataservicecatalog.domain.*
 import no.fdk.dataservicecatalog.exception.OpenApiParseException
 import no.fdk.dataservicecatalog.service.ImportOpenApiService
 import no.fdk.dataservicecatalog.service.ImportResultService
@@ -10,9 +8,7 @@ import no.fdk.dataservicecatalog.service.ImportService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.net.URI
-import java.net.URISyntaxException
-
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class ImportHandler(
@@ -20,47 +16,46 @@ class ImportHandler(
     private val importResultService: ImportResultService,
     private val importOpenApiService: ImportOpenApiService
 ) {
+    @Transactional
     fun importOpenApi(catalogId: String, specification: String): ImportResult {
         val parseResult = importOpenApiService.parse(specification)
 
-        val openAPI = parseResult.openAPI ?: throw OpenApiParseException("Error parsing OpenAPI import")
+        val openAPI = parseResult.openAPI
+            ?: throw OpenApiParseException("Unexpected error parsing OpenAPI import")
 
-        if (openAPI.servers.size > 1) {
-            throw OpenApiParseException("Attribute servers must be exactly one")
+        val dataServiceExtractions = openAPI.servers.map { server ->
+            val externalId = server.url
+
+            val dataService = importResultService.findDataServiceIdByCatalogIdAndExternalId(catalogId, externalId)
+                ?.let { importService.findDataService(it) }
+                ?: importService.createDataService(externalId, catalogId)
+
+            importOpenApiService.extract(openAPI, dataService)
         }
 
-        val externalId = parseResult.openAPI.servers.first().url
-
-        try {
-            val uri = URI(externalId)
-
-            if (!uri.isAbsolute || uri.scheme == null) {
-                throw OpenApiParseException("Attribute servers has invalid URL: $externalId")
-            }
-        } catch (e: URISyntaxException) {
-            throw OpenApiParseException("Attribute servers has invalid URL: $externalId")
-        }
-
-        val dataService = importResultService.findDataServiceIdByCatalogIdAndExternalId(catalogId, externalId)
-            ?.let { importService.findDataService(it) }
-            ?: importService.createDataService(externalId, catalogId)
-
-        val importResult = importOpenApiService.extract(parseResult, dataService)
-
-        return if (importResult.status == ImportResultStatus.FAILED) {
-            importResultService.save(importResult)
+        return if (dataServiceExtractions.isEmpty() || dataServiceExtractions.hasError) {
+            importResultService.save(catalogId, dataServiceExtractions.allExtractionRecords, ImportResultStatus.FAILED)
+                .also { logger.warn("Errors occurred during OpenAPI import for catalog $catalogId") }
         } else {
-            importResult.extractionRecords.firstOrNull()
-                ?.let { applyPatch(dataService, it.allOperations) }
-                ?.let { importService.save(it) }
-                ?.also { logger.info("Updated data service (${it.id}) in catalog: $catalogId") }
+            dataServiceExtractions.forEach { extraction ->
+                val patchedDataService = applyPatch(extraction.dataService, extraction.extractionRecord.allOperations)
 
-            importResultService.save(importResult)
+                importService.save(patchedDataService)
+                    .also { logger.info("Updated data service (${it.id}) in catalog: $catalogId") }
+            }
+
+            importResultService.save(
+                catalogId,
+                dataServiceExtractions.allExtractionRecords,
+                ImportResultStatus.COMPLETED
+            ).also {
+                logger.info("OpenAPI import completed successfully for catalog $catalogId")
+            }
         }
     }
 
     fun getResults(catalogId: String): List<ImportResult> {
-        return importResultService.getResults(catalogId);
+        return importResultService.getResults(catalogId)
     }
 
     fun getResult(statusId: String): ImportResult? {

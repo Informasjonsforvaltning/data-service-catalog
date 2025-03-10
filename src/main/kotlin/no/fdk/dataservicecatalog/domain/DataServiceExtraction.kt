@@ -5,5 +5,8 @@ data class DataServiceExtraction(
     val extractionRecord: ExtractionRecord
 )
 
-val DataServiceExtraction.hasError: Boolean
-    get() = extractionRecord.extractResult.hasError()
+val Iterable<DataServiceExtraction>.hasError: Boolean
+    get() = any { it.extractionRecord.extractResult.hasError() }
+
+val Iterable<DataServiceExtraction>.allExtractionRecords: List<ExtractionRecord>
+    get() = map { it.extractionRecord }

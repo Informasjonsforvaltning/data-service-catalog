@@ -8,7 +8,6 @@ import no.fdk.dataservicecatalog.handler.createPatchOperations
 import org.springframework.stereotype.Service
 import java.net.URI
 import java.net.URISyntaxException
-import java.util.*
 
 @Service
 class ImportOpenApiService {
@@ -17,47 +16,30 @@ class ImportOpenApiService {
         return OpenAPIParser().readContents(specification, null, null)
     }
 
-    fun extract(parseResult: SwaggerParseResult, originalDataService: DataService): ImportResult {
-        val dataServiceExtraction = parseResult.extract(originalDataService)
-
-        return createImportResult(
-            originalDataService.catalogId,
-            dataServiceExtraction.extractionRecord,
-            if (dataServiceExtraction.hasError) ImportResultStatus.FAILED else ImportResultStatus.COMPLETED
-        )
-    }
-
-    private fun createImportResult(
-        catalogId: String,
-        extractionRecord: ExtractionRecord,
-        status: ImportResultStatus
-    ): ImportResult {
-        return ImportResult(
-            id = UUID.randomUUID().toString(),
-            catalogId = catalogId,
-            status = status,
-            extractionRecords = listOf(extractionRecord)
-        )
+    fun extract(openAPI: OpenAPI, originalDataService: DataService): DataServiceExtraction {
+        return openAPI.extract(originalDataService)
     }
 }
 
 private val EMAIL_REGEX = Regex("""^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$""")
 
-fun SwaggerParseResult.extract(originalDataService: DataService): DataServiceExtraction {
-    val title = openAPI.extractTitle()
-    val description = openAPI.extractDescription()
-    val contactPoint = openAPI.extractContactPoint()
+fun OpenAPI.extract(originalDataService: DataService): DataServiceExtraction {
+    val title = extractTitle()
+    val description = extractDescription()
+    val endpointDescriptions = extractEndpointDescriptions()
+    val contactPoint = extractContactPoint()
 
     val updatedDataService = originalDataService.copy(
-        endpointUrl = openAPI.servers.first().url,
         title = title.first,
         description = description.first,
+        endpointDescriptions = endpointDescriptions.first,
         contactPoint = contactPoint.first
     )
 
     val issues = listOf(
         title.second,
         description.second,
+        endpointDescriptions.second,
         contactPoint.second
     ).flatten()
 
@@ -93,10 +75,27 @@ private fun OpenAPI.extractTitle(): Pair<LocalizedStrings, List<Issue>> {
 }
 
 private fun OpenAPI.extractDescription(): Pair<LocalizedStrings?, List<Issue>> {
-    return info?.description
-        ?.takeIf { it.isNotBlank() }
-        ?.let { LocalizedStrings(en = it) to emptyList() }
+    val description = info?.description?.takeIf { it.isNotBlank() }
+        ?: info?.summary?.takeIf { it.isNotBlank() }
+
+    return description?.let { LocalizedStrings(en = it) to emptyList() }
         ?: (null to emptyList())
+}
+
+private fun OpenAPI.extractEndpointDescriptions(): Pair<List<String>?, List<Issue>> {
+    val descriptions = mutableListOf<String>()
+
+    paths?.forEach { (path, pathItem) ->
+        val description = pathItem.description ?: pathItem.summary
+
+        if (!description.isNullOrBlank()) {
+            descriptions.add("$path - $description")
+        } else {
+            descriptions.add(path)
+        }
+    }
+
+    return descriptions.takeIf { it.isNotEmpty() } to emptyList()
 }
 
 private fun OpenAPI.extractContactPoint(): Pair<ContactPoint?, List<Issue>> {

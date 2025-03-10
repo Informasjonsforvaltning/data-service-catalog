@@ -53,50 +53,6 @@ class ImportHandlerTest {
     }
 
     @Test
-    fun `should throw exception if too many servers in open api`() {
-        val catalogId = "1234"
-
-        val server = Server()
-        server.url = "https://example.com"
-
-        val openAPI = OpenAPI()
-        openAPI.servers = listOf(server, server)
-
-        val parseResult = SwaggerParseResult()
-        parseResult.openAPI = openAPI
-
-        importOpenApiService.stub {
-            on { parse(any()) } doReturn parseResult
-        }
-
-        assertThrows<OpenApiParseException> {
-            handler.importOpenApi(catalogId, "specification")
-        }
-    }
-
-    @Test
-    fun `should throw exception on invalid url for servers in open api`() {
-        val catalogId = "1234"
-
-        val server = Server()
-        server.url = "example.com"
-
-        val openAPI = OpenAPI()
-        openAPI.servers = listOf(server)
-
-        val parseResult = SwaggerParseResult()
-        parseResult.openAPI = openAPI
-
-        importOpenApiService.stub {
-            on { parse(any()) } doReturn parseResult
-        }
-
-        assertThrows<OpenApiParseException> {
-            handler.importOpenApi(catalogId, "specification")
-        }
-    }
-
-    @Test
     fun `should import open api from existing data service`() {
         val specification = "specification"
 
@@ -132,29 +88,38 @@ class ImportHandlerTest {
             on { findDataService(internalId) } doReturn dataService
         }
 
-        val importResult = ImportResult(
-            id = "",
-            catalogId = catalogId,
-            status = ImportResultStatus.COMPLETED,
-            extractionRecords = listOf(
-                ExtractionRecord(
-                    internalId = internalId,
-                    externalId = externalId,
-                    extractResult = ExtractResult()
-                )
+        val dataServiceExtraction = DataServiceExtraction(
+            dataService = dataService,
+            extractionRecord = ExtractionRecord(
+                internalId = internalId,
+                externalId = externalId,
+                extractResult = ExtractResult()
             )
         )
 
         importOpenApiService.stub {
-            on { extract(parseResult, dataService) } doReturn importResult
+            on { extract(parseResult.openAPI, dataService) } doReturn dataServiceExtraction
         }
 
         importService.stub {
             on { save(dataService) } doReturn dataService
         }
 
+        val importResult = ImportResult(
+            id = "id",
+            catalogId = catalogId,
+            status = ImportResultStatus.COMPLETED,
+            extractionRecords = listOf(dataServiceExtraction.extractionRecord)
+        )
+
         importResultService.stub {
-            on { save(importResult) } doReturn importResult
+            on {
+                save(
+                    catalogId,
+                    listOf(dataServiceExtraction.extractionRecord),
+                    ImportResultStatus.COMPLETED
+                )
+            } doReturn importResult
         }
 
         val result = handler.importOpenApi(catalogId, specification)
@@ -198,29 +163,38 @@ class ImportHandlerTest {
             on { createDataService(externalId, catalogId) } doReturn dataService
         }
 
-        val importResult = ImportResult(
-            id = "",
-            catalogId = catalogId,
-            status = ImportResultStatus.COMPLETED,
-            extractionRecords = listOf(
-                ExtractionRecord(
-                    internalId = internalId,
-                    externalId = externalId,
-                    extractResult = ExtractResult()
-                )
+        val dataServiceExtraction = DataServiceExtraction(
+            dataService = dataService,
+            extractionRecord = ExtractionRecord(
+                internalId = internalId,
+                externalId = externalId,
+                extractResult = ExtractResult()
             )
         )
 
         importOpenApiService.stub {
-            on { extract(parseResult, dataService) } doReturn importResult
+            on { extract(parseResult.openAPI, dataService) } doReturn dataServiceExtraction
         }
 
         importService.stub {
             on { save(dataService) } doReturn dataService
         }
 
+        val importResult = ImportResult(
+            id = "id",
+            catalogId = catalogId,
+            status = ImportResultStatus.COMPLETED,
+            extractionRecords = listOf(dataServiceExtraction.extractionRecord)
+        )
+
         importResultService.stub {
-            on { save(importResult) } doReturn importResult
+            on {
+                save(
+                    catalogId,
+                    listOf(dataServiceExtraction.extractionRecord),
+                    ImportResultStatus.COMPLETED
+                )
+            } doReturn importResult
         }
 
         val result = handler.importOpenApi(catalogId, specification)
@@ -264,25 +238,36 @@ class ImportHandlerTest {
             on { createDataService(externalId, catalogId) } doReturn dataService
         }
 
-        val importResult = ImportResult(
-            id = "",
-            catalogId = catalogId,
-            status = ImportResultStatus.FAILED,
-            extractionRecords = listOf(
-                ExtractionRecord(
-                    internalId = internalId,
-                    externalId = externalId,
-                    extractResult = ExtractResult()
+        val dataServiceExtraction = DataServiceExtraction(
+            dataService = dataService,
+            extractionRecord = ExtractionRecord(
+                internalId = internalId,
+                externalId = externalId,
+                extractResult = ExtractResult(
+                    issues = listOf(Issue(IssueType.ERROR, "attribute info.title is missing"))
                 )
             )
         )
 
         importOpenApiService.stub {
-            on { extract(parseResult, dataService) } doReturn importResult
+            on { extract(parseResult.openAPI, dataService) } doReturn dataServiceExtraction
         }
 
+        val importResult = ImportResult(
+            id = "id",
+            catalogId = catalogId,
+            status = ImportResultStatus.FAILED,
+            extractionRecords = listOf(dataServiceExtraction.extractionRecord)
+        )
+
         importResultService.stub {
-            on { save(importResult) } doReturn importResult
+            on {
+                save(
+                    catalogId,
+                    listOf(dataServiceExtraction.extractionRecord),
+                    ImportResultStatus.FAILED
+                )
+            } doReturn importResult
         }
 
         val result = handler.importOpenApi(catalogId, specification)

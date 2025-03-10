@@ -1,6 +1,9 @@
 package no.fdk.dataservicecatalog.domain
 
-data class ExtractResult(val operations: List<JsonPatchOperation> = emptyList(), val issues: List<Issue> = emptyList()) {
+data class ExtractResult(
+    val operations: List<JsonPatchOperation> = emptyList(),
+    val issues: List<Issue> = emptyList()
+) {
 
     fun hasError(): Boolean {
         return issues.any { it.type == IssueType.ERROR }
