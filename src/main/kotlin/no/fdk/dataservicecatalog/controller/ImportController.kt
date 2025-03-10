@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*
 import java.net.URI
 
 @RestController
-@RequestMapping(value = ["/import/{catalogId}"])
+@RequestMapping("/internal/catalogs/{catalogId}/import")
 class ImportController(private val importHandler: ImportHandler) {
 
     @PreAuthorize(ADMIN)
@@ -24,7 +24,7 @@ class ImportController(private val importHandler: ImportHandler) {
         val importResult = importHandler.importOpenApi(catalogId, dataService)
 
         return ResponseEntity
-            .created(URI("/import/$catalogId/results/${importResult.id}"))
+            .created(URI("/internal/catalogs/${catalogId}/import/results/${importResult.id}"))
             .build()
     }
 

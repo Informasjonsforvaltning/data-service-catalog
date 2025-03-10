@@ -51,14 +51,14 @@ class ImportControllerTest(@Autowired val mockMvc: MockMvc) {
             )
         }
 
-        mockMvc.post("/import/$catalogId")
+        mockMvc.post("/internal/catalogs/$catalogId/import")
         {
             contentType = MediaType.APPLICATION_JSON
             content = specification
             with(jwt().authorities(SimpleGrantedAuthority("organization:%s:admin".format(catalogId))))
         }.andExpect {
             status { isCreated() }
-            header { string("Location", "/import/$catalogId/results/$resultId") }
+            header { string("Location", "/internal/catalogs/$catalogId/import/results/$resultId") }
         }
     }
 
@@ -72,7 +72,7 @@ class ImportControllerTest(@Autowired val mockMvc: MockMvc) {
             on { importOpenApi(catalogId, specification) } doThrow OpenApiParseException("Failed to parse OpenAPI.")
         }
 
-        mockMvc.post("/import/$catalogId")
+        mockMvc.post("/internal/catalogs/$catalogId/import")
         {
             contentType = MediaType.APPLICATION_JSON
             content = specification
@@ -90,7 +90,7 @@ class ImportControllerTest(@Autowired val mockMvc: MockMvc) {
     fun `import openAPI should respond with forbidden on invalid authority`() {
         val catalogId = "1234"
 
-        mockMvc.post("/import/$catalogId")
+        mockMvc.post("/internal/catalogs/$catalogId/import")
         {
             contentType = MediaType.APPLICATION_JSON
             content = "specification"
@@ -108,7 +108,7 @@ class ImportControllerTest(@Autowired val mockMvc: MockMvc) {
             on { getResults(catalogId) } doReturn emptyList()
         }
 
-        mockMvc.get("/import/$catalogId/results")
+        mockMvc.get("/internal/catalogs/$catalogId/import/results")
         {
             with(jwt().authorities(SimpleGrantedAuthority("organization:%s:admin".format(catalogId))))
         }.andExpect {
@@ -126,7 +126,7 @@ class ImportControllerTest(@Autowired val mockMvc: MockMvc) {
             on { getResult(catalogId) } doReturn null
         }
 
-        mockMvc.get("/import/$catalogId/results/$resultId")
+        mockMvc.get("/internal/catalogs/$catalogId/import/results/$resultId")
         {
             with(jwt().authorities(SimpleGrantedAuthority("organization:%s:admin".format(catalogId))))
         }.andExpect {
