@@ -254,7 +254,7 @@
                     <useSystemClassLoader>false</useSystemClassLoader>
                     <!--suppress UnresolvedMavenProperty -->
                     <argLine>${failsafe.jacoco.args}</argLine>
-                    <groups>integration</groups>
+                    <groups>integration, contract</groups>
                     <excludedGroups>unit</excludedGroups>
                     <includes>
                         <include>**/*.java</include>

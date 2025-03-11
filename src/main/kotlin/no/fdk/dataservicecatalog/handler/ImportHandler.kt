@@ -38,7 +38,7 @@ class ImportHandler(
                 .also { logger.warn("Errors occurred during OpenAPI import for catalog $catalogId") }
         } else {
             dataServiceExtractions.forEach { extraction ->
-                val patchedDataService = applyPatch(extraction.dataService, extraction.extractionRecord.allOperations)
+                val patchedDataService = patchOriginal(extraction.dataService, extraction.extractionRecord.allOperations)
 
                 importService.save(patchedDataService)
                     .also { logger.info("Updated data service (${it.id}) in catalog: $catalogId") }
