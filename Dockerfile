@@ -1,4 +1,4 @@
-FROM amazoncorretto:21-alpine
+FROM eclipse-temurin:21-jre-alpine
 
 ARG USER=default
 ENV HOME=/home/$USER
