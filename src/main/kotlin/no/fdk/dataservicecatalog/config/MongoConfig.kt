@@ -9,6 +9,8 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.domain.AuditorAware
 import org.springframework.data.domain.Sort
+import org.springframework.data.mongodb.MongoDatabaseFactory
+import org.springframework.data.mongodb.MongoTransactionManager
 import org.springframework.data.mongodb.config.EnableMongoAuditing
 import org.springframework.data.mongodb.core.MongoOperations
 import org.springframework.data.mongodb.core.index.CompoundIndexDefinition
@@ -20,6 +22,11 @@ import java.util.*
 @Configuration
 @EnableMongoAuditing
 class MongoConfig : AuditorAware<User> {
+
+    @Bean
+    fun transactionManager(dbFactory: MongoDatabaseFactory): MongoTransactionManager {
+        return MongoTransactionManager(dbFactory)
+    }
 
     @Bean
     fun configureIndexes(mongoOperations: MongoOperations): Boolean {
