@@ -28,19 +28,22 @@ fun OpenAPI.extract(originalDataService: DataService): DataServiceExtraction {
     val description = extractDescription()
     val contactPoint = extractContactPoint()
     val pages = extractPages()
+    val landingPage = extractLandingPage()
 
     val updatedDataService = originalDataService.copy(
         title = title.first,
         description = description.first,
         contactPoint = contactPoint.first,
-        pages = pages.first
+        pages = pages.first,
+        landingPage = landingPage.first
     )
 
     val issues = listOf(
         title.second,
         description.second,
         contactPoint.second,
-        pages.second
+        pages.second,
+        landingPage.second
     ).flatten()
 
     val operations = createPatchOperations(originalDataService, updatedDataService)
@@ -131,7 +134,7 @@ private fun OpenAPI.extractPages(): Pair<List<String>?, List<Issue>> {
             if (it.isBlank()) {
                 false
             } else if (!it.isValidUri()) {
-                issues.add(Issue(IssueType.WARNING, "attribute info.termsOfService has invalid URI: $it"))
+                issues.add(Issue(IssueType.WARNING, "attribute info.termsOfService has invalid format: $it"))
                 false
             } else {
                 true
@@ -139,7 +142,25 @@ private fun OpenAPI.extractPages(): Pair<List<String>?, List<Issue>> {
         }
         ?.let { listOf(it) }
 
-    return pages to emptyList()
+    return pages to issues
+}
+
+private fun OpenAPI.extractLandingPage(): Pair<String?, List<Issue>> {
+    val issues = mutableListOf<Issue>()
+
+    val landingPage = externalDocs?.url
+        ?.takeIf {
+            if (it.isBlank()) {
+                false
+            } else if (!it.isValidUri()) {
+                issues.add(Issue(IssueType.WARNING, "attribute externalDocs.url has invalid format: $it"))
+                false
+            } else {
+                true
+            }
+        }
+
+    return landingPage to issues
 }
 
 private fun String.isValidUri(): Boolean {

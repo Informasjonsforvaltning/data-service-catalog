@@ -49,9 +49,11 @@ class ImportTest {
                 "version": "1.0",
                 "title": "title",
                 "description": "description",
+                "termsOfService": "https://example.com/tos",
                 "contact": {
                   "name": "contact",
-                  "email": "invalid"
+                  "email": "invalid",
+                  "url": "https://example.com/contact"
                 }
               },
               "servers": [
@@ -61,7 +63,10 @@ class ImportTest {
                 {
                   "url": "https://text.example.com"
                 }
-              ]
+              ],
+              "externalDocs": {
+                "url": "https://example.com/docs"
+              }
             }
         """.trimIndent()
 

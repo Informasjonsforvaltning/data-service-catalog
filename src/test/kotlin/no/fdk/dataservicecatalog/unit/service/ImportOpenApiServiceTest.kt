@@ -1,5 +1,6 @@
 package no.fdk.dataservicecatalog.unit.service
 
+import io.swagger.v3.oas.models.ExternalDocumentation
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.info.Contact
 import io.swagger.v3.oas.models.info.Info
@@ -190,6 +191,38 @@ class ImportOpenApiServiceTest {
 
             assertTrue(result.operations.any {
                 it.op == OpEnum.REPLACE && it.path == "/pages" && it.value == listOf("https://example.com/tos")
+            })
+        }
+    }
+
+    @Test
+    fun `should extract landing page`() {
+        val info = Info()
+        info.title = "title"
+
+        val externalDocumentation = ExternalDocumentation()
+        externalDocumentation.url = "https://example.com/doc"
+
+        val openAPI = OpenAPI()
+        openAPI.info = info
+        openAPI.externalDocs = externalDocumentation
+
+        val dataService = DataService(
+            id = "id",
+            catalogId = "catalogId",
+            endpointUrl = "endpointUrl",
+            title = LocalizedStrings()
+        )
+
+        val dataServiceExtraction = openAPI.extract(dataService)
+
+        assertEquals("https://example.com/doc", dataServiceExtraction.dataService.landingPage!!)
+
+        dataServiceExtraction.extractionRecord.extractResult.let { result ->
+            assertEquals(2, result.operations.size)
+
+            assertTrue(result.operations.any {
+                it.op == OpEnum.REPLACE && it.path == "/landingPage" && it.value == "https://example.com/doc"
             })
         }
     }
