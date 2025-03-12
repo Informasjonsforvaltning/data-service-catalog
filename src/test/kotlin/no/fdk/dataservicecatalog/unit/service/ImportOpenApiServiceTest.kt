@@ -1,8 +1,6 @@
 package no.fdk.dataservicecatalog.unit.service
 
 import io.swagger.v3.oas.models.OpenAPI
-import io.swagger.v3.oas.models.PathItem
-import io.swagger.v3.oas.models.Paths
 import io.swagger.v3.oas.models.info.Contact
 import io.swagger.v3.oas.models.info.Info
 import no.fdk.dataservicecatalog.domain.*
@@ -113,49 +111,11 @@ class ImportOpenApiServiceTest {
     }
 
     @Test
-    fun `should extract endpoint descriptions`() {
-        val info = Info()
-        info.title = "title"
-
-        val pathItem = PathItem()
-        pathItem.description = "description"
-
-        val paths = Paths()
-        paths["/example"] = pathItem
-
-        val openAPI = OpenAPI()
-        openAPI.info = info
-        openAPI.paths = paths
-
-        val dataService = DataService(
-            id = "id",
-            catalogId = "catalogId",
-            endpointUrl = "endpointUrl",
-            title = LocalizedStrings()
-        )
-
-        val dataServiceExtraction = openAPI.extract(dataService)
-
-        assertEquals(listOf("/example - description"), dataServiceExtraction.dataService.endpointDescriptions!!)
-
-        dataServiceExtraction.extractionRecord.extractResult.let { result ->
-            assertEquals(2, result.operations.size)
-
-            assertTrue(result.operations.any {
-                it.op == OpEnum.REPLACE && it.path == "/endpointDescriptions" && it.value == listOf(
-                    "/example - description",
-                )
-            })
-
-            assertTrue(result.issues.isEmpty())
-        }
-    }
-
-    @Test
     fun `should extract contact point`() {
         val contact = Contact()
         contact.name = "name"
         contact.email = "invalid"
+        contact.url = "https://example.com/contact"
 
         val info = Info()
         info.title = "title"
@@ -174,7 +134,10 @@ class ImportOpenApiServiceTest {
         val dataServiceExtraction = openAPI.extract(dataService)
 
         assertEquals(
-            ContactPoint(name = LocalizedStrings(nb = null, nn = null, en = "name")),
+            ContactPoint(
+                name = LocalizedStrings(nb = null, nn = null, en = "name"),
+                url = "https://example.com/contact"
+            ),
             dataServiceExtraction.dataService.contactPoint!!
         )
 
@@ -190,7 +153,7 @@ class ImportOpenApiServiceTest {
                     ),
                     "phone" to null,
                     "email" to null,
-                    "url" to null
+                    "url" to "https://example.com/contact"
                 )
             })
 
@@ -198,6 +161,35 @@ class ImportOpenApiServiceTest {
 
             assertTrue(result.issues.any {
                 it.type == IssueType.WARNING && it.message.contains("contact.email")
+            })
+        }
+    }
+
+    @Test
+    fun `should extract pages`() {
+        val info = Info()
+        info.title = "title"
+        info.termsOfService = "https://example.com/tos"
+
+        val openAPI = OpenAPI()
+        openAPI.info = info
+
+        val dataService = DataService(
+            id = "id",
+            catalogId = "catalogId",
+            endpointUrl = "endpointUrl",
+            title = LocalizedStrings()
+        )
+
+        val dataServiceExtraction = openAPI.extract(dataService)
+
+        assertEquals(listOf("https://example.com/tos"), dataServiceExtraction.dataService.pages!!)
+
+        dataServiceExtraction.extractionRecord.extractResult.let { result ->
+            assertEquals(2, result.operations.size)
+
+            assertTrue(result.operations.any {
+                it.op == OpEnum.REPLACE && it.path == "/pages" && it.value == listOf("https://example.com/tos")
             })
         }
     }

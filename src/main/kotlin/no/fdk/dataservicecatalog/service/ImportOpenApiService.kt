@@ -26,21 +26,21 @@ private val EMAIL_REGEX = Regex("""^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2
 fun OpenAPI.extract(originalDataService: DataService): DataServiceExtraction {
     val title = extractTitle()
     val description = extractDescription()
-    val endpointDescriptions = extractEndpointDescriptions()
     val contactPoint = extractContactPoint()
+    val pages = extractPages()
 
     val updatedDataService = originalDataService.copy(
         title = title.first,
         description = description.first,
-        endpointDescriptions = endpointDescriptions.first,
-        contactPoint = contactPoint.first
+        contactPoint = contactPoint.first,
+        pages = pages.first
     )
 
     val issues = listOf(
         title.second,
         description.second,
-        endpointDescriptions.second,
-        contactPoint.second
+        contactPoint.second,
+        pages.second
     ).flatten()
 
     val operations = createPatchOperations(originalDataService, updatedDataService)
@@ -82,22 +82,6 @@ private fun OpenAPI.extractDescription(): Pair<LocalizedStrings?, List<Issue>> {
         ?: (null to emptyList())
 }
 
-private fun OpenAPI.extractEndpointDescriptions(): Pair<List<String>?, List<Issue>> {
-    val descriptions = mutableListOf<String>()
-
-    paths?.forEach { (path, pathItem) ->
-        val description = pathItem.description ?: pathItem.summary
-
-        if (!description.isNullOrBlank()) {
-            descriptions.add("$path - $description")
-        } else {
-            descriptions.add(path)
-        }
-    }
-
-    return descriptions.takeIf { it.isNotEmpty() } to emptyList()
-}
-
 private fun OpenAPI.extractContactPoint(): Pair<ContactPoint?, List<Issue>> {
     val issues = mutableListOf<Issue>()
 
@@ -107,30 +91,28 @@ private fun OpenAPI.extractContactPoint(): Pair<ContactPoint?, List<Issue>> {
             LocalizedStrings(en = it)
         }
 
-    val email = info?.contact?.email?.let {
-        if (!EMAIL_REGEX.matches(it)) {
-            issues.add(Issue(IssueType.WARNING, "attribute contact.email has invalid format: $it"))
-            null
-        } else {
-            it
-        }
-    }
-
-    val url = info?.contact?.url?.let {
-        try {
-            val uri = URI(it)
-
-            if (!uri.isAbsolute || uri.scheme == null) {
-                issues.add(Issue(IssueType.WARNING, "attribute contact.url has invalid format: $it"))
+    val email = info?.contact?.email
+        ?.takeIf { it.isNotBlank() }
+        ?.let {
+            if (!EMAIL_REGEX.matches(it)) {
+                issues.add(Issue(IssueType.WARNING, "attribute contact.email has invalid format: $it"))
                 null
             } else {
                 it
             }
-        } catch (e: URISyntaxException) {
-            issues.add(Issue(IssueType.WARNING, "attribute contact.url has invalid format: $it"))
-            null
         }
-    }
+
+    val url = info?.contact?.url
+        ?.takeIf {
+            if (it.isBlank()) {
+                false
+            } else if (!it.isValidUri()) {
+                issues.add(Issue(IssueType.WARNING, "attribute contact.url has invalid format: $it"))
+                false
+            } else {
+                true
+            }
+        }
 
     val contactPoint = if (name != null || email != null || url != null) {
         ContactPoint(name = name, email = email, url = url)
@@ -140,3 +122,38 @@ private fun OpenAPI.extractContactPoint(): Pair<ContactPoint?, List<Issue>> {
 
     return contactPoint to issues
 }
+
+private fun OpenAPI.extractPages(): Pair<List<String>?, List<Issue>> {
+    val issues = mutableListOf<Issue>()
+
+    val pages = info?.termsOfService
+        ?.takeIf {
+            if (it.isBlank()) {
+                false
+            } else if (!it.isValidUri()) {
+                issues.add(Issue(IssueType.WARNING, "attribute info.termsOfService has invalid URI: $it"))
+                false
+            } else {
+                true
+            }
+        }
+        ?.let { listOf(it) }
+
+    return pages to emptyList()
+}
+
+private fun String.isValidUri(): Boolean {
+    try {
+        val uri = URI(this)
+
+        if (!uri.isAbsolute || uri.scheme == null) {
+            return false
+        }
+    } catch (e: URISyntaxException) {
+        return false
+    }
+
+    return true
+}
+
+

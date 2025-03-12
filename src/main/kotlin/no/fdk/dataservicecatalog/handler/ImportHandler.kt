@@ -1,6 +1,9 @@
 package no.fdk.dataservicecatalog.handler
 
-import no.fdk.dataservicecatalog.domain.*
+import no.fdk.dataservicecatalog.domain.ImportResult
+import no.fdk.dataservicecatalog.domain.ImportResultStatus
+import no.fdk.dataservicecatalog.domain.allExtractionRecords
+import no.fdk.dataservicecatalog.domain.hasError
 import no.fdk.dataservicecatalog.exception.OpenApiParseException
 import no.fdk.dataservicecatalog.service.ImportOpenApiService
 import no.fdk.dataservicecatalog.service.ImportResultService
@@ -38,9 +41,7 @@ class ImportHandler(
                 .also { logger.warn("Errors occurred during OpenAPI import for catalog $catalogId") }
         } else {
             dataServiceExtractions.forEach { extraction ->
-                val patchedDataService = patchOriginal(extraction.dataService, extraction.extractionRecord.allOperations)
-
-                importService.save(patchedDataService)
+                importService.save(extraction.dataService)
                     .also { logger.info("Updated data service (${it.id}) in catalog: $catalogId") }
             }
 

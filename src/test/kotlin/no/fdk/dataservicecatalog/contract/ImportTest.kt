@@ -61,18 +61,7 @@ class ImportTest {
                 {
                   "url": "https://text.example.com"
                 }
-              ],
-              "paths": {
-                "/example": {
-                  "description": "description",
-                  "get": {
-                    "description": "returns all examples"
-                  },
-                  "post": {
-                    "description": "creates an example"
-                  }
-                }
-              }
+              ]
             }
         """.trimIndent()
 
