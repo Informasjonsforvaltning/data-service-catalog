@@ -29,13 +29,15 @@ fun OpenAPI.extract(originalDataService: DataService): DataServiceExtraction {
     val contactPoint = extractContactPoint()
     val pages = extractPages()
     val landingPage = extractLandingPage()
+    val keywords = extractKeywords()
 
     val updatedDataService = originalDataService.copy(
         title = title.first,
         description = description.first,
         contactPoint = contactPoint.first,
         pages = pages.first,
-        landingPage = landingPage.first
+        landingPage = landingPage.first,
+        keywords = keywords.first
     )
 
     val issues = listOf(
@@ -43,7 +45,8 @@ fun OpenAPI.extract(originalDataService: DataService): DataServiceExtraction {
         description.second,
         contactPoint.second,
         pages.second,
-        landingPage.second
+        landingPage.second,
+        keywords.second
     ).flatten()
 
     val operations = createPatchOperations(originalDataService, updatedDataService)
@@ -161,6 +164,16 @@ private fun OpenAPI.extractLandingPage(): Pair<String?, List<Issue>> {
         }
 
     return landingPage to issues
+}
+
+private fun OpenAPI.extractKeywords(): Pair<LocalizedStringLists?, List<Issue>> {
+    val keywords = tags
+        ?.map { it.name }
+        ?.filter { it.isNotBlank() }
+        ?.takeIf { it.isNotEmpty() }
+        ?.let { LocalizedStringLists(en = it) }
+
+    return keywords to emptyList()
 }
 
 private fun String.isValidUri(): Boolean {

@@ -44,36 +44,40 @@ class ImportTest {
     fun `import openAPI should respond with created and location`() {
         val specification = """
             {
-              "openapi": "3.0.0",
-              "info": {
-                "version": "1.0",
-                "title": "title",
-                "description": "description",
-                "termsOfService": "https://example.com/tos",
-                "contact": {
-                  "name": "contact",
-                  "email": "invalid",
-                  "url": "https://example.com/contact"
+                "openapi": "3.0.0",
+                "info": {
+                    "version": "1.0",
+                    "title": "title",
+                    "description": "description",
+                    "termsOfService": "https://example.com/tos",
+                    "contact": {
+                        "name": "contact",
+                        "email": "invalid",
+                        "url": "https://example.com/contact"
+                    }
+                },
+                "servers": [
+                    {
+                        "url": "https://example.com"
+                    }, 
+                    {
+                        "url": "https://text.example.com"
+                    }
+                ],
+                "tags": [
+                    {
+                        "name": "tag"
+                    }
+                ],
+                "externalDocs": {
+                    "url": "https://example.com/docs"
                 }
-              },
-              "servers": [
-                {
-                  "url": "https://example.com"
-                }, 
-                {
-                  "url": "https://text.example.com"
-                }
-              ],
-              "externalDocs": {
-                "url": "https://example.com/docs"
-              }
             }
         """.trimIndent()
 
         val catalogId = "1234"
 
-        mockMvc.post("/internal/catalogs/$catalogId/import")
-        {
+        mockMvc.post("/internal/catalogs/$catalogId/import") {
             contentType = MediaType.APPLICATION_JSON
             content = specification
             with(jwt().authorities(SimpleGrantedAuthority("organization:%s:admin".format(catalogId))))

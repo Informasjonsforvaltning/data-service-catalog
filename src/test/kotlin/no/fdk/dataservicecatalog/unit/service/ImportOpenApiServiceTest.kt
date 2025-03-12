@@ -226,4 +226,40 @@ class ImportOpenApiServiceTest {
             })
         }
     }
+
+    @Test
+    fun `should extract keywords`() {
+        val info = Info()
+        info.title = "title"
+
+        val tag = io.swagger.v3.oas.models.tags.Tag()
+        tag.name = "tag"
+
+        val openAPI = OpenAPI()
+        openAPI.info = info
+        openAPI.tags = listOf(tag)
+
+        val dataService = DataService(
+            id = "id",
+            catalogId = "catalogId",
+            endpointUrl = "endpointUrl",
+            title = LocalizedStrings()
+        )
+
+        val dataServiceExtraction = openAPI.extract(dataService)
+
+        assertEquals(LocalizedStringLists(en = listOf("tag")), dataServiceExtraction.dataService.keywords!!)
+
+        dataServiceExtraction.extractionRecord.extractResult.let { result ->
+            assertEquals(2, result.operations.size)
+
+            assertTrue(result.operations.any {
+                it.op == OpEnum.REPLACE && it.path == "/keywords" && it.value == mapOf(
+                    "nb" to null,
+                    "nn" to null,
+                    "en" to listOf("tag")
+                )
+            })
+        }
+    }
 }
