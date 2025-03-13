@@ -36,7 +36,10 @@ data class DataService(
 
     val catalogId: String,
 
-    val status: String?,
+    /*
+    status (adms:status)
+     */
+    val status: String? = null,
 
     /*
     endepunktsURL (dcat:endpointURL)
