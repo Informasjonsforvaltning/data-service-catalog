@@ -4,6 +4,7 @@ import no.fdk.dataservicecatalog.domain.ImportResult
 import no.fdk.dataservicecatalog.domain.ImportResultStatus
 import no.fdk.dataservicecatalog.domain.allExtractionRecords
 import no.fdk.dataservicecatalog.domain.hasError
+import no.fdk.dataservicecatalog.exception.NotFoundException
 import no.fdk.dataservicecatalog.exception.OpenApiParseException
 import no.fdk.dataservicecatalog.service.ImportOpenApiService
 import no.fdk.dataservicecatalog.service.ImportResultService
@@ -61,6 +62,16 @@ class ImportHandler(
 
     fun getResult(statusId: String): ImportResult? {
         return importResultService.getResult(statusId)
+    }
+
+    fun deleteResult(catalogId: String, resultId: String) {
+        val result = importResultService.getResult(resultId)
+            ?.takeIf { it.catalogId == catalogId }
+            ?: throw NotFoundException("Import result with id: $resultId not found in Catalog with id: $catalogId")
+
+        importResultService.deleteResult(result)
+
+        logger.info("Deleted import result with id: $resultId in Catalog with id: $catalogId")
     }
 }
 

@@ -1,6 +1,7 @@
 package no.fdk.dataservicecatalog.controller
 
 import no.fdk.dataservicecatalog.domain.ImportResult
+import no.fdk.dataservicecatalog.exception.NotFoundException
 import no.fdk.dataservicecatalog.exception.OpenApiParseException
 import no.fdk.dataservicecatalog.handler.ImportHandler
 import org.springframework.http.HttpStatus
@@ -42,11 +43,22 @@ class ImportController(private val importHandler: ImportHandler) {
             ?: ResponseEntity(HttpStatus.NOT_FOUND)
     }
 
+    @PreAuthorize(ADMIN)
+    @DeleteMapping(value = ["/results/{id}"])
+    fun delete(@PathVariable catalogId: String, @PathVariable id: String): ResponseEntity<Void> {
+        return importHandler.deleteResult(catalogId, id).let { ResponseEntity.noContent().build() }
+    }
+
     @ExceptionHandler
     fun handleOpenApiParseException(ex: OpenApiParseException): ResponseEntity<ProblemDetail> {
         val problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.message)
 
         return ResponseEntity.of(problemDetail).build()
+    }
+
+    @ExceptionHandler
+    fun handleNotFoundException(ex: NotFoundException): ResponseEntity<ProblemDetail> {
+        return ResponseEntity.of(ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.message)).build()
     }
 
     companion object {
