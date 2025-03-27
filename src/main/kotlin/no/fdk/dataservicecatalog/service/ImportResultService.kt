@@ -20,6 +20,10 @@ class ImportResultService(private val importResultRepository: ImportResultReposi
         return importResultRepository.findByIdOrNull(statusId)
     }
 
+    fun deleteResult(result: ImportResult) {
+        importResultRepository.delete(result)
+    }
+
     fun findDataServiceIdByCatalogIdAndExternalId(catalogId: String, externalId: String): String? {
         return importResultRepository
             .findFirstByStatusAndCatalogIdAndExtractionRecordsExternalId(

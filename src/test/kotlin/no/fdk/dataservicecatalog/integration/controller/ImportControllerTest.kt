@@ -5,10 +5,13 @@ import no.fdk.dataservicecatalog.config.SecurityConfig
 import no.fdk.dataservicecatalog.controller.ImportController
 import no.fdk.dataservicecatalog.domain.ImportResult
 import no.fdk.dataservicecatalog.domain.ImportResultStatus
+import no.fdk.dataservicecatalog.exception.NotFoundException
 import no.fdk.dataservicecatalog.exception.OpenApiParseException
 import no.fdk.dataservicecatalog.handler.ImportHandler
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.stub
@@ -21,6 +24,7 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import java.time.LocalDateTime
@@ -131,6 +135,50 @@ class ImportControllerTest(@Autowired val mockMvc: MockMvc) {
             with(jwt().authorities(SimpleGrantedAuthority("organization:%s:admin".format(catalogId))))
         }.andExpect {
             status { isNotFound() }
+        }
+    }
+
+    @Test
+    fun `delete should respond with no content`() {
+        val catalogId = "1234"
+        val resultId = "5678"
+
+        mockMvc.delete("/internal/catalogs/$catalogId/import/results/$resultId") {
+            with(jwt().authorities(SimpleGrantedAuthority("organization:$catalogId:admin")))
+        }.andExpect {
+            status { isNoContent() }
+        }
+    }
+
+    @Test
+    fun `delete should respond with forbidden on invalid authority`() {
+        val catalogId = "1234"
+        val resultId = "5678"
+
+        mockMvc.delete("/internal/catalogs/$catalogId/import/results/$resultId") {
+            with(jwt().authorities(SimpleGrantedAuthority("invalid")))
+        }.andExpect {
+            status { isForbidden() }
+        }
+    }
+
+    @Test
+    fun `delete should respond with not found on exception`() {
+        val catalogId = "1234"
+        val resultId = "5678"
+
+        handler.stub {
+            on { deleteResult(catalogId, resultId) } doThrow NotFoundException("Import result $resultId not found")
+        }
+
+        mockMvc.delete("/internal/catalogs/$catalogId/import/results/$resultId") {
+            with(jwt().authorities(SimpleGrantedAuthority("organization:$catalogId:admin")))
+        }.andExpect {
+            status { isNotFound() }
+            header {
+                string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
+            }
+            jsonPath("$.detail") { value("Import result $resultId not found") }
         }
     }
 }
