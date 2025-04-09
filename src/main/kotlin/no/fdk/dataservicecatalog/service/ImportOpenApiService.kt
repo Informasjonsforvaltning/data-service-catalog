@@ -101,7 +101,7 @@ private fun OpenAPI.extractContactPoint(): Pair<ContactPoint?, List<Issue>> {
         ?.takeIf { it.isNotBlank() }
         ?.let {
             if (!EMAIL_REGEX.matches(it)) {
-                issues.add(Issue(IssueType.WARNING, "attribute contact.email has invalid format: $it"))
+                issues.add(Issue(IssueType.WARNING, "attribute contact.email has invalid format: $it, an example of a properly formatted e-mail: 'example@domain.com'"))
                 null
             } else {
                 it
@@ -113,7 +113,7 @@ private fun OpenAPI.extractContactPoint(): Pair<ContactPoint?, List<Issue>> {
             if (it.isBlank()) {
                 false
             } else if (!it.isValidUri()) {
-                issues.add(Issue(IssueType.WARNING, "attribute contact.url has invalid format: $it"))
+                issues.add(Issue(IssueType.WARNING, "attribute contact.url has invalid format: $it, an example of a properly formatted URI: 'https://example.com'"))
                 false
             } else {
                 true
@@ -137,7 +137,7 @@ private fun OpenAPI.extractPages(): Pair<List<String>?, List<Issue>> {
             if (it.isBlank()) {
                 false
             } else if (!it.isValidUri()) {
-                issues.add(Issue(IssueType.WARNING, "attribute info.termsOfService has invalid format: $it"))
+                issues.add(Issue(IssueType.WARNING, "attribute info.termsOfService has invalid format: $it, an example of a properly formatted URI: 'https://example.com'"))
                 false
             } else {
                 true
@@ -156,7 +156,7 @@ private fun OpenAPI.extractLandingPage(): Pair<String?, List<Issue>> {
             if (it.isBlank()) {
                 false
             } else if (!it.isValidUri()) {
-                issues.add(Issue(IssueType.WARNING, "attribute externalDocs.url has invalid format: $it"))
+                issues.add(Issue(IssueType.WARNING, "attribute externalDocs.url has invalid format: $it, an example of a properly formatted URI: 'https://example.com'"))
                 false
             } else {
                 true
