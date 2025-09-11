@@ -18,6 +18,44 @@ spec:
     spec:
       containers:
         - name: data-service-catalog
+          env:
+            - name: JAVA_TOOL_OPTIONS
+              value: "-XX:MaxRAMPercentage=80.0"
+            - name: MONGO_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: data-service-catalog
+                  key: MONGODB_USER
+            - name: MONGO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: data-service-catalog
+                  key: MONGODB_PASSWORD
+            - name: MONGODB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb
+                  key: MONGODB_HOST
+            - name: MONGODB_AUTH
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb
+                  key: MONGODB_AUTH
+            - name: MONGODB_REPLICASET
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb
+                  key: MONGODB_REPLICASET
+            - name: SSO_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: commonurl
+                  key: SSO_BASE_URI
+            - name: CORS_ORIGIN_PATTERNS
+              valueFrom:
+                secretKeyRef:
+                  name: data-service-catalog
+                  key: CORS_ORIGIN_PATTERNS
           image: data-service-catalog
           imagePullPolicy: Always
           ports:
