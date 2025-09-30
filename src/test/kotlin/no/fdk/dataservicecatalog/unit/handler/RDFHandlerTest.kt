@@ -95,7 +95,7 @@ class RDFHandlerTest {
                                                 vcard:fn                   "name"@en;
                                                 vcard:hasEmail             <mailto:email>;
                                                 vcard:hasTelephone         [ rdf:type        vcard:TelephoneType;
-                                                                             vcard:hasValue  <tel:phone>
+                                                                             vcard:hasValue  <tel:phonenumber>
                                                                            ];
                                                 vcard:hasURL               <url>
                                               ];
@@ -211,7 +211,7 @@ class RDFHandlerTest {
                                                 vcard:fn                   "name"@en;
                                                 vcard:hasEmail             <mailto:email>;
                                                 vcard:hasTelephone         [ rdf:type        vcard:TelephoneType;
-                                                                             vcard:hasValue  <tel:phone>
+                                                                             vcard:hasValue  <tel:phonenumber>
                                                                            ];
                                                 vcard:hasURL               <url>
                                               ];
@@ -314,7 +314,7 @@ class RDFHandlerTest {
                                                 vcard:fn                   "name"@en;
                                                 vcard:hasEmail             <mailto:email>;
                                                 vcard:hasTelephone         [ rdf:type        vcard:TelephoneType;
-                                                                             vcard:hasValue  <tel:phone>
+                                                                             vcard:hasValue  <tel:phonenumber>
                                                                            ];
                                                 vcard:hasURL               <url>
                                               ];
@@ -369,7 +369,7 @@ class RDFHandlerTest {
         formats = listOf("http://format.com"),
         contactPoint = ContactPoint(
             name = LocalizedStrings(en = "name"),
-            phone = "phone",
+            phone = "phone number",
             email = "email",
             url = "url"
         ),

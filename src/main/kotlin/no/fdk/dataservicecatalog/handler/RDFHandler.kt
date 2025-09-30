@@ -192,7 +192,7 @@ fun Model.addDataService(dataService: DataService, dataServiceUri: String) {
             val telephoneTypeResource = this.createResource().addProperty(
                 RDF.type, VCARD4.TelephoneType
             ).addProperty(
-                VCARD4.hasValue, ResourceFactory.createResource(URIref.encode("tel:$it"))
+                VCARD4.hasValue, ResourceFactory.createResource(URIref.encode("tel:${it.replace(Regex("\\s"), "")}"))
             )
 
             contactPointResource.addProperty(
