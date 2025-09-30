@@ -192,7 +192,7 @@ fun Model.addDataService(dataService: DataService, dataServiceUri: String) {
             val telephoneTypeResource = this.createResource().addProperty(
                 RDF.type, VCARD4.TelephoneType
             ).addProperty(
-                VCARD4.hasValue, ResourceFactory.createResource(URIref.encode("tel:${it.replace(Regex("\\s"), "")}"))
+                VCARD4.hasValue, telephoneResource(it)
             )
 
             contactPointResource.addProperty(
@@ -321,6 +321,17 @@ fun Model.serialize(lang: Lang): String {
 
     return stringWriter.buffer.toString()
 }
+
+private fun telephoneResource(telephone: String): Resource =
+    telephone.trim { it <= ' ' }
+        .filterIndexed { index, c ->
+            when {
+                index == 0 && c == '+' -> true // global-number-digits
+                c in '0'..'9' -> true // digit
+                else -> false // skip visual-separator and other content
+            }
+        }
+        .let { ResourceFactory.createResource(URIref.encode("tel:$it")) }
 
 private fun Resource.addLangLiteralFromLocalizedStrings(localizedStrings: LocalizedStrings, predicate: Property) {
     listOf(
