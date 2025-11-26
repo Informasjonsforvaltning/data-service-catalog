@@ -65,8 +65,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: https://keycloak.staging.fellesdatakatalog.digdir.no/realms/fdk
-          jwk-set-uri: https://keycloak.staging.fellesdatakatalog.digdir.no/realms/fdk/protocol/openid-connect/certs
+          issuer-uri: https://auth.staging.fellesdatakatalog.digdir.no/realms/fdk
+          jwk-set-uri: https://auth.staging.fellesdatakatalog.digdir.no/realms/fdk/protocol/openid-connect/certs
 application:
   cors:
     originPatterns: "*"
