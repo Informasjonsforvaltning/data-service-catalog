@@ -12,10 +12,11 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest
+import org.springframework.boot.data.mongodb.test.autoconfigure.DataMongoTest
 import org.springframework.context.annotation.Import
 import org.springframework.data.mongodb.core.MongoOperations
 import org.springframework.data.mongodb.core.query.Query
+import org.springframework.data.mongodb.core.remove
 import org.springframework.test.context.ActiveProfiles
 
 @Tag("integration")
@@ -24,13 +25,13 @@ import org.springframework.test.context.ActiveProfiles
 @DataMongoTest
 @Import(MongoDBTestcontainer::class)
 class ImportResultRepositoryTest(
-    @Autowired val operations: MongoOperations,
-    @Autowired val repository: ImportResultRepository
+    @param:Autowired val operations: MongoOperations,
+    @param:Autowired val repository: ImportResultRepository
 ) {
 
     @AfterEach
     fun cleanup() {
-        operations.remove(Query(), ImportResult::class.java)
+        operations.remove<ImportResult>(Query())
     }
 
     @Test

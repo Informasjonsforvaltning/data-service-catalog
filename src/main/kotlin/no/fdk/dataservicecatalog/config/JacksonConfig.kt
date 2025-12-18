@@ -21,7 +21,7 @@ class JacksonConfig {
             configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, true)
             configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-            setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL)
             addMixIn(ProblemDetail::class.java, ProblemDetailJacksonMixin::class.java)
         }
     }

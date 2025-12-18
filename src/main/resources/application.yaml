@@ -18,16 +18,6 @@ management:
     tags:
       application: data-service-catalog
 spring:
-  data:
-    mongodb:
-      host: ${MONGODB_HOST}
-      username: ${MONGO_USERNAME}
-      password: ${MONGO_PASSWORD}
-      authentication-database: ${MONGODB_AUTH}
-      replica-set-name: ${MONGODB_REPLICASET}
-      port: 27017
-      database: dataServiceCatalog
-      auto-index-creation: true
   security:
     oauth2:
       resourceserver:
@@ -43,6 +33,14 @@ spring:
   mvc:
     problemdetails:
       enabled: true
+  mongodb:
+    host: ${MONGODB_HOST}
+    username: ${MONGO_USERNAME}
+    password: ${MONGO_PASSWORD}
+    authentication-database: ${MONGODB_AUTH}
+    replica-set-name: ${MONGODB_REPLICASET}
+    port: 27017
+    database: dataServiceCatalog
 application:
   base-uri: ${BASE_URI:http://localhost}
   organization-catalog-base-uri: ${ORGANIZATION_CATALOG_BASE_URI:https://organization-catalog.staging.fellesdatakatalog.digdir.no}
@@ -54,19 +52,18 @@ spring:
   config:
     activate:
       on-profile: dev
-  data:
-    mongodb:
-      host: localhost
-      username: root
-      password: secret
-      authentication-database: admin
-      replica-set-name: null
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: https://auth.staging.fellesdatakatalog.digdir.no/realms/fdk
           jwk-set-uri: https://auth.staging.fellesdatakatalog.digdir.no/realms/fdk/protocol/openid-connect/certs
+  mongodb:
+    host: localhost
+    username: root
+    password: secret
+    authentication-database: admin
+    replica-set-name: null
 application:
   cors:
     originPatterns: "*"
