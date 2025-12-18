@@ -1,8 +1,8 @@
 package no.fdk.dataservicecatalog.integration.controller
 
 import no.fdk.dataservicecatalog.config.JacksonConfig
-import no.fdk.dataservicecatalog.config.SecurityConfig
 import no.fdk.dataservicecatalog.controller.CountController
+import no.fdk.dataservicecatalog.integration.config.WebMvcTestSecurityConfig
 import no.fdk.dataservicecatalog.domain.DataServiceCount
 import no.fdk.dataservicecatalog.handler.CountHandler
 import org.junit.jupiter.api.Tag
@@ -12,7 +12,7 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.stub
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt
 import org.springframework.test.context.ActiveProfiles
@@ -23,9 +23,9 @@ import org.springframework.test.web.servlet.get
 @Tag("integration")
 @ActiveProfiles("test")
 
-@Import(SecurityConfig::class, JacksonConfig::class)
+@Import(WebMvcTestSecurityConfig::class, JacksonConfig::class)
 @WebMvcTest(controllers = [CountController::class])
-class CountControllerTest(@Autowired val mockMvc: MockMvc) {
+class CountControllerTest(@param:Autowired val mockMvc: MockMvc) {
 
     @MockitoBean
     lateinit var handler: CountHandler

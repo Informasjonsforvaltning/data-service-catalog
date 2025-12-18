@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.config.EnableMongoAuditing
 import org.springframework.data.mongodb.core.MongoOperations
 import org.springframework.data.mongodb.core.index.CompoundIndexDefinition
 import org.springframework.data.mongodb.core.index.Index
+import org.springframework.data.mongodb.core.indexOps
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.jwt.Jwt
 import java.util.*
@@ -30,11 +31,11 @@ class MongoConfig : AuditorAware<User> {
 
     @Bean
     fun configureIndexes(mongoOperations: MongoOperations): Boolean {
-        val indexOps = mongoOperations.indexOps(DataService::class.java)
+        val indexOps = mongoOperations.indexOps<DataService>()
 
-        indexOps.ensureIndex(Index().on("catalogId", Sort.Direction.ASC).on("published", Sort.Direction.ASC))
+        indexOps.createIndex(Index().on("catalogId", Sort.Direction.ASC).on("published", Sort.Direction.ASC))
 
-        indexOps.ensureIndex(CompoundIndexDefinition(Document().append("catalogId", 1).append("published", 1)))
+        indexOps.createIndex(CompoundIndexDefinition(Document().append("catalogId", 1).append("published", 1)))
 
         return true
     }

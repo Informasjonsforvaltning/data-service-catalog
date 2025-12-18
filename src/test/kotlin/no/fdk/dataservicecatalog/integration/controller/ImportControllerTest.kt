@@ -1,8 +1,8 @@
 package no.fdk.dataservicecatalog.integration.controller
 
 import no.fdk.dataservicecatalog.config.JacksonConfig
-import no.fdk.dataservicecatalog.config.SecurityConfig
 import no.fdk.dataservicecatalog.controller.ImportController
+import no.fdk.dataservicecatalog.integration.config.WebMvcTestSecurityConfig
 import no.fdk.dataservicecatalog.domain.ImportResult
 import no.fdk.dataservicecatalog.domain.ImportResultStatus
 import no.fdk.dataservicecatalog.exception.NotFoundException
@@ -10,13 +10,11 @@ import no.fdk.dataservicecatalog.exception.OpenApiParseException
 import no.fdk.dataservicecatalog.handler.ImportHandler
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.stub
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -32,9 +30,9 @@ import java.time.LocalDateTime
 @Tag("integration")
 @ActiveProfiles("test")
 
-@Import(SecurityConfig::class, JacksonConfig::class)
+@Import(WebMvcTestSecurityConfig::class, JacksonConfig::class)
 @WebMvcTest(controllers = [ImportController::class])
-class ImportControllerTest(@Autowired val mockMvc: MockMvc) {
+class ImportControllerTest(@param:Autowired val mockMvc: MockMvc) {
 
     @MockitoBean
     lateinit var handler: ImportHandler

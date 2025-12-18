@@ -1,8 +1,8 @@
 package no.fdk.dataservicecatalog.integration.controller
 
 import no.fdk.dataservicecatalog.config.JacksonConfig
-import no.fdk.dataservicecatalog.config.SecurityConfig
 import no.fdk.dataservicecatalog.controller.DataServiceController
+import no.fdk.dataservicecatalog.integration.config.WebMvcTestSecurityConfig
 import no.fdk.dataservicecatalog.domain.*
 import no.fdk.dataservicecatalog.exception.BadRequestException
 import no.fdk.dataservicecatalog.exception.NotFoundException
@@ -15,7 +15,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.stub
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -27,9 +27,9 @@ import org.springframework.test.web.servlet.*
 @Tag("integration")
 @ActiveProfiles("test")
 
-@Import(SecurityConfig::class, JacksonConfig::class)
+@Import(WebMvcTestSecurityConfig::class, JacksonConfig::class)
 @WebMvcTest(controllers = [DataServiceController::class])
-class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
+class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
 
     @MockitoBean
     lateinit var handler: DataServiceHandler
@@ -285,12 +285,14 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
             with(jwt().authorities(SimpleGrantedAuthority(authority.format(catalogId))))
             contentType = MediaType.APPLICATION_JSON
             content = """
-                [
+                {
+                  "patchOperations": [
                     {
-                        "op": "remove",
-                        "path": "title"
+                      "op": "remove",
+                      "path": "title"
                     }
-                ]
+                  ]
+                }
             """
         }.andExpect {
             status { isOk() }
@@ -306,12 +308,14 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
             with(jwt().authorities(SimpleGrantedAuthority("invalid")))
             contentType = MediaType.APPLICATION_JSON
             content = """
-                [
+                {
+                  "patchOperations": [
                     {
-                        "op": "add",
-                        "path": "path"
+                      "op": "add",
+                      "path": "path"
                     }
-                ]
+                  ]
+                }
             """
         }.andExpect {
             status { isForbidden() }
@@ -346,12 +350,14 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
             with(jwt().authorities(SimpleGrantedAuthority("organization:$catalogId:admin")))
             contentType = MediaType.APPLICATION_JSON
             content = """
-                [
+                {
+                  "patchOperations": [
                     {
-                        "op": "remove",
-                        "path": "title"
+                      "op": "remove",
+                      "path": "title"
                     }
-                ]
+                  ]
+                }
             """
         }.andExpect {
             status { isNotFound() }
@@ -371,13 +377,14 @@ class DataServiceControllerTest(@Autowired val mockMvc: MockMvc) {
             with(jwt())
             contentType = MediaType.APPLICATION_JSON
             content = """
-                [
+                {
+                  "patchOperations": [
                     {
-                        "op": "add",
-                        "path": ""
+                      "op": "add",
+                      "path": ""
                     }
-                ]
-                
+                  ]
+                }
             """
         }.andExpect {
             status { isBadRequest() }

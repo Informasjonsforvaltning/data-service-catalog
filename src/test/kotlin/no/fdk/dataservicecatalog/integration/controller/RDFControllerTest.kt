@@ -1,8 +1,8 @@
 package no.fdk.dataservicecatalog.integration.controller
 
 import no.fdk.dataservicecatalog.config.JacksonConfig
-import no.fdk.dataservicecatalog.config.SecurityConfig
 import no.fdk.dataservicecatalog.controller.RDFController
+import no.fdk.dataservicecatalog.integration.config.WebMvcTestSecurityConfig
 import no.fdk.dataservicecatalog.controller.RDFController.Companion.JSON_LD
 import no.fdk.dataservicecatalog.controller.RDFController.Companion.N3
 import no.fdk.dataservicecatalog.controller.RDFController.Companion.N_QUADS
@@ -23,7 +23,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.stub
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt
@@ -35,9 +35,9 @@ import org.springframework.test.web.servlet.get
 @Tag("integration")
 @ActiveProfiles("test")
 
-@Import(SecurityConfig::class, JacksonConfig::class)
+@Import(WebMvcTestSecurityConfig::class, JacksonConfig::class)
 @WebMvcTest(controllers = [RDFController::class])
-class RDFControllerTest(@Autowired val mockMvc: MockMvc) {
+class RDFControllerTest(@param:Autowired val mockMvc: MockMvc) {
 
     @MockitoBean
     lateinit var handler: RDFHandler

@@ -7,15 +7,19 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
 import org.springframework.context.annotation.Import
 import org.springframework.data.mongodb.core.MongoOperations
+import org.springframework.data.mongodb.core.count
 import org.springframework.data.mongodb.core.query.Query
+import org.springframework.data.mongodb.core.remove
 import org.springframework.http.MediaType
 import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.oauth2.jwt.JwtDecoder
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.post
 import kotlin.test.assertEquals
@@ -36,8 +40,8 @@ class ImportTest {
 
     @AfterEach
     fun cleanup() {
-        operations.remove(Query(), DataService::class.java)
-        operations.remove(Query(), ImportResult::class.java)
+        operations.remove<DataService>(Query())
+        operations.remove<ImportResult>(Query())
     }
 
     @Test
@@ -86,7 +90,7 @@ class ImportTest {
             header { exists("Location") }
         }
 
-        assertEquals(2, operations.count(Query(), DataService::class.java))
-        assertEquals(1, operations.count(Query(), ImportResult::class.java))
+        assertEquals(2, operations.count<DataService>(Query()))
+        assertEquals(1, operations.count<ImportResult>(Query()))
     }
 }
