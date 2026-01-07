@@ -3,7 +3,7 @@ package no.fdk.dataservicecatalog.controller
 import com.fasterxml.jackson.core.JsonProcessingException
 import jakarta.validation.Valid
 import no.fdk.dataservicecatalog.domain.DataService
-import no.fdk.dataservicecatalog.domain.PatchRequest
+import no.fdk.dataservicecatalog.domain.JsonPatchOperation
 import no.fdk.dataservicecatalog.domain.RegisterDataService
 import no.fdk.dataservicecatalog.exception.BadRequestException
 import no.fdk.dataservicecatalog.exception.InternalServerErrorException
@@ -58,9 +58,9 @@ class DataServiceController(private val handler: DataServiceHandler) {
     fun updateDataServiceByCatalogIdAndDataServiceId(
         @PathVariable catalogId: String,
         @PathVariable dataServiceId: String,
-        @Valid @RequestBody patchRequest: PatchRequest
+        @Valid @RequestBody operations: List<JsonPatchOperation>
     ): ResponseEntity<DataService> {
-        return handler.update(catalogId, dataServiceId, patchRequest)
+        return handler.update(catalogId, dataServiceId, operations)
             .let { ResponseEntity.ok(it) }
     }
 
