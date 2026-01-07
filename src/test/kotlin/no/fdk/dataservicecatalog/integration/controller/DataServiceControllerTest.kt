@@ -226,7 +226,7 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
             header {
                 string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
             }
-            jsonPath("$.detail") { value("Failed to validate content.") }
+            jsonPath("$.detail") { value("Validation failure") }
             jsonPath("$.errors[0].field") { value("endpointUrl") }
             jsonPath("$.errors[0].message") { value("Cannot be blank") }
         }
@@ -379,7 +379,7 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
             header {
                 string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
             }
-            jsonPath("$.detail") { value("Failed to validate content.") }
+            jsonPath("$.detail") { value("Validation failure") }
             jsonPath("$.errors[0].field") { value("operations[0].path") }
             jsonPath("$.errors[0].message") { value("Cannot be blank") }
         }
