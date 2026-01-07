@@ -268,31 +268,27 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
             title = LocalizedStrings(nb = "title")
         )
 
-        val patchRequest = PatchRequest(
-            listOf(
-                JsonPatchOperation(
-                    op = OpEnum.REMOVE,
-                    path = "title"
-                )
+        val operations = listOf(
+            JsonPatchOperation(
+                op = OpEnum.REMOVE,
+                path = "title"
             )
         )
 
         handler.stub {
-            on { update(catalogId, dataServiceId, patchRequest) } doReturn dataService
+            on { update(catalogId, dataServiceId, operations) } doReturn dataService
         }
 
         mockMvc.patch("/internal/catalogs/$catalogId/data-services/$dataServiceId") {
             with(jwt().authorities(SimpleGrantedAuthority(authority.format(catalogId))))
             contentType = MediaType.APPLICATION_JSON
             content = """
-                {
-                  "patchOperations": [
-                    {
-                      "op": "remove",
-                      "path": "title"
-                    }
-                  ]
-                }
+                [
+                  {
+                    "op": "remove",
+                    "path": "title"
+                  }
+                ]
             """
         }.andExpect {
             status { isOk() }
@@ -308,14 +304,12 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
             with(jwt().authorities(SimpleGrantedAuthority("invalid")))
             contentType = MediaType.APPLICATION_JSON
             content = """
-                {
-                  "patchOperations": [
-                    {
-                      "op": "add",
-                      "path": "path"
-                    }
-                  ]
-                }
+                [
+                  {
+                    "op": "add",
+                    "path": "path"
+                  }
+                ]
             """
         }.andExpect {
             status { isForbidden() }
@@ -327,12 +321,10 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
         val catalogId = "1234"
         val dataServiceId = "5678"
 
-        val patchRequest = PatchRequest(
-            listOf(
-                JsonPatchOperation(
-                    op = OpEnum.REMOVE,
-                    path = "title"
-                )
+        val operations = listOf(
+            JsonPatchOperation(
+                op = OpEnum.REMOVE,
+                path = "title"
             )
         )
 
@@ -341,7 +333,7 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
                 update(
                     catalogId,
                     dataServiceId,
-                    patchRequest
+                    operations
                 )
             } doThrow NotFoundException("Data Service $dataServiceId not found")
         }
@@ -350,14 +342,12 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
             with(jwt().authorities(SimpleGrantedAuthority("organization:$catalogId:admin")))
             contentType = MediaType.APPLICATION_JSON
             content = """
-                {
-                  "patchOperations": [
-                    {
-                      "op": "remove",
-                      "path": "title"
-                    }
-                  ]
-                }
+                [
+                  {
+                    "op": "remove",
+                    "path": "title"
+                  }
+                ]
             """
         }.andExpect {
             status { isNotFound() }
@@ -377,14 +367,12 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
             with(jwt())
             contentType = MediaType.APPLICATION_JSON
             content = """
-                {
-                  "patchOperations": [
-                    {
-                      "op": "add",
-                      "path": ""
-                    }
-                  ]
-                }
+                [
+                  {
+                    "op": "add",
+                    "path": ""
+                  }
+                ]
             """
         }.andExpect {
             status { isBadRequest() }
@@ -392,7 +380,7 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
                 string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
             }
             jsonPath("$.detail") { value("Failed to validate content.") }
-            jsonPath("$.errors[0].field") { value("patchOperations[0].path") }
+            jsonPath("$.errors[0].field") { value("operations[0].path") }
             jsonPath("$.errors[0].message") { value("Cannot be blank") }
         }
     }

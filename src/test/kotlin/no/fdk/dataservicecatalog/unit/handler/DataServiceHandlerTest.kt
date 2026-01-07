@@ -129,17 +129,15 @@ class DataServiceHandlerTest {
             on { save(patchedDataService) } doReturn patchedDataService
         }
 
-        val patchRequest = PatchRequest(
-            listOf(
-                JsonPatchOperation(
-                    op = OpEnum.REPLACE,
-                    path = "/endpointUrl",
-                    value = "newEndpointUrl"
-                )
+        val operations = listOf(
+            JsonPatchOperation(
+                op = OpEnum.REPLACE,
+                path = "/endpointUrl",
+                value = "newEndpointUrl"
             )
         )
 
-        val update = handler.update(catalogId, dataServiceId, patchRequest)
+        val update = handler.update(catalogId, dataServiceId, operations)
 
         assertEquals("newEndpointUrl", update.endpointUrl)
     }
@@ -162,12 +160,10 @@ class DataServiceHandlerTest {
 
         assertThrows(NotFoundException::class.java) {
             handler.update(
-                catalogId, dataServiceId, PatchRequest(
-                    patchOperations = listOf(
-                        JsonPatchOperation(
-                            op = OpEnum.REPLACE,
-                            path = "/endpointUrl",
-                        )
+                catalogId, dataServiceId, listOf(
+                    JsonPatchOperation(
+                        op = OpEnum.REPLACE,
+                        path = "/endpointUrl",
                     )
                 )
             )

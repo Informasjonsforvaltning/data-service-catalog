@@ -1,7 +1,7 @@
 package no.fdk.dataservicecatalog.handler
 
 import no.fdk.dataservicecatalog.domain.DataService
-import no.fdk.dataservicecatalog.domain.PatchRequest
+import no.fdk.dataservicecatalog.domain.JsonPatchOperation
 import no.fdk.dataservicecatalog.domain.RegisterDataService
 import no.fdk.dataservicecatalog.exception.BadRequestException
 import no.fdk.dataservicecatalog.exception.NotFoundException
@@ -55,12 +55,12 @@ class DataServiceHandler(private val repository: DataServiceRepository) {
         return id
     }
 
-    fun update(catalogId: String, dataServiceId: String, patchRequest: PatchRequest): DataService {
+    fun update(catalogId: String, dataServiceId: String, operations: List<JsonPatchOperation>): DataService {
         val dataService = repository.findDataServiceById(dataServiceId)
             ?.takeIf { it.catalogId == catalogId }
             ?: throw NotFoundException("Data Service with id: $dataServiceId not found in Catalog with id: $catalogId")
 
-        val patchedDataService = patchOriginal(dataService, patchRequest.patchOperations)
+        val patchedDataService = patchOriginal(dataService, operations)
 
         return repository.save(patchedDataService).also {
             logger.info("Updated Data Service with id: $dataServiceId in Catalog with id: $catalogId")
