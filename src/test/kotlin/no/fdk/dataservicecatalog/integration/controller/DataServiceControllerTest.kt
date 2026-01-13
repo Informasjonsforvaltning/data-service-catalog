@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.stub
@@ -75,7 +76,22 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
                 published = true,
                 status = null,
                 endpointUrl = "endpointUrl",
-                title = LocalizedStrings(nb = "title")
+                title = LocalizedStrings(nb = "title"),
+                keywords = null,
+                endpointDescriptions = null,
+                formats = null,
+                contactPoint = null,
+                themes = null,
+                servesDataset = null,
+                description = null,
+                pages = null,
+                landingPage = null,
+                license = null,
+                mediaTypes = null,
+                accessRights = null,
+                type = null,
+                availability = null,
+                costs = null
             )
         }
 
@@ -125,13 +141,8 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
         val catalogId = "1234"
         val dataServiceId = "5678"
 
-        val registerDataService = RegisterDataService(
-            endpointUrl = "endpointUrl",
-            title = LocalizedStrings(nb = "title")
-        )
-
         handler.stub {
-            on { register(catalogId, registerDataService) } doReturn dataServiceId
+            on { register(any(), any()) } doReturn dataServiceId
         }
 
         mockMvc.post("/internal/catalogs/$catalogId/data-services") {
@@ -177,13 +188,8 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
     fun `register should respond with not found on exception`() {
         val catalogId = "1234"
 
-        val registerDataService = RegisterDataService(
-            endpointUrl = "endpointUrl",
-            title = LocalizedStrings(nb = "title")
-        )
-
         handler.stub {
-            on { register(catalogId, registerDataService) } doThrow NotFoundException("Catalog $catalogId not found")
+            on { register(any(), any()) } doThrow NotFoundException("Catalog $catalogId not found")
         }
 
         mockMvc.post("/internal/catalogs/$catalogId/data-services") {
@@ -207,7 +213,7 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
     }
 
     @Test
-    fun `register should respond with bad request on blank endpointUrl in payload`() {
+    fun `register should respond with bad request on invalid endpointUrl in payload`() {
         val catalogId = "1234"
 
         mockMvc.post("/internal/catalogs/$catalogId/data-services") {
@@ -215,7 +221,7 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
             contentType = MediaType.APPLICATION_JSON
             content = """
                 {
-                    "endpointUrl": "",
+                    "endpointUrl": {},
                     "title": {
                         "nb": "title"
                     }
@@ -226,14 +232,12 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
             header {
                 string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
             }
-            jsonPath("$.detail") { value("Failed to validate content.") }
-            jsonPath("$.errors[0].field") { value("endpointUrl") }
-            jsonPath("$.errors[0].message") { value("Cannot be blank") }
+            jsonPath("$.detail") { value("Failed to read request") }
         }
     }
 
     @Test
-    fun `register should respond with bad request on missing title in payload`() {
+    fun `register should respond with bad request on badly formatted title in payload`() {
         val catalogId = "1234"
 
         mockMvc.post("/internal/catalogs/$catalogId/data-services") {
@@ -242,7 +246,7 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
             content = """
                 {
                     "endpointUrl": "endpointUrl",
-                    "title": null
+                    "title": "invalid"
                 }
             """
         }.andExpect {
@@ -265,7 +269,22 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
             published = true,
             status = null,
             endpointUrl = "endpointUrl",
-            title = LocalizedStrings(nb = "title")
+            title = LocalizedStrings(nb = "title"),
+            keywords = null,
+            endpointDescriptions = null,
+            formats = null,
+            contactPoint = null,
+            themes = null,
+            servesDataset = null,
+            description = null,
+            pages = null,
+            landingPage = null,
+            license = null,
+            mediaTypes = null,
+            accessRights = null,
+            type = null,
+            availability = null,
+            costs = null
         )
 
         val operations = listOf(

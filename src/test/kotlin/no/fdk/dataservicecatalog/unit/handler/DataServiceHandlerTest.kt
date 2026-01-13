@@ -1,6 +1,7 @@
 package no.fdk.dataservicecatalog.unit.handler
 
 import no.fdk.dataservicecatalog.domain.*
+import no.fdk.dataservicecatalog.entity.DataServiceEntity
 import no.fdk.dataservicecatalog.exception.NotFoundException
 import no.fdk.dataservicecatalog.handler.DataServiceHandler
 import no.fdk.dataservicecatalog.repository.DataServiceRepository
@@ -32,13 +33,14 @@ class DataServiceHandlerTest {
 
         repository.stub {
             on { findAllByCatalogId(catalogId) } doReturn listOf(
-                DataService(
+                DataServiceEntity(
                     id = "5678",
                     catalogId = catalogId,
                     published = true,
-                    status = null,
-                    endpointUrl = "endpointUrl",
-                    title = LocalizedStrings(nb = "title")
+                    data = mapOf(
+                        Pair("endpointUrl", "endpointUrl"),
+                        Pair("title", LocalizedStrings(nb = "title"))
+                    )
                 )
             )
         }
@@ -54,13 +56,14 @@ class DataServiceHandlerTest {
         val dataServiceId = "5678"
 
         repository.stub {
-            on { findDataServiceById(dataServiceId) } doReturn DataService(
+            on { findDataServiceById(dataServiceId) } doReturn DataServiceEntity(
                 id = dataServiceId,
                 catalogId = catalogId,
                 published = true,
-                status = null,
-                endpointUrl = "endpointUrl",
-                title = LocalizedStrings(nb = "title")
+                data = mapOf(
+                    Pair("endpointUrl", "endpointUrl"),
+                    Pair("title", LocalizedStrings(nb = "title"))
+                )
             )
         }
 
@@ -75,13 +78,14 @@ class DataServiceHandlerTest {
         val dataServiceId = "5678"
 
         repository.stub {
-            on { findDataServiceById(dataServiceId) } doReturn DataService(
+            on { findDataServiceById(dataServiceId) } doReturn DataServiceEntity(
                 id = dataServiceId,
                 catalogId = "invalid_catalog id",
                 published = true,
-                status = null,
-                endpointUrl = "endpointUrl",
-                title = LocalizedStrings(nb = "title")
+                data = mapOf(
+                    Pair("endpointUrl", "endpointUrl"),
+                    Pair("title", LocalizedStrings(nb = "title"))
+                )
             )
         }
 
@@ -95,15 +99,31 @@ class DataServiceHandlerTest {
         val catalogId = "1234"
 
         val dataServiceId = handler.register(
-            catalogId, RegisterDataService(
+            catalogId, DataServiceValues(
                 endpointUrl = "endpointUrl",
-                title = LocalizedStrings(nb = "title")
+                title = LocalizedStrings(nb = "title"),
+                status = null,
+                keywords = null,
+                endpointDescriptions = null,
+                formats = null,
+                contactPoint = null,
+                themes = null,
+                servesDataset = null,
+                description = null,
+                pages = null,
+                landingPage = null,
+                license = null,
+                mediaTypes = null,
+                accessRights = null,
+                type = null,
+                availability = null,
+                costs = null
             )
         )
 
         assertTrue(dataServiceId.isNotBlank())
 
-        verify(repository).insert(any<DataService>())
+        verify(repository).save(any<DataServiceEntity>())
     }
 
     @Test
@@ -111,17 +131,19 @@ class DataServiceHandlerTest {
         val catalogId = "1234"
         val dataServiceId = "5678"
 
-        val dataService = DataService(
+        val dataService = DataServiceEntity(
             id = dataServiceId,
             catalogId = catalogId,
             published = true,
-            status = null,
-            endpointUrl = "endpointUrl",
-            title = LocalizedStrings(nb = "title")
+            data = mapOf(
+                Pair("endpointUrl", "endpointUrl")
+            )
         )
 
         val patchedDataService = dataService.copy(
-            endpointUrl = "newEndpointUrl"
+            data = mapOf(
+                Pair("endpointUrl", "newEndpointUrl")
+            )
         )
 
         repository.stub {
@@ -148,13 +170,14 @@ class DataServiceHandlerTest {
         val dataServiceId = "5678"
 
         repository.stub {
-            on { findDataServiceById(dataServiceId) } doReturn DataService(
+            on { findDataServiceById(dataServiceId) } doReturn DataServiceEntity(
                 id = dataServiceId,
                 catalogId = "invalid catalog id",
                 published = true,
-                status = null,
-                endpointUrl = "endpointUrl",
-                title = LocalizedStrings(nb = "title")
+                data = mapOf(
+                    Pair("endpointUrl", "endpointUrl"),
+                    Pair("title", LocalizedStrings(nb = "title"))
+                )
             )
         }
 
@@ -176,19 +199,20 @@ class DataServiceHandlerTest {
         val dataServiceId = "5678"
 
         repository.stub {
-            on { findDataServiceById(dataServiceId) } doReturn DataService(
+            on { findDataServiceById(dataServiceId) } doReturn DataServiceEntity(
                 id = dataServiceId,
                 catalogId = catalogId,
                 published = true,
-                status = null,
-                endpointUrl = "endpointUrl",
-                title = LocalizedStrings(nb = "title")
+                data = mapOf(
+                    Pair("endpointUrl", "endpointUrl"),
+                    Pair("title", LocalizedStrings(nb = "title"))
+                )
             )
         }
 
         handler.delete(catalogId, dataServiceId)
 
-        verify(repository).delete(any<DataService>())
+        verify(repository).delete(any<DataServiceEntity>())
     }
 
     @Test
@@ -197,13 +221,14 @@ class DataServiceHandlerTest {
         val dataServiceId = "5678"
 
         repository.stub {
-            on { findDataServiceById(dataServiceId) } doReturn DataService(
+            on { findDataServiceById(dataServiceId) } doReturn DataServiceEntity(
                 id = dataServiceId,
                 catalogId = "invalid catalog id",
                 published = true,
-                status = null,
-                endpointUrl = "endpointUrl",
-                title = LocalizedStrings(nb = "title")
+                data = mapOf(
+                    Pair("endpointUrl", "endpointUrl"),
+                    Pair("title", LocalizedStrings(nb = "title"))
+                )
             )
         }
 

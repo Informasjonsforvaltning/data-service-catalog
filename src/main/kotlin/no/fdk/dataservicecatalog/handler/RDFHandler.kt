@@ -1,8 +1,11 @@
 package no.fdk.dataservicecatalog.handler
 
+import com.fasterxml.jackson.module.kotlin.convertValue
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.fdk.dataservicecatalog.ApplicationProperties
-import no.fdk.dataservicecatalog.domain.DataService
+import no.fdk.dataservicecatalog.domain.DataServiceValues
 import no.fdk.dataservicecatalog.domain.LocalizedStrings
+import no.fdk.dataservicecatalog.entity.DataServiceEntity
 import no.fdk.dataservicecatalog.exception.NotFoundException
 import no.fdk.dataservicecatalog.rdf.ADMS
 import no.fdk.dataservicecatalog.rdf.CV
@@ -30,7 +33,7 @@ class RDFHandler(private val repository: DataServiceRepository, private val prop
         val model = createModel()
 
         repository.findAllByPublished(true)
-            .groupBy(DataService::catalogId)
+            .groupBy(DataServiceEntity::catalogId)
             .forEach { (catalogId, dataServices) ->
                 catalogId.let { id ->
                     model.addCatalog(id, getCatalogUri(), getOrganizationUri(), getPublisherUri())
@@ -132,28 +135,29 @@ fun Model.addCatalog(catalogId: String, baseUri: String, organizationCatalogUri:
     )
 }
 
-fun Model.addDataServiceToCatalog(dataService: DataService, catalogUri: String, dataServiceUri: String) {
+fun Model.addDataServiceToCatalog(dataService: DataServiceEntity, catalogUri: String, dataServiceUri: String) {
     this.getProperty(URIref.encode(catalogUri.plus(dataService.catalogId))).addProperty(
         DCAT.service, this.createResource(URIref.encode(dataServiceUri.plus(dataService.id)))
     )
 }
 
-fun Model.addDataService(dataService: DataService, dataServiceUri: String) {
+fun Model.addDataService(dataService: DataServiceEntity, dataServiceUri: String) {
     val dataServiceResource = this.createResource(URIref.encode(dataServiceUri.plus(dataService.id))).addProperty(
         RDF.type, DCAT.DataService
     )
+    val values = jacksonObjectMapper().convertValue<DataServiceValues>(dataService.data)
 
-    dataService.endpointUrl.let {
+    values.endpointUrl.let {
         dataServiceResource.addProperty(
             DCAT.endpointURL, ResourceFactory.createResource(URIref.encode(it))
         )
     }
 
-    dataService.title.let { title ->
+    values.title.let { title ->
         dataServiceResource.addLangLiteralFromLocalizedStrings(title, DCTerms.title)
     }
 
-    dataService.keywords?.let { keyword ->
+    values.keywords?.let { keyword ->
         listOf(
             "nb" to keyword.nb,
             "nn" to keyword.nn,
@@ -167,19 +171,19 @@ fun Model.addDataService(dataService: DataService, dataServiceUri: String) {
         }
     }
 
-    dataService.endpointDescriptions?.filter(FileUtils::isURI)?.forEach {
+    values.endpointDescriptions?.filter(FileUtils::isURI)?.forEach {
         dataServiceResource.addProperty(
             DCAT.endpointDescription, ResourceFactory.createResource(URIref.encode(it))
         )
     }
 
-    dataService.formats?.filter(FileUtils::isURI)?.forEach {
+    values.formats?.filter(FileUtils::isURI)?.forEach {
         dataServiceResource.addProperty(
             DCTerms.format, ResourceFactory.createResource(URIref.encode(it))
         )
     }
 
-    dataService.contactPoint?.let { point ->
+    values.contactPoint?.let { point ->
         val contactPointResource = this.createResource().addProperty(
             RDF.type, VCARD4.Organization
         )
@@ -217,53 +221,53 @@ fun Model.addDataService(dataService: DataService, dataServiceUri: String) {
         )
     }
 
-    dataService.status?.takeIf(String::isNotBlank)?.let {
+    values.status?.takeIf(String::isNotBlank)?.let {
         dataServiceResource.addProperty(
             ADMS.status, ResourceFactory.createResource(URIref.encode(it))
         )
     }
 
-    dataService.availability?.takeIf(String::isNotBlank)?.let {
+    values.availability?.takeIf(String::isNotBlank)?.let {
         dataServiceResource.addProperty(
             DCATAP.availability, ResourceFactory.createResource(URIref.encode(it))
         )
     }
 
-    dataService.themes?.filter(FileUtils::isURI)?.forEach {
+    values.themes?.filter(FileUtils::isURI)?.forEach {
         dataServiceResource.addProperty(
             DCAT.theme, ResourceFactory.createResource(URIref.encode(it))
         )
     }
 
-    dataService.servesDataset?.filter(FileUtils::isURI)?.forEach {
+    values.servesDataset?.filter(FileUtils::isURI)?.forEach {
         dataServiceResource.addProperty(
             DCAT.servesDataset, ResourceFactory.createResource(URIref.encode(it))
         )
     }
 
-    dataService.description?.let { description ->
+    values.description?.let { description ->
         dataServiceResource.addLangLiteralFromLocalizedStrings(description, DCTerms.description)
     }
 
-    dataService.pages?.filter(FileUtils::isURI)?.forEach {
+    values.pages?.filter(FileUtils::isURI)?.forEach {
         dataServiceResource.addProperty(
             FOAF.page, ResourceFactory.createResource(URIref.encode(it))
         )
     }
 
-    dataService.landingPage?.takeIf(FileUtils::isURI)?.let {
+    values.landingPage?.takeIf(FileUtils::isURI)?.let {
         dataServiceResource.addProperty(
             DCAT.landingPage, ResourceFactory.createResource(URIref.encode(it))
         )
     }
 
-    dataService.license?.takeIf(FileUtils::isURI)?.let {
+    values.license?.takeIf(FileUtils::isURI)?.let {
         dataServiceResource.addProperty(
             DCTerms.license, ResourceFactory.createResource(URIref.encode(it))
         )
     }
 
-    dataService.mediaTypes?.filter(String::isNotBlank)?.forEach { type ->
+    values.mediaTypes?.filter(String::isNotBlank)?.forEach { type ->
         if (type.startsWith("https://www.iana.org/assignments/media-types/")) {
             dataServiceResource.addProperty(
                 DCAT.mediaType, ResourceFactory.createResource(URIref.encode(type))
@@ -273,19 +277,19 @@ fun Model.addDataService(dataService: DataService, dataServiceUri: String) {
         }
     }
 
-    dataService.accessRights?.takeIf(FileUtils::isURI)?.let {
+    values.accessRights?.takeIf(FileUtils::isURI)?.let {
         dataServiceResource.addProperty(
             DCTerms.accessRights, ResourceFactory.createResource(URIref.encode(it))
         )
     }
 
-    dataService.type?.takeIf(FileUtils::isURI)?.let {
+    values.type?.takeIf(FileUtils::isURI)?.let {
         dataServiceResource.addProperty(
             DCTerms.type, ResourceFactory.createResource(URIref.encode(it))
         )
     }
 
-    dataService.costs?.forEach { cost ->
+    values.costs?.forEach { cost ->
         val costResource = this.createResource()
             .addProperty(RDF.type, CV.Cost)
 
@@ -333,11 +337,11 @@ private fun telephoneResource(telephone: String): Resource =
         }
         .let { ResourceFactory.createResource(URIref.encode("tel:$it")) }
 
-private fun Resource.addLangLiteralFromLocalizedStrings(localizedStrings: LocalizedStrings, predicate: Property) {
+private fun Resource.addLangLiteralFromLocalizedStrings(localizedStrings: LocalizedStrings?, predicate: Property) {
     listOf(
-        "nb" to localizedStrings.nb,
-        "nn" to localizedStrings.nn,
-        "en" to localizedStrings.en,
+        "nb" to localizedStrings?.nb,
+        "nn" to localizedStrings?.nn,
+        "en" to localizedStrings?.en,
     ).forEach { (lang, value) ->
         value?.let {
             addProperty(predicate, ResourceFactory.createLangLiteral(it, lang))

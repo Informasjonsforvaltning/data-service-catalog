@@ -1,170 +1,151 @@
 package no.fdk.dataservicecatalog.domain
 
-import jakarta.validation.constraints.NotBlank
-import org.springframework.data.annotation.*
-import org.springframework.data.mongodb.core.mapping.Document
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonInclude
 import java.time.LocalDateTime
+
+data class DataService(
+
+    val id: String,
+    val published: Boolean = false,
+    val publishedDate: LocalDateTime? = null,
+    val catalogId: String,
+
+    override val status: String?,
+    override val endpointUrl: String?,
+    override val title: LocalizedStrings?,
+    override val keywords: LocalizedStringLists?,
+    override val endpointDescriptions: List<String>?,
+    override val formats: List<String>?,
+    override val contactPoint: ContactPoint?,
+    override val themes: List<String>?,
+    override val servesDataset: List<String>?,
+    override val description: LocalizedStrings?,
+    override val pages: List<String>?,
+    override val landingPage: String?,
+    override val license: String?,
+    override val mediaTypes: List<String>?,
+    override val accessRights: String?,
+    override val type: String?,
+    override val availability: String?,
+    override val costs: List<Cost>?,
+) : DataServiceValues(
+    status,
+    endpointUrl,
+    title,
+    keywords,
+    endpointDescriptions,
+    formats,
+    contactPoint,
+    themes,
+    servesDataset,
+    description,
+    pages,
+    landingPage,
+    license,
+    mediaTypes,
+    accessRights,
+    type,
+    availability,
+    costs,
+)
 
 /*
 https://data.norge.no/specification/dcat-ap-no#Datatjeneste
  */
-
-@Document(collection = "dataServices")
-data class DataService(
-
-    /*
-    identifikator (dct:identifier)
-     */
-    @Id
-    val id: String,
-
-    val published: Boolean = false,
-
-    val publishedDate: LocalDateTime? = null,
-
-    @CreatedDate
-    val created: LocalDateTime? = null,
-
-    @LastModifiedDate
-    val modified: LocalDateTime? = null,
-
-    @LastModifiedBy
-    val modifiedBy: User? = null,
-
-    @Version
-    val version: Int? = null,
-
-    val catalogId: String,
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+open class DataServiceValues(
 
     /*
     status (adms:status)
      */
-    val status: String? = null,
+    open val status: String?,
 
     /*
     endepunktsURL (dcat:endpointURL)
      */
-    val endpointUrl: String,
+    open val endpointUrl: String?,
 
     /*
     tittel (dct:title)
      */
-    val title: LocalizedStrings,
+    open val title: LocalizedStrings?,
 
     /*
     emneord (dcat:keyword)
      */
-    val keywords: LocalizedStringLists? = null,
+    open val keywords: LocalizedStringLists?,
 
     /*
     endepunktsbeskrivelse (dcat:endpointDescription)
      */
-    val endpointDescriptions: List<String>? = null,
+    open val endpointDescriptions: List<String>?,
 
     /*
     format (dct:format)
      */
-    val formats: List<String>? = null,
+    open val formats: List<String>?,
 
     /*
     kontaktpunkt (dcat:contactPoint)
      */
-    val contactPoint: ContactPoint? = null,
+    open val contactPoint: ContactPoint?,
 
     /*
     tema (dcat:theme)
      */
-    val themes: List<String>? = null,
+    open val themes: List<String>?,
 
     /*
     tilgjengeliggjør datasett (dcat:servesDataset)
      */
-    val servesDataset: List<String>? = null,
+    open val servesDataset: List<String>?,
 
     /*
     beskrivelse (dct:description)
      */
-    val description: LocalizedStrings? = null,
+    open val description: LocalizedStrings?,
 
     /*
     dokumentasjon (foaf:page)
      */
-    val pages: List<String>? = null,
+    open val pages: List<String>?,
 
     /*
     landingsside (dcat:landingPage)
      */
-    val landingPage: String? = null,
+    open val landingPage: String?,
 
     /*
     lisens (dct:license)
      */
-    val license: String? = null,
+    open val license: String?,
 
     /*
     medietype (dcat:mediaType)
     */
-    val mediaTypes: List<String>? = null,
+    open val mediaTypes: List<String>?,
 
     /*
     tilgangsrettigheter (dct:accessRights)
      */
-    val accessRights: String? = null,
+    open val accessRights: String?,
 
     /*
     type (dct:type)
      */
-    val type: String? = null,
+    open val type: String?,
 
     /*
     tilgjengelighet (dcatap:availability)
      */
-    val availability: String? = null,
+    open val availability: String?,
 
     /*
     har gebyr (cv:hasCost)
     */
-    val costs: List<Cost>? = null,
-)
-
-data class RegisterDataService(
-
-    val status: String? = null,
-
-    @field:NotBlank(message = "Cannot be blank")
-    val endpointUrl: String,
-
-    val title: LocalizedStrings,
-
-    val keywords: LocalizedStringLists? = null,
-
-    val endpointDescriptions: List<String>? = null,
-
-    val formats: List<String>? = null,
-
-    val contactPoint: ContactPoint? = null,
-
-    val themes: List<String>? = null,
-
-    val servesDataset: List<String>? = null,
-
-    val description: LocalizedStrings? = null,
-
-    val pages: List<String>? = null,
-
-    val landingPage: String? = null,
-
-    val license: String? = null,
-
-    val mediaTypes: List<String>? = null,
-
-    val accessRights: String? = null,
-
-    val type: String? = null,
-
-    val availability: String? = null,
-
-    val costs: List<Cost>? = null,
+    open val costs: List<Cost>?,
 )
 
 data class LocalizedStrings(

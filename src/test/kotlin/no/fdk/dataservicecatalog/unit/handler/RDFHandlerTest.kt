@@ -1,7 +1,11 @@
 package no.fdk.dataservicecatalog.unit.handler
 
 import no.fdk.dataservicecatalog.ApplicationProperties
-import no.fdk.dataservicecatalog.domain.*
+import no.fdk.dataservicecatalog.domain.ContactPoint
+import no.fdk.dataservicecatalog.domain.Cost
+import no.fdk.dataservicecatalog.domain.LocalizedStringLists
+import no.fdk.dataservicecatalog.domain.LocalizedStrings
+import no.fdk.dataservicecatalog.entity.DataServiceEntity
 import no.fdk.dataservicecatalog.exception.NotFoundException
 import no.fdk.dataservicecatalog.handler.RDFHandler
 import no.fdk.dataservicecatalog.repository.DataServiceRepository
@@ -268,13 +272,11 @@ class RDFHandlerTest {
         val catalogId = "5678"
 
         repository.stub {
-            on { findDataServiceById(dataServiceId) } doReturn DataService(
+            on { findDataServiceById(dataServiceId) } doReturn DataServiceEntity(
                 id = dataServiceId,
                 catalogId = "invalid catalog id",
                 published = true,
-                status = null,
-                endpointUrl = "endpointUrl",
-                title = LocalizedStrings(nb = "title")
+                data = emptyMap(),
             )
         }
 
@@ -357,34 +359,40 @@ class RDFHandlerTest {
         assertTrue(expectedModel.isIsomorphicWith(actualModel))
     }
 
-    private fun dataService() = DataService(
+    private fun dataService() = DataServiceEntity(
         id = "1234",
         catalogId = "5678",
         published = true,
-        status = "http://publications.europa.eu/resource/authority/distribution-status/DEVELOP",
-        endpointUrl = "http://example.com",
-        title = LocalizedStrings(en = "title"),
-        keywords = LocalizedStringLists(en = listOf("keyword")),
-        endpointDescriptions = listOf("http://endpoint-description.com"),
-        formats = listOf("http://format.com"),
-        contactPoint = ContactPoint(
-            name = LocalizedStrings(en = "name"),
-            phone = "+47 123 45 678",
-            email = "email",
-            url = "url"
-        ),
-        servesDataset = listOf("http://serves-dataset.com"),
-        description = LocalizedStrings(en = "description"),
-        pages = listOf("http://page.com"),
-        landingPage = "http://landing-page.com",
-        license = "http://license.com",
-        mediaTypes = listOf("https://www.iana.org/assignments/media-types/application/json"),
-        accessRights = "http://access-rights.com",
-        type = "http://type.com",
-        availability = "http://publications.europa.eu/resource/authority/planned-availability/STABLE",
-        costs = listOf(
-            Cost(value = 125.57, currency = "http://publications.europa.eu/resource/authority/currency/EUR"),
-            Cost(description = LocalizedStrings(nb = "med doc"), documentation = listOf("https://gebyr-doc.no"))
-        ),
+        data = mapOf(
+            Pair("status", "http://publications.europa.eu/resource/authority/distribution-status/DEVELOP"),
+            Pair("endpointUrl", "http://example.com"),
+            Pair("title", LocalizedStrings(en = "title")),
+            Pair("keywords", LocalizedStringLists(en = listOf("keyword"))),
+            Pair("endpointDescriptions", listOf("http://endpoint-description.com")),
+            Pair("formats", listOf("http://format.com")),
+            Pair(
+                "contactPoint", ContactPoint(
+                    name = LocalizedStrings(en = "name"),
+                    phone = "+47 123 45 678",
+                    email = "email",
+                    url = "url"
+                )
+            ),
+            Pair("servesDataset", listOf("http://serves-dataset.com")),
+            Pair("description", LocalizedStrings(en = "description")),
+            Pair("pages", listOf("http://page.com")),
+            Pair("landingPage", "http://landing-page.com"),
+            Pair("license", "http://license.com"),
+            Pair("mediaTypes", listOf("https://www.iana.org/assignments/media-types/application/json")),
+            Pair("accessRights", "http://access-rights.com"),
+            Pair("type", "http://type.com"),
+            Pair("availability", "http://publications.europa.eu/resource/authority/planned-availability/STABLE"),
+            Pair(
+                "costs", listOf(
+                    Cost(value = 125.57, currency = "http://publications.europa.eu/resource/authority/currency/EUR"),
+                    Cost(description = LocalizedStrings(nb = "med doc"), documentation = listOf("https://gebyr-doc.no"))
+                )
+            ),
+        )
     )
 }

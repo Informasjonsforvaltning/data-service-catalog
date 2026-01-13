@@ -1,34 +1,28 @@
 package no.fdk.dataservicecatalog.integration.repository
 
-import no.fdk.dataservicecatalog.domain.DataService
-import no.fdk.dataservicecatalog.domain.LocalizedStrings
-import no.fdk.dataservicecatalog.integration.MongoDBTestcontainer
+import no.fdk.dataservicecatalog.entity.DataServiceEntity
+import no.fdk.dataservicecatalog.integration.PostgresDBTestcontainer
 import no.fdk.dataservicecatalog.repository.DataServiceRepository
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.data.mongodb.test.autoconfigure.DataMongoTest
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
-import org.springframework.data.mongodb.core.MongoOperations
-import org.springframework.data.mongodb.core.query.Query
-import org.springframework.data.mongodb.core.remove
 import org.springframework.test.context.ActiveProfiles
 
 @Tag("integration")
 @ActiveProfiles("test")
-
-@DataMongoTest
-@Import(MongoDBTestcontainer::class)
+@Import(PostgresDBTestcontainer::class)
+@SpringBootTest
 class DataServiceRepositoryTest(
-    @param:Autowired val operations: MongoOperations,
     @param:Autowired val repository: DataServiceRepository
 ) {
 
     @AfterEach
     fun cleanup() {
-        operations.remove<DataService>(Query())
+        repository.deleteAll()
     }
 
     @Test
@@ -36,16 +30,14 @@ class DataServiceRepositoryTest(
         val firstCatalogId = "123"
         val secondCatalogId = "456"
 
-        val dataService = DataService(
+        val dataService = DataServiceEntity(
             id = "1111",
             catalogId = firstCatalogId,
             published = true,
-            status = null,
-            endpointUrl = "endpointUrl",
-            title = LocalizedStrings(nb = "title")
+            data = emptyMap()
         )
 
-        operations.insertAll(
+        repository.saveAll(
             listOf(dataService, dataService.copy(id = "2222", catalogId = secondCatalogId))
         )
 
@@ -60,16 +52,14 @@ class DataServiceRepositoryTest(
         val firstCatalogId = "123"
         val secondCatalogId = "456"
 
-        val dataService = DataService(
+        val dataService = DataServiceEntity(
             id = "1111",
             catalogId = firstCatalogId,
             published = true,
-            status = null,
-            endpointUrl = "endpointUrl",
-            title = LocalizedStrings(nb = "title")
+            data = emptyMap()
         )
 
-        operations.insertAll(
+        repository.saveAll(
             listOf(dataService, dataService.copy(id = "2222", catalogId = secondCatalogId))
         )
 
@@ -84,14 +74,12 @@ class DataServiceRepositoryTest(
         val catalogId = "1234"
         val dataServiceId = "5678"
 
-        operations.insert(
-            DataService(
+        repository.save(
+            DataServiceEntity(
                 id = dataServiceId,
                 catalogId = catalogId,
                 published = true,
-                status = null,
-                endpointUrl = "endpointUrl",
-                title = LocalizedStrings(nb = "title")
+                data = emptyMap()
             )
         )
 
@@ -104,16 +92,14 @@ class DataServiceRepositoryTest(
     fun `find all by published status`() {
         val catalogId = "1234"
 
-        val dataService = DataService(
+        val dataService = DataServiceEntity(
             id = "1111",
             catalogId = catalogId,
             published = true,
-            status = null,
-            endpointUrl = "endpointUrl",
-            title = LocalizedStrings(nb = "title")
+            data = emptyMap()
         )
 
-        operations.insertAll(
+        repository.saveAll(
             listOf(dataService, dataService.copy(id = "2222", published = false))
         )
 
@@ -127,16 +113,14 @@ class DataServiceRepositoryTest(
     fun `find all by catalog id and published status`() {
         val catalogId = "1234"
 
-        val dataService = DataService(
+        val dataService = DataServiceEntity(
             id = "1111",
             catalogId = catalogId,
             published = true,
-            status = null,
-            endpointUrl = "endpointUrl",
-            title = LocalizedStrings(nb = "title")
+            data = emptyMap()
         )
 
-        operations.insertAll(
+        repository.saveAll(
             listOf(dataService, dataService.copy(id = "2222", published = false))
         )
 

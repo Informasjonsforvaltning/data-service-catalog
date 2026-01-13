@@ -1,9 +1,7 @@
 services:
-  mongodb:
-    image: 'mongo:latest'
+  db:
+    image: postgres:14-alpine
     environment:
-      - 'MONGO_INITDB_DATABASE=mydatabase'
-      - 'MONGO_INITDB_ROOT_PASSWORD=secret'
-      - 'MONGO_INITDB_ROOT_USERNAME=root'
+      - POSTGRES_PASSWORD=postgres
     ports:
-      - '27017:27017'
+      - '5432:5432'
