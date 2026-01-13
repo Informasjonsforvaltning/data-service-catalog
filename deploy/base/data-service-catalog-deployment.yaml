@@ -21,31 +21,31 @@ spec:
           env:
             - name: JAVA_TOOL_OPTIONS
               value: "-XX:MaxRAMPercentage=80.0"
-            - name: MONGO_USERNAME
+            - name: POSTGRESQL_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: postgres
+                  key: HOST
+            - name: POSTGRESQL_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: postgres
+                  key: PORT
+            - name: POSTGRESQL_DB
               valueFrom:
                 secretKeyRef:
                   name: data-service-catalog
-                  key: MONGODB_USER
-            - name: MONGO_PASSWORD
+                  key: POSTGRESQL_DB
+            - name: POSTGRESQL_USER
               valueFrom:
                 secretKeyRef:
                   name: data-service-catalog
-                  key: MONGODB_PASSWORD
-            - name: MONGODB_HOST
+                  key: POSTGRESQL_USER
+            - name: POSTGRESQL_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: mongodb
-                  key: MONGODB_HOST
-            - name: MONGODB_AUTH
-              valueFrom:
-                secretKeyRef:
-                  name: mongodb
-                  key: MONGODB_AUTH
-            - name: MONGODB_REPLICASET
-              valueFrom:
-                secretKeyRef:
-                  name: mongodb
-                  key: MONGODB_REPLICASET
+                  name: data-service-catalog
+                  key: POSTGRESQL_PASSWORD
             - name: KEYCLOAK_OIDC_ISSUER
               valueFrom:
                 secretKeyRef:

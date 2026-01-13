@@ -1,7 +1,6 @@
 package no.fdk.dataservicecatalog.unit.handler
 
-import no.fdk.dataservicecatalog.domain.DataService
-import no.fdk.dataservicecatalog.domain.LocalizedStrings
+import no.fdk.dataservicecatalog.entity.DataServiceEntity
 import no.fdk.dataservicecatalog.handler.CountHandler
 import no.fdk.dataservicecatalog.repository.DataServiceRepository
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -29,13 +28,11 @@ class CountHandlerTest {
         val firstCatalogId = "1234"
         val secondCatalogId = "5678"
 
-        val dataService = DataService(
+        val dataService = DataServiceEntity(
             id = "1111",
             catalogId = firstCatalogId,
             published = true,
-            status = null,
-            endpointUrl = "endpointUrl",
-            title = LocalizedStrings(nb = "title")
+            data = emptyMap()
         )
 
         repository.stub {
@@ -65,13 +62,11 @@ class CountHandlerTest {
         val firstCatalogId = "1234"
         val secondCatalogId = "5678"
 
-        val dataService = DataService(
+        val dataService = DataServiceEntity(
             id = "1111",
             catalogId = firstCatalogId,
             published = true,
-            status = null,
-            endpointUrl = "endpointUrl",
-            title = LocalizedStrings(nb = "title")
+            data = emptyMap()
         )
 
         repository.stub {

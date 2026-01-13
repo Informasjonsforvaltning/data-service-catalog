@@ -3,8 +3,8 @@ package no.fdk.dataservicecatalog.controller
 import com.fasterxml.jackson.core.JsonProcessingException
 import jakarta.validation.Valid
 import no.fdk.dataservicecatalog.domain.DataService
+import no.fdk.dataservicecatalog.domain.DataServiceValues
 import no.fdk.dataservicecatalog.domain.JsonPatchOperation
-import no.fdk.dataservicecatalog.domain.RegisterDataService
 import no.fdk.dataservicecatalog.exception.BadRequestException
 import no.fdk.dataservicecatalog.exception.InternalServerErrorException
 import no.fdk.dataservicecatalog.exception.NotFoundException
@@ -41,7 +41,7 @@ class DataServiceController(private val handler: DataServiceHandler) {
     @PreAuthorize(WRITE)
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun registerDataServiceByCatalogId(
-        @PathVariable catalogId: String, @Valid @RequestBody registerDataService: RegisterDataService
+        @PathVariable catalogId: String, @Valid @RequestBody registerDataService: DataServiceValues
     ): ResponseEntity<Void> {
         return handler.register(catalogId, registerDataService)
             .let {
