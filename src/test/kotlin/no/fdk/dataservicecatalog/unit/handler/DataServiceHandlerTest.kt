@@ -39,7 +39,7 @@ class DataServiceHandlerTest {
                     published = true,
                     data = mapOf(
                         Pair("endpointUrl", "endpointUrl"),
-                        Pair("title", LocalizedStrings(nb = "title"))
+                        Pair("title", LocalizedStrings(nb = "title", en = null, nn = null))
                     )
                 )
             )
@@ -62,7 +62,7 @@ class DataServiceHandlerTest {
                 published = true,
                 data = mapOf(
                     Pair("endpointUrl", "endpointUrl"),
-                    Pair("title", LocalizedStrings(nb = "title"))
+                    Pair("title", LocalizedStrings(nb = "title", en = null, nn = null))
                 )
             )
         }
@@ -84,7 +84,7 @@ class DataServiceHandlerTest {
                 published = true,
                 data = mapOf(
                     Pair("endpointUrl", "endpointUrl"),
-                    Pair("title", LocalizedStrings(nb = "title"))
+                    Pair("title", LocalizedStrings(nb = "title", en = null, nn = null))
                 )
             )
         }
@@ -101,7 +101,7 @@ class DataServiceHandlerTest {
         val dataServiceId = handler.register(
             catalogId, DataServiceValues(
                 endpointUrl = "endpointUrl",
-                title = LocalizedStrings(nb = "title"),
+                title = LocalizedStrings(nb = "title", en = null, nn = null),
                 status = null,
                 keywords = null,
                 endpointDescriptions = null,
@@ -176,7 +176,7 @@ class DataServiceHandlerTest {
                 published = true,
                 data = mapOf(
                     Pair("endpointUrl", "endpointUrl"),
-                    Pair("title", LocalizedStrings(nb = "title"))
+                    Pair("title", LocalizedStrings(nb = "title", en = null, nn = null))
                 )
             )
         }
@@ -205,7 +205,7 @@ class DataServiceHandlerTest {
                 published = true,
                 data = mapOf(
                     Pair("endpointUrl", "endpointUrl"),
-                    Pair("title", LocalizedStrings(nb = "title"))
+                    Pair("title", LocalizedStrings(nb = "title", en = null, nn = null))
                 )
             )
         }
@@ -227,7 +227,7 @@ class DataServiceHandlerTest {
                 published = true,
                 data = mapOf(
                     Pair("endpointUrl", "endpointUrl"),
-                    Pair("title", LocalizedStrings(nb = "title"))
+                    Pair("title", LocalizedStrings(nb = "title", en = null, nn = null))
                 )
             )
         }

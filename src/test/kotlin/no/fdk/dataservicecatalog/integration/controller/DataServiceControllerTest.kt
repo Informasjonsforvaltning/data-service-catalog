@@ -1,6 +1,5 @@
 package no.fdk.dataservicecatalog.integration.controller
 
-import no.fdk.dataservicecatalog.config.JacksonConfig
 import no.fdk.dataservicecatalog.controller.DataServiceController
 import no.fdk.dataservicecatalog.integration.config.WebMvcTestSecurityConfig
 import no.fdk.dataservicecatalog.domain.*
@@ -28,7 +27,7 @@ import org.springframework.test.web.servlet.*
 @Tag("integration")
 @ActiveProfiles("test")
 
-@Import(WebMvcTestSecurityConfig::class, JacksonConfig::class)
+@Import(WebMvcTestSecurityConfig::class)
 @WebMvcTest(controllers = [DataServiceController::class])
 class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
 
@@ -76,7 +75,7 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
                 published = true,
                 status = null,
                 endpointUrl = "endpointUrl",
-                title = LocalizedStrings(nb = "title"),
+                title = LocalizedStrings(nb = "title", en = null, nn = null),
                 keywords = null,
                 endpointDescriptions = null,
                 formats = null,
@@ -269,7 +268,7 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
             published = true,
             status = null,
             endpointUrl = "endpointUrl",
-            title = LocalizedStrings(nb = "title"),
+            title = LocalizedStrings(nb = "title", en = null, nn = null),
             keywords = null,
             endpointDescriptions = null,
             formats = null,

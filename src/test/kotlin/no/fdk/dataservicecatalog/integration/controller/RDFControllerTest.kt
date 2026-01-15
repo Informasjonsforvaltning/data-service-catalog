@@ -1,6 +1,5 @@
 package no.fdk.dataservicecatalog.integration.controller
 
-import no.fdk.dataservicecatalog.config.JacksonConfig
 import no.fdk.dataservicecatalog.controller.RDFController
 import no.fdk.dataservicecatalog.integration.config.WebMvcTestSecurityConfig
 import no.fdk.dataservicecatalog.controller.RDFController.Companion.JSON_LD
@@ -35,7 +34,7 @@ import org.springframework.test.web.servlet.get
 @Tag("integration")
 @ActiveProfiles("test")
 
-@Import(WebMvcTestSecurityConfig::class, JacksonConfig::class)
+@Import(WebMvcTestSecurityConfig::class)
 @WebMvcTest(controllers = [RDFController::class])
 class RDFControllerTest(@param:Autowired val mockMvc: MockMvc) {
 
