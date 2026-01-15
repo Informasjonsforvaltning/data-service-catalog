@@ -366,20 +366,20 @@ class RDFHandlerTest {
         data = mapOf(
             Pair("status", "http://publications.europa.eu/resource/authority/distribution-status/DEVELOP"),
             Pair("endpointUrl", "http://example.com"),
-            Pair("title", LocalizedStrings(en = "title")),
-            Pair("keywords", LocalizedStringLists(en = listOf("keyword"))),
+            Pair("title", LocalizedStrings(nb = null, nn = null, en = "title")),
+            Pair("keywords", LocalizedStringLists(nb = null, nn = null, en = listOf("keyword"))),
             Pair("endpointDescriptions", listOf("http://endpoint-description.com")),
             Pair("formats", listOf("http://format.com")),
             Pair(
                 "contactPoint", ContactPoint(
-                    name = LocalizedStrings(en = "name"),
+                    name = LocalizedStrings(nb = null, nn = null, en = "name"),
                     phone = "+47 123 45 678",
                     email = "email",
                     url = "url"
                 )
             ),
             Pair("servesDataset", listOf("http://serves-dataset.com")),
-            Pair("description", LocalizedStrings(en = "description")),
+            Pair("description", LocalizedStrings(nb = null, nn = null, en = "description")),
             Pair("pages", listOf("http://page.com")),
             Pair("landingPage", "http://landing-page.com"),
             Pair("license", "http://license.com"),
@@ -389,8 +389,18 @@ class RDFHandlerTest {
             Pair("availability", "http://publications.europa.eu/resource/authority/planned-availability/STABLE"),
             Pair(
                 "costs", listOf(
-                    Cost(value = 125.57, currency = "http://publications.europa.eu/resource/authority/currency/EUR"),
-                    Cost(description = LocalizedStrings(nb = "med doc"), documentation = listOf("https://gebyr-doc.no"))
+                    Cost(
+                        value = 125.57,
+                        currency = "http://publications.europa.eu/resource/authority/currency/EUR",
+                        description = null,
+                        documentation = null
+                    ),
+                    Cost(
+                        value = null,
+                        currency = null,
+                        description = LocalizedStrings(nb = "med doc", en = null, nn = null),
+                        documentation = listOf("https://gebyr-doc.no")
+                    )
                 )
             ),
         )

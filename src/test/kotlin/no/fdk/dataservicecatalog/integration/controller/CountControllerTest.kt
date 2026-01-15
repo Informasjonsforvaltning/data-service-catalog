@@ -1,6 +1,5 @@
 package no.fdk.dataservicecatalog.integration.controller
 
-import no.fdk.dataservicecatalog.config.JacksonConfig
 import no.fdk.dataservicecatalog.controller.CountController
 import no.fdk.dataservicecatalog.integration.config.WebMvcTestSecurityConfig
 import no.fdk.dataservicecatalog.domain.DataServiceCount
@@ -23,7 +22,7 @@ import org.springframework.test.web.servlet.get
 @Tag("integration")
 @ActiveProfiles("test")
 
-@Import(WebMvcTestSecurityConfig::class, JacksonConfig::class)
+@Import(WebMvcTestSecurityConfig::class)
 @WebMvcTest(controllers = [CountController::class])
 class CountControllerTest(@param:Autowired val mockMvc: MockMvc) {
 
