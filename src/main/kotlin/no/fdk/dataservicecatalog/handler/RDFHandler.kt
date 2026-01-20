@@ -317,6 +317,12 @@ fun Model.addDataService(dataService: DataServiceEntity, dataServiceUri: String)
 
         dataServiceResource.addProperty(CV.hasCost, costResource)
     }
+
+    values.version?.takeIf(String::isNotBlank)?.let {
+        dataServiceResource.addProperty(
+            ResourceFactory.createProperty("${DCAT.NS}version"), it
+        )
+    }
 }
 
 fun Model.serialize(lang: Lang): String {

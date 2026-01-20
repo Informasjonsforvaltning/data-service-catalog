@@ -30,6 +30,7 @@ data class DataService(
     override val type: String?,
     override val availability: String?,
     override val costs: List<Cost>?,
+    override val version: String?,
 ) : DataServiceValues(
     status,
     endpointUrl,
@@ -49,6 +50,7 @@ data class DataService(
     type,
     availability,
     costs,
+    version,
 )
 
 /*
@@ -147,6 +149,11 @@ open class DataServiceValues(
     har gebyr (cv:hasCost)
     */
     open val costs: List<Cost>?,
+
+    /*
+    versjon (dcat:version)
+    */
+    open val version: String?,
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)

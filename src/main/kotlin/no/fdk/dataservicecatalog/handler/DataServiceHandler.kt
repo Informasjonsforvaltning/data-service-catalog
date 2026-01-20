@@ -43,7 +43,8 @@ class DataServiceHandler(private val repository: DataServiceRepository) {
             accessRights = values.accessRights,
             type = values.type,
             availability = values.availability,
-            costs = values.costs
+            costs = values.costs,
+            version = values.version
         )
     }
 
