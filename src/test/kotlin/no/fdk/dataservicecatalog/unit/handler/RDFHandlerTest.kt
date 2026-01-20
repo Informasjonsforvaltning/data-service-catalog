@@ -117,6 +117,7 @@ class RDFHandlerTest {
                     dcat:landingPage          <http://landing-page.com>;
                     dcat:mediaType            <https://www.iana.org/assignments/media-types/application/json>;
                     dcat:servesDataset        <http://serves-dataset.com>;
+                    dcat:version              "1.0.0";
                     foaf:page                 <http://page.com> .
 
             <$baseUri/catalogs/$catalogId>  rdf:type  dcat:Catalog;
@@ -233,6 +234,7 @@ class RDFHandlerTest {
                     dcat:landingPage          <http://landing-page.com>;
                     dcat:mediaType            <https://www.iana.org/assignments/media-types/application/json>;
                     dcat:servesDataset        <http://serves-dataset.com>;
+                    dcat:version              "1.0.0";
                     foaf:page                 <http://page.com> .
 
             <$baseUri/catalogs/$catalogId>  rdf:type  dcat:Catalog;
@@ -334,6 +336,7 @@ class RDFHandlerTest {
                     dcat:landingPage          <http://landing-page.com>;
                     dcat:mediaType            <https://www.iana.org/assignments/media-types/application/json>;
                     dcat:servesDataset        <http://serves-dataset.com>;
+                    dcat:version              "1.0.0";
                     foaf:page                 <http://page.com> .
         """
 
@@ -403,6 +406,7 @@ class RDFHandlerTest {
                     )
                 )
             ),
+            Pair("version", "1.0.0"),
         )
     )
 }

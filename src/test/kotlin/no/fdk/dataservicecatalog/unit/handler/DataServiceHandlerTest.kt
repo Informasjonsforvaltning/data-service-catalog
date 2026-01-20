@@ -117,7 +117,8 @@ class DataServiceHandlerTest {
                 accessRights = null,
                 type = null,
                 availability = null,
-                costs = null
+                costs = null,
+                version = null
             )
         )
 

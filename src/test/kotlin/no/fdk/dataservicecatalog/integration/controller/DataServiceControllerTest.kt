@@ -90,7 +90,8 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
                 accessRights = null,
                 type = null,
                 availability = null,
-                costs = null
+                costs = null,
+                version = null
             )
         }
 
@@ -283,7 +284,8 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
             accessRights = null,
             type = null,
             availability = null,
-            costs = null
+            costs = null,
+            version = null
         )
 
         val operations = listOf(
