@@ -25,6 +25,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import java.io.StringWriter
+import java.lang.Exception
 
 @Component
 class RDFHandler(private val repository: DataServiceRepository, private val properties: ApplicationProperties) {
@@ -118,15 +119,15 @@ class RDFHandler(private val repository: DataServiceRepository, private val prop
 }
 
 fun Model.addCatalog(catalogId: String, baseUri: String, organizationCatalogUri: String, publisherUri: String) {
-    this.createResource(URIref.encode(baseUri.plus(catalogId))).addProperty(
+    this.safeCreateResource(baseUri.plus(catalogId)).addProperty(
         RDF.type, DCAT.Catalog
     ).addProperty(
-        DCTerms.publisher, ResourceFactory.createResource(URIref.encode(organizationCatalogUri.plus(catalogId)))
+        DCTerms.publisher, safeCreateResource(organizationCatalogUri.plus(catalogId))
     ).addProperty(
         DCTerms.title, ResourceFactory.createLangLiteral("Data service catalog ($catalogId)", "en")
     )
 
-    this.createResource(URIref.encode(organizationCatalogUri.plus(catalogId))).addProperty(
+    this.safeCreateResource(organizationCatalogUri.plus(catalogId)).addProperty(
         RDF.type, FOAF.Agent
     ).addProperty(
         DCTerms.identifier, catalogId
@@ -137,19 +138,19 @@ fun Model.addCatalog(catalogId: String, baseUri: String, organizationCatalogUri:
 
 fun Model.addDataServiceToCatalog(dataService: DataServiceEntity, catalogUri: String, dataServiceUri: String) {
     this.getProperty(URIref.encode(catalogUri.plus(dataService.catalogId))).addProperty(
-        DCAT.service, this.createResource(URIref.encode(dataServiceUri.plus(dataService.id)))
+        DCAT.service, this.safeCreateResource(dataServiceUri.plus(dataService.id))
     )
 }
 
 fun Model.addDataService(dataService: DataServiceEntity, dataServiceUri: String) {
-    val dataServiceResource = this.createResource(URIref.encode(dataServiceUri.plus(dataService.id))).addProperty(
+    val dataServiceResource = this.safeCreateResource(dataServiceUri.plus(dataService.id)).addProperty(
         RDF.type, DCAT.DataService
     )
     val values = jacksonObjectMapper().convertValue<DataServiceValues>(dataService.data)
 
     values.endpointUrl.let {
         dataServiceResource.addProperty(
-            DCAT.endpointURL, ResourceFactory.createResource(URIref.encode(it))
+            DCAT.endpointURL, safeCreateResource(it)
         )
     }
 
@@ -173,18 +174,18 @@ fun Model.addDataService(dataService: DataServiceEntity, dataServiceUri: String)
 
     values.endpointDescriptions?.filter(FileUtils::isURI)?.forEach {
         dataServiceResource.addProperty(
-            DCAT.endpointDescription, ResourceFactory.createResource(URIref.encode(it))
+            DCAT.endpointDescription, safeCreateResource(it)
         )
     }
 
     values.formats?.filter(FileUtils::isURI)?.forEach {
         dataServiceResource.addProperty(
-            DCTerms.format, ResourceFactory.createResource(URIref.encode(it))
+            DCTerms.format, safeCreateResource(it)
         )
     }
 
     values.contactPoint?.let { point ->
-        val contactPointResource = this.createResource().addProperty(
+        val contactPointResource = this.safeCreateResource(null).addProperty(
             RDF.type, VCARD4.Organization
         )
 
@@ -193,7 +194,7 @@ fun Model.addDataService(dataService: DataServiceEntity, dataServiceUri: String)
         }
 
         point.phone?.takeIf(String::isNotBlank)?.let {
-            val telephoneTypeResource = this.createResource().addProperty(
+            val telephoneTypeResource = this.safeCreateResource(null).addProperty(
                 RDF.type, VCARD4.TelephoneType
             ).addProperty(
                 VCARD4.hasValue, telephoneResource(it)
@@ -206,13 +207,13 @@ fun Model.addDataService(dataService: DataServiceEntity, dataServiceUri: String)
 
         point.email?.takeIf(String::isNotBlank)?.let {
             contactPointResource.addProperty(
-                VCARD4.hasEmail, ResourceFactory.createResource(URIref.encode("mailto:$it"))
+                VCARD4.hasEmail, safeCreateResource("mailto:$it")
             )
         }
 
         point.url?.takeIf(String::isNotBlank)?.let {
             contactPointResource.addProperty(
-                VCARD4.hasURL, ResourceFactory.createResource(URIref.encode(it))
+                VCARD4.hasURL, safeCreateResource(it)
             )
         }
 
@@ -223,25 +224,25 @@ fun Model.addDataService(dataService: DataServiceEntity, dataServiceUri: String)
 
     values.status?.takeIf(String::isNotBlank)?.let {
         dataServiceResource.addProperty(
-            ADMS.status, ResourceFactory.createResource(URIref.encode(it))
+            ADMS.status, safeCreateResource(it)
         )
     }
 
     values.availability?.takeIf(String::isNotBlank)?.let {
         dataServiceResource.addProperty(
-            DCATAP.availability, ResourceFactory.createResource(URIref.encode(it))
+            DCATAP.availability, safeCreateResource(it)
         )
     }
 
     values.themes?.filter(FileUtils::isURI)?.forEach {
         dataServiceResource.addProperty(
-            DCAT.theme, ResourceFactory.createResource(URIref.encode(it))
+            DCAT.theme, safeCreateResource(it)
         )
     }
 
     values.servesDataset?.filter(FileUtils::isURI)?.forEach {
         dataServiceResource.addProperty(
-            DCAT.servesDataset, ResourceFactory.createResource(URIref.encode(it))
+            DCAT.servesDataset, safeCreateResource(it)
         )
     }
 
@@ -251,26 +252,26 @@ fun Model.addDataService(dataService: DataServiceEntity, dataServiceUri: String)
 
     values.pages?.filter(FileUtils::isURI)?.forEach {
         dataServiceResource.addProperty(
-            FOAF.page, ResourceFactory.createResource(URIref.encode(it))
+            FOAF.page, safeCreateResource(it)
         )
     }
 
     values.landingPage?.takeIf(FileUtils::isURI)?.let {
         dataServiceResource.addProperty(
-            DCAT.landingPage, ResourceFactory.createResource(URIref.encode(it))
+            DCAT.landingPage, safeCreateResource(it)
         )
     }
 
     values.license?.takeIf(FileUtils::isURI)?.let {
         dataServiceResource.addProperty(
-            DCTerms.license, ResourceFactory.createResource(URIref.encode(it))
+            DCTerms.license, safeCreateResource(it)
         )
     }
 
     values.mediaTypes?.filter(String::isNotBlank)?.forEach { type ->
         if (type.startsWith("https://www.iana.org/assignments/media-types/")) {
             dataServiceResource.addProperty(
-                DCAT.mediaType, ResourceFactory.createResource(URIref.encode(type))
+                DCAT.mediaType, safeCreateResource(type)
             )
         } else {
             logger.warn("Non iana media type {} on data service {} was skipped", type, dataService.id)
@@ -279,18 +280,18 @@ fun Model.addDataService(dataService: DataServiceEntity, dataServiceUri: String)
 
     values.accessRights?.takeIf(FileUtils::isURI)?.let {
         dataServiceResource.addProperty(
-            DCTerms.accessRights, ResourceFactory.createResource(URIref.encode(it))
+            DCTerms.accessRights, safeCreateResource(it)
         )
     }
 
     values.type?.takeIf(FileUtils::isURI)?.let {
         dataServiceResource.addProperty(
-            DCTerms.type, ResourceFactory.createResource(URIref.encode(it))
+            DCTerms.type, safeCreateResource(it)
         )
     }
 
     values.costs?.forEach { cost ->
-        val costResource = this.createResource()
+        val costResource = this.safeCreateResource(null)
             .addProperty(RDF.type, CV.Cost)
 
         cost.value?.let {
@@ -305,13 +306,13 @@ fun Model.addDataService(dataService: DataServiceEntity, dataServiceUri: String)
 
         cost.documentation?.filter(FileUtils::isURI)?.forEach {
             costResource.addProperty(
-                FOAF.page, ResourceFactory.createResource(URIref.encode(it))
+                FOAF.page, safeCreateResource(it)
             )
         }
 
         cost.currency?.takeIf(FileUtils::isURI)?.let {
             costResource.addProperty(
-                CV.currency, ResourceFactory.createResource(URIref.encode(it))
+                CV.currency, safeCreateResource(it)
             )
         }
 
@@ -332,6 +333,26 @@ fun Model.serialize(lang: Lang): String {
     return stringWriter.buffer.toString()
 }
 
+private fun Model.safeCreateResource(value: String?): Resource =
+    try {
+        value
+            ?.let { URIref.encode(it) }
+            ?.let { createResource(value) }
+            ?: createResource()
+    } catch (e: Exception) {
+        createResource()
+    }
+
+private fun safeCreateResource(value: String?): Resource =
+    try {
+        value
+            ?.let { URIref.encode(it) }
+            ?.let { ResourceFactory.createResource(value) }
+            ?: ResourceFactory.createResource()
+    } catch (e: Exception) {
+        ResourceFactory.createResource()
+    }
+
 private fun telephoneResource(telephone: String): Resource =
     telephone.trim { it <= ' ' }
         .filterIndexed { index, c ->
@@ -341,7 +362,7 @@ private fun telephoneResource(telephone: String): Resource =
                 else -> false // skip visual-separator and other content
             }
         }
-        .let { ResourceFactory.createResource(URIref.encode("tel:$it")) }
+        .let { safeCreateResource("tel:$it") }
 
 private fun Resource.addLangLiteralFromLocalizedStrings(localizedStrings: LocalizedStrings?, predicate: Property) {
     listOf(
