@@ -98,11 +98,11 @@ class RDFHandler(private val repository: DataServiceRepository, private val prop
     }
 
     private fun getCatalogUri(): String {
-        return buildUri(properties.baseUri, "/catalogs/")
+        return buildUri(properties.oldBaseUri, "/catalogs/")
     }
 
     private fun getDataServiceUri(catalogId: String): String {
-        return buildUri(properties.baseUri, "/catalogs/$catalogId/data-services/")
+        return buildUri(properties.oldBaseUri, "/data-services/")
     }
 
     private fun getOrganizationUri(): String {

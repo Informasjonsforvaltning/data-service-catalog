@@ -56,6 +56,11 @@ spec:
                 secretKeyRef:
                   name: data-service-catalog
                   key: CORS_ORIGIN_PATTERNS
+            - name: OLD_BASE_URI
+              valueFrom:
+                secretKeyRef:
+                  name: commonurl
+                  key: DATASERVICE_CATALOG_BASE_URI
           image: data-service-catalog
           imagePullPolicy: Always
           ports:

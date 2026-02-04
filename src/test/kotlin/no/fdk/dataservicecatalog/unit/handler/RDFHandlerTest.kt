@@ -85,7 +85,7 @@ class RDFHandlerTest {
                     <http://www.w3.org/2002/07/owl#sameAs>
                             "https://data.brreg.no/enhetsregisteret/api/enheter/$catalogId" .
             
-            <$baseUri/catalogs/$catalogId/data-services/$dataServiceId>
+            <$baseUri/data-services/$dataServiceId>
                     rdf:type                  dcat:DataService;
                     dct:accessRights          <http://access-rights.com>;
                     dct:description           "description"@en;
@@ -123,7 +123,7 @@ class RDFHandlerTest {
             <$baseUri/catalogs/$catalogId>  rdf:type  dcat:Catalog;
                     dct:publisher  <$organizationCatalogBaseUri/organizations/$catalogId>;
                     dct:title      "Data service catalog ($catalogId)"@en;
-                    dcat:service   <$baseUri/catalogs/$catalogId/data-services/$dataServiceId> .
+                    dcat:service   <$baseUri/data-services/$dataServiceId> .
         """
 
         val expectedModel = ModelFactory.createDefaultModel()
@@ -139,7 +139,7 @@ class RDFHandlerTest {
         }
 
         properties.stub {
-            on { this.baseUri } doReturn baseUri
+            on { this.oldBaseUri } doReturn baseUri
             on { this.organizationCatalogBaseUri } doReturn organizationCatalogBaseUri
         }
 
@@ -202,7 +202,7 @@ class RDFHandlerTest {
                     <http://www.w3.org/2002/07/owl#sameAs>
                             "https://data.brreg.no/enhetsregisteret/api/enheter/$catalogId" .
             
-            <$baseUri/catalogs/$catalogId/data-services/$dataServiceId>
+            <$baseUri/data-services/$dataServiceId>
                     rdf:type                  dcat:DataService;
                     dct:accessRights          <http://access-rights.com>;
                     dct:description           "description"@en;
@@ -240,7 +240,7 @@ class RDFHandlerTest {
             <$baseUri/catalogs/$catalogId>  rdf:type  dcat:Catalog;
                     dct:publisher  <$organizationCatalogBaseUri/organizations/$catalogId>;
                     dct:title      "Data service catalog ($catalogId)"@en;
-                    dcat:service   <$baseUri/catalogs/$catalogId/data-services/$dataServiceId> .
+                    dcat:service   <$baseUri/data-services/$dataServiceId> .
         """
 
         val expectedModel = ModelFactory.createDefaultModel()
@@ -256,7 +256,7 @@ class RDFHandlerTest {
         }
 
         properties.stub {
-            on { this.baseUri } doReturn baseUri
+            on { this.oldBaseUri } doReturn baseUri
             on { this.organizationCatalogBaseUri } doReturn organizationCatalogBaseUri
         }
 
@@ -304,7 +304,7 @@ class RDFHandlerTest {
             PREFIX dcatap: <http://data.europa.eu/r5r/>
             PREFIX cv:    <http://data.europa.eu/m8g/>
 
-            <$baseUri/catalogs/$catalogId/data-services/$dataServiceId>
+            <$baseUri/data-services/$dataServiceId>
                     rdf:type                  dcat:DataService;
                     dct:accessRights          <http://access-rights.com>;
                     dct:description           "description"@en;
@@ -351,7 +351,7 @@ class RDFHandlerTest {
         }
 
         properties.stub {
-            on { this.baseUri } doReturn baseUri
+            on { this.oldBaseUri } doReturn baseUri
         }
 
         val dataService = handler.findDataServiceByCatalogIdAndDataServiceId(catalogId, dataServiceId, Lang.TURTLE)

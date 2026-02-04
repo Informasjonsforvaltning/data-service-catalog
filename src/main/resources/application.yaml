@@ -48,7 +48,7 @@ spring:
         type:
           json_format_mapper: no.fdk.dataservicecatalog.config.CustomJacksonJsonFormatMapper
 application:
-  base-uri: ${BASE_URI:http://localhost}
+  old-base-uri: ${OLD_BASE_URI}
   organization-catalog-base-uri: ${ORGANIZATION_CATALOG_BASE_URI:https://organization-catalog.staging.fellesdatakatalog.digdir.no}
   cors:
     originPatterns: "${CORS_ORIGIN_PATTERNS}"
@@ -76,6 +76,7 @@ spring:
       hibernate:
         format_sql: true
 application:
+  old-base-uri: http://localhost
   cors:
     originPatterns: "*"
 logging.level.no: DEBUG
@@ -103,5 +104,6 @@ spring:
       hibernate:
         format_sql: true
 application:
+  old-base-uri: http://localhost
   cors:
     originPatterns: "*"
