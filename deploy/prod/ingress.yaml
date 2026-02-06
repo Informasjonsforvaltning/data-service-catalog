@@ -4,9 +4,9 @@ kind: Ingress
 metadata:
   name: data-service-catalog
   annotations:
-    nginx.ingress.kubernetes.io/limit-rps: '5'
+    nginx.ingress.kubernetes.io/limit-rps: '10'
     nginx.ingress.kubernetes.io/limit-burst-multiplier: '2'
-    nginx.ingress.kubernetes.io/limit-whitelist: '10.0.0.0/8,162.244.5.0/24'
+    nginx.ingress.kubernetes.io/limit-whitelist: '10.0.0.0/8,35.228.50.2/32'
     nginx.ingress.kubernetes.io/server-snippet: |
       server_tokens off;
       location ~ ^/(ping|ready|prometheus) {
