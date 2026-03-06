@@ -377,7 +377,7 @@ class RDFHandlerTest {
                 "contactPoint", ContactPoint(
                     name = LocalizedStrings(nb = null, nn = null, en = "name"),
                     phone = "+47 123 45 678",
-                    email = "email",
+                    email = " email",
                     url = "url"
                 )
             ),
