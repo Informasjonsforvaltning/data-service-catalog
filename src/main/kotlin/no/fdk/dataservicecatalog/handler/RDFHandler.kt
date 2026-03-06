@@ -207,7 +207,7 @@ fun Model.addDataService(dataService: DataServiceEntity, dataServiceUri: String)
 
         point.email?.takeIf(String::isNotBlank)?.let {
             contactPointResource.addProperty(
-                VCARD4.hasEmail, safeCreateResource("mailto:$it")
+                VCARD4.hasEmail, safeCreateResource("mailto:${it.filterNot { char -> char.isWhitespace() } }")
             )
         }
 
