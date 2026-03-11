@@ -37,11 +37,12 @@ class RDFHandler(private val repository: DataServiceRepository, private val prop
             .groupBy(DataServiceEntity::catalogId)
             .forEach { (catalogId, dataServices) ->
                 catalogId.let { id ->
-                    model.addCatalog(id, getCatalogUri(), getOrganizationUri(), getPublisherUri())
+                    model.addCatalog(id, getCatalogUri(), getOrganizationUri(id))
+                    model.addPublisherData(id, getOrganizationUri(id), getNorwegianRegistryUri(id))
 
                     dataServices.forEach { dataService ->
-                        model.addDataServiceToCatalog(dataService, getCatalogUri(), getDataServiceUri(id))
-                        model.addDataService(dataService, getDataServiceUri(id))
+                        model.addDataServiceToCatalog(dataService, getCatalogUri(), getDataServiceUri())
+                        model.addDataService(dataService, getDataServiceUri(), getOrganizationUri(id))
                     }
                 }
             }
@@ -55,9 +56,10 @@ class RDFHandler(private val repository: DataServiceRepository, private val prop
         repository.findAllByCatalogIdAndPublished(catalogId, true)
             .forEach { dataService ->
                 dataService.catalogId.let { id ->
-                    model.addCatalog(id, getCatalogUri(), getOrganizationUri(), getPublisherUri())
-                    model.addDataServiceToCatalog(dataService, getCatalogUri(), getDataServiceUri(id))
-                    model.addDataService(dataService, getDataServiceUri(id))
+                    model.addCatalog(id, getCatalogUri(), getOrganizationUri(id))
+                    model.addPublisherData(id, getOrganizationUri(id), getNorwegianRegistryUri(id))
+                    model.addDataServiceToCatalog(dataService, getCatalogUri(), getDataServiceUri())
+                    model.addDataService(dataService, getDataServiceUri(), getOrganizationUri(id))
                 }
             }
 
@@ -73,7 +75,8 @@ class RDFHandler(private val repository: DataServiceRepository, private val prop
 
         dataService.catalogId
             .let { id ->
-                model.addDataService(dataService, getDataServiceUri(id))
+                model.addDataService(dataService, getDataServiceUri(), getOrganizationUri(id))
+                model.addPublisherData(id, getOrganizationUri(id), getNorwegianRegistryUri(id))
             }
 
         return model.serialize(lang)
@@ -101,38 +104,40 @@ class RDFHandler(private val repository: DataServiceRepository, private val prop
         return buildUri(properties.oldBaseUri, "/catalogs/")
     }
 
-    private fun getDataServiceUri(catalogId: String): String {
+    private fun getDataServiceUri(): String {
         return buildUri(properties.oldBaseUri, "/data-services/")
     }
 
-    private fun getOrganizationUri(): String {
-        return buildUri(properties.organizationCatalogBaseUri, "/organizations/")
+    private fun getOrganizationUri(id: String): String {
+        return buildUri(properties.organizationCatalogBaseUri, "/organizations/$id")
     }
 
     private fun buildUri(baseUri: String, path: String): String {
         return "$baseUri$path"
     }
 
-    private fun getPublisherUri(): String {
-        return "https://data.brreg.no/enhetsregisteret/api/enheter/"
+    private fun getNorwegianRegistryUri(id: String): String {
+        return "https://data.brreg.no/enhetsregisteret/api/enheter/$id"
     }
 }
 
-fun Model.addCatalog(catalogId: String, baseUri: String, organizationCatalogUri: String, publisherUri: String) {
+fun Model.addCatalog(catalogId: String, baseUri: String, organizationCatalogUri: String) {
     this.safeCreateResource(baseUri.plus(catalogId)).addProperty(
         RDF.type, DCAT.Catalog
     ).addProperty(
-        DCTerms.publisher, safeCreateResource(organizationCatalogUri.plus(catalogId))
+        DCTerms.publisher, safeCreateResource(organizationCatalogUri)
     ).addProperty(
         DCTerms.title, ResourceFactory.createLangLiteral("Data service catalog ($catalogId)", "en")
     )
+}
 
-    this.safeCreateResource(organizationCatalogUri.plus(catalogId)).addProperty(
+fun Model.addPublisherData(catalogId: String, organizationCatalogUri: String, publisherUri: String) {
+    this.safeCreateResource(organizationCatalogUri).addProperty(
         RDF.type, FOAF.Agent
     ).addProperty(
         DCTerms.identifier, catalogId
     ).addProperty(
-        OWL.sameAs, URIref.encode(publisherUri.plus(catalogId))
+        OWL.sameAs, URIref.encode(publisherUri)
     )
 }
 
@@ -142,9 +147,11 @@ fun Model.addDataServiceToCatalog(dataService: DataServiceEntity, catalogUri: St
     )
 }
 
-fun Model.addDataService(dataService: DataServiceEntity, dataServiceUri: String) {
+fun Model.addDataService(dataService: DataServiceEntity, dataServiceUri: String, organizationCatalogUri: String) {
     val dataServiceResource = this.safeCreateResource(dataServiceUri.plus(dataService.id)).addProperty(
         RDF.type, DCAT.DataService
+    ).addProperty(
+        DCTerms.publisher, safeCreateResource(organizationCatalogUri)
     )
     val values = jacksonObjectMapper().convertValue<DataServiceValues>(dataService.data)
 

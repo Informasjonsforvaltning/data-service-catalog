@@ -92,6 +92,7 @@ class RDFHandlerTest {
                     dct:format                <http://format.com>;
                     dct:license               <http://license.com>;
                     dct:title                 "title"@en;
+                    dct:publisher             <$organizationCatalogBaseUri/organizations/$catalogId>;
                     dct:type                  <http://type.com>;
                     dcatap:availability       <http://publications.europa.eu/resource/authority/planned-availability/STABLE>;
                     adms:status               <http://publications.europa.eu/resource/authority/distribution-status/DEVELOP>;
@@ -209,6 +210,7 @@ class RDFHandlerTest {
                     dct:format                <http://format.com>;
                     dct:license               <http://license.com>;
                     dct:title                 "title"@en;
+                    dct:publisher             <$organizationCatalogBaseUri/organizations/$catalogId>;
                     dct:type                  <http://type.com>;
                     dcatap:availability       <http://publications.europa.eu/resource/authority/planned-availability/STABLE>;
                     adms:status               <http://publications.europa.eu/resource/authority/distribution-status/DEVELOP>;
@@ -293,6 +295,7 @@ class RDFHandlerTest {
         val catalogId = "5678"
 
         val baseUri = "http://base-uri.com"
+        val organizationCatalogBaseUri = "http://organization-catalog-base-uri.com"
 
         val rdf = """
             PREFIX dcat:  <http://www.w3.org/ns/dcat#>
@@ -304,6 +307,12 @@ class RDFHandlerTest {
             PREFIX dcatap: <http://data.europa.eu/r5r/>
             PREFIX cv:    <http://data.europa.eu/m8g/>
 
+            <$organizationCatalogBaseUri/organizations/$catalogId>
+                    rdf:type        foaf:Agent;
+                    dct:identifier  "$catalogId";
+                    <http://www.w3.org/2002/07/owl#sameAs>
+                            "https://data.brreg.no/enhetsregisteret/api/enheter/$catalogId" .
+
             <$baseUri/data-services/$dataServiceId>
                     rdf:type                  dcat:DataService;
                     dct:accessRights          <http://access-rights.com>;
@@ -311,6 +320,7 @@ class RDFHandlerTest {
                     dct:format                <http://format.com>;
                     dct:license               <http://license.com>;
                     dct:title                 "title"@en;
+                    dct:publisher             <$organizationCatalogBaseUri/organizations/$catalogId>;
                     dct:type                  <http://type.com>;
                     dcatap:availability       <http://publications.europa.eu/resource/authority/planned-availability/STABLE>;
                     adms:status               <http://publications.europa.eu/resource/authority/distribution-status/DEVELOP>;
@@ -352,6 +362,7 @@ class RDFHandlerTest {
 
         properties.stub {
             on { this.oldBaseUri } doReturn baseUri
+            on { this.organizationCatalogBaseUri } doReturn organizationCatalogBaseUri
         }
 
         val dataService = handler.findDataServiceByCatalogIdAndDataServiceId(catalogId, dataServiceId, Lang.TURTLE)
