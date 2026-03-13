@@ -2,6 +2,7 @@ package no.fdk.dataservicecatalog.handler
 
 import com.fasterxml.jackson.module.kotlin.convertValue
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import no.fdk.dataservicecatalog.adapter.HarvestAdminClient
 import no.fdk.dataservicecatalog.domain.DataService
 import no.fdk.dataservicecatalog.domain.JsonPatchOperation
 import no.fdk.dataservicecatalog.domain.DataServiceValues
@@ -16,7 +17,10 @@ import java.time.LocalDateTime
 import java.util.*
 
 @Component
-class DataServiceHandler(private val repository: DataServiceRepository) {
+class DataServiceHandler(
+    private val repository: DataServiceRepository,
+    private val adminClient: HarvestAdminClient
+) {
 
     private fun DataServiceEntity.toDataService(): DataService {
         val values = jacksonObjectMapper().convertValue<DataServiceValues>(data)
@@ -83,6 +87,7 @@ class DataServiceHandler(private val repository: DataServiceRepository) {
 
         return repository.save(entity.copy(data = patchedValues))
             .toDataService()
+            .also { if (entity.published) adminClient.triggerHarvest(catalogId) }
             .also { logger.info("Updated Data Service with id: $dataServiceId in Catalog with id: $catalogId") }
     }
 
@@ -103,7 +108,11 @@ class DataServiceHandler(private val repository: DataServiceRepository) {
 
         if (dataService.published) throw BadRequestException("Data Service with id: $dataServiceId is already published")
 
+        val isFirstPublished = repository.findAllByCatalogIdAndPublished(catalogId, true).isEmpty()
+        if (isFirstPublished) adminClient.createNewDataSource(catalogId)
+
         repository.save(dataService.copy(published = true, publishedDate = LocalDateTime.now()))
+        adminClient.triggerHarvest(catalogId)
 
         logger.info("Published Data Service with id: $dataServiceId in Catalog with id: $catalogId")
     }

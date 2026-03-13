@@ -49,7 +49,9 @@ spring:
           json_format_mapper: no.fdk.dataservicecatalog.config.CustomJacksonJsonFormatMapper
 application:
   old-base-uri: ${OLD_BASE_URI}
-  organization-catalog-base-uri: ${ORGANIZATION_CATALOG_BASE_URI:https://organization-catalog.staging.fellesdatakatalog.digdir.no}
+  organization-catalog-base-uri: ${ORGANIZATION_CATALOG_BASE_URI}
+  harvest-admin-uri: ${ADMIN_API_BASE_URI}
+  data-service-catalog-uri-host: ${DATA_SERVICE_CATALOG_BASE_URI}/catalogs
   cors:
     originPatterns: "${CORS_ORIGIN_PATTERNS}"
 
@@ -76,7 +78,10 @@ spring:
       hibernate:
         format_sql: true
 application:
-  old-base-uri: http://localhost
+  old-base-uri: http://localhost:5050
+  organization-catalog-base-uri: https://organization-catalog.staging.fellesdatakatalog.digdir.no
+  harvest-admin-uri: https://harvest-admin.api.staging.fellesdatakatalog.digdir.no
+  data-service-catalog-uri-host: https://data-service-catalog.api.staging.fellesdatakatalog.digdir.no/catalogs
   cors:
     originPatterns: "*"
 logging.level.no: DEBUG
@@ -104,6 +109,9 @@ spring:
       hibernate:
         format_sql: true
 application:
-  old-base-uri: http://localhost
+  old-base-uri: http://localhost:5050
+  organization-catalog-base-uri: http://localhost:5050
+  harvest-admin-uri: http://localhost:5050
+  data-service-catalog-uri-host: http://localhost:5050/catalogs
   cors:
     originPatterns: "*"

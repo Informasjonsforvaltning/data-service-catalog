@@ -1,5 +1,6 @@
 package no.fdk.dataservicecatalog.unit.handler
 
+import no.fdk.dataservicecatalog.adapter.HarvestAdminClient
 import no.fdk.dataservicecatalog.domain.*
 import no.fdk.dataservicecatalog.entity.DataServiceEntity
 import no.fdk.dataservicecatalog.exception.NotFoundException
@@ -23,6 +24,9 @@ class DataServiceHandlerTest {
 
     @Mock
     lateinit var repository: DataServiceRepository
+
+    @Mock
+    lateinit var adminClient: HarvestAdminClient
 
     @InjectMocks
     lateinit var handler: DataServiceHandler
@@ -163,6 +167,7 @@ class DataServiceHandlerTest {
         val update = handler.update(catalogId, dataServiceId, operations)
 
         assertEquals("newEndpointUrl", update.endpointUrl)
+        verify(adminClient).triggerHarvest(catalogId)
     }
 
     @Test
