@@ -71,6 +71,11 @@ spec:
                 secretKeyRef:
                   name: commonurl
                   key: DATASERVICE_CATALOG_BASE_URI
+            - name: ORGANIZATION_CATALOG_BASE_URI
+              valueFrom:
+                secretKeyRef:
+                  name: commonurl
+                  key: ORGANIZATION_CATALOG_BASE_URI
           image: data-service-catalog
           imagePullPolicy: Always
           ports:
