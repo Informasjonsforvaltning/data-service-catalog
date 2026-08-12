@@ -1,11 +1,14 @@
 package no.fdk.dataservicecatalog.integration.controller
 
 import no.fdk.dataservicecatalog.controller.DataServiceController
-import no.fdk.dataservicecatalog.integration.config.WebMvcTestSecurityConfig
-import no.fdk.dataservicecatalog.domain.*
+import no.fdk.dataservicecatalog.domain.DataService
+import no.fdk.dataservicecatalog.domain.JsonPatchOperation
+import no.fdk.dataservicecatalog.domain.LocalizedStrings
+import no.fdk.dataservicecatalog.domain.OpEnum
 import no.fdk.dataservicecatalog.exception.BadRequestException
 import no.fdk.dataservicecatalog.exception.NotFoundException
 import no.fdk.dataservicecatalog.handler.DataServiceHandler
+import no.fdk.dataservicecatalog.integration.config.WebMvcTestSecurityConfig
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -22,15 +25,19 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.bean.override.mockito.MockitoBean
-import org.springframework.test.web.servlet.*
+import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.delete
+import org.springframework.test.web.servlet.get
+import org.springframework.test.web.servlet.patch
+import org.springframework.test.web.servlet.post
 
 @Tag("integration")
 @ActiveProfiles("test")
-
 @Import(WebMvcTestSecurityConfig::class)
 @WebMvcTest(controllers = [DataServiceController::class])
-class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
-
+class DataServiceControllerTest(
+    @param:Autowired val mockMvc: MockMvc,
+) {
     @MockitoBean
     lateinit var handler: DataServiceHandler
 
@@ -43,23 +50,25 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
             on { findAll(catalogId) } doReturn emptyList()
         }
 
-        mockMvc.get("/internal/catalogs/$catalogId/data-services") {
-            with(jwt().authorities(SimpleGrantedAuthority(authority.format(catalogId))))
-        }.andExpect {
-            status { isOk() }
-            content { json("[]") }
-        }
+        mockMvc
+            .get("/internal/catalogs/$catalogId/data-services") {
+                with(jwt().authorities(SimpleGrantedAuthority(authority.format(catalogId))))
+            }.andExpect {
+                status { isOk() }
+                content { json("[]") }
+            }
     }
 
     @Test
     fun `find should respond with forbidden on invalid authority`() {
         val catalogId = "1234"
 
-        mockMvc.get("/internal/catalogs/$catalogId/data-services") {
-            with(jwt().authorities(SimpleGrantedAuthority("invalid")))
-        }.andExpect {
-            status { isForbidden() }
-        }
+        mockMvc
+            .get("/internal/catalogs/$catalogId/data-services") {
+                with(jwt().authorities(SimpleGrantedAuthority("invalid")))
+            }.andExpect {
+                status { isForbidden() }
+            }
     }
 
     @ParameterizedTest
@@ -69,7 +78,211 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
         val dataServiceId = "5678"
 
         handler.stub {
-            on { findById(catalogId, dataServiceId) } doReturn DataService(
+            on { findById(catalogId, dataServiceId) } doReturn
+                DataService(
+                    id = dataServiceId,
+                    catalogId = catalogId,
+                    published = true,
+                    status = null,
+                    endpointUrl = "endpointUrl",
+                    title = LocalizedStrings(nb = "title", en = null, nn = null),
+                    keywords = null,
+                    endpointDescriptions = null,
+                    formats = null,
+                    contactPoint = null,
+                    themes = null,
+                    servesDataset = null,
+                    description = null,
+                    pages = null,
+                    landingPage = null,
+                    license = null,
+                    mediaTypes = null,
+                    accessRights = null,
+                    type = null,
+                    availability = null,
+                    costs = null,
+                    version = null,
+                )
+        }
+
+        mockMvc
+            .get("/internal/catalogs/$catalogId/data-services/$dataServiceId") {
+                with(jwt().authorities(SimpleGrantedAuthority(authority.format(catalogId))))
+            }.andExpect {
+                status { isOk() }
+                jsonPath("$.endpointUrl") { value("endpointUrl") }
+            }
+    }
+
+    @Test
+    fun `find by id should respond with forbidden on invalid authority`() {
+        val catalogId = "1234"
+        val dataServiceId = "5678"
+
+        mockMvc
+            .get("/internal/catalogs/$catalogId/data-services/$dataServiceId") {
+                with(jwt().authorities(SimpleGrantedAuthority("invalid")))
+            }.andExpect {
+                status { isForbidden() }
+            }
+    }
+
+    @Test
+    fun `find by id should respond with not found on exception`() {
+        val catalogId = "1234"
+        val dataServiceId = "5678"
+
+        handler.stub {
+            on { findById(catalogId, dataServiceId) } doThrow NotFoundException("Data Service $dataServiceId not found")
+        }
+
+        mockMvc
+            .get("/internal/catalogs/$catalogId/data-services/$dataServiceId") {
+                with(jwt().authorities(SimpleGrantedAuthority("system:root:admin")))
+            }.andExpect {
+                status { isNotFound() }
+                header {
+                    string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
+                }
+                jsonPath("$.detail") { value("Data Service $dataServiceId not found") }
+            }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["organization:%s:admin", "organization:%s:write"])
+    fun `register should respond with created and location on valid payload`(authority: String) {
+        val catalogId = "1234"
+        val dataServiceId = "5678"
+
+        handler.stub {
+            on { register(any(), any()) } doReturn dataServiceId
+        }
+
+        mockMvc
+            .post("/internal/catalogs/$catalogId/data-services") {
+                with(jwt().authorities(SimpleGrantedAuthority(authority.format(catalogId))))
+                contentType = MediaType.APPLICATION_JSON
+                content = """
+                {
+                    "endpointUrl": "endpointUrl",
+                    "title": {
+                        "nb": "title"
+                    }
+                }
+            """
+            }.andExpect {
+                status { isCreated() }
+                header {
+                    string("location", "/internal/catalogs/$catalogId/data-services/$dataServiceId")
+                }
+            }
+    }
+
+    @Test
+    fun `register should respond with forbidden on invalid authority`() {
+        val catalogId = "1234"
+
+        mockMvc
+            .post("/internal/catalogs/$catalogId/data-services") {
+                with(jwt().authorities(SimpleGrantedAuthority("invalid")))
+                contentType = MediaType.APPLICATION_JSON
+                content = """
+                {
+                    "endpointUrl": "endpointUrl",
+                    "title": {
+                        "nb": "title"
+                    }
+                }
+            """
+            }.andExpect {
+                status { isForbidden() }
+            }
+    }
+
+    @Test
+    fun `register should respond with not found on exception`() {
+        val catalogId = "1234"
+
+        handler.stub {
+            on { register(any(), any()) } doThrow NotFoundException("Catalog $catalogId not found")
+        }
+
+        mockMvc
+            .post("/internal/catalogs/$catalogId/data-services") {
+                with(jwt().authorities(SimpleGrantedAuthority("organization:$catalogId:admin")))
+                contentType = MediaType.APPLICATION_JSON
+                content = """
+                {
+                    "endpointUrl": "endpointUrl",
+                    "title": {
+                        "nb": "title"
+                    }
+                }
+            """
+            }.andExpect {
+                status { isNotFound() }
+                header {
+                    string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
+                }
+                jsonPath("$.detail") { value("Catalog 1234 not found") }
+            }
+    }
+
+    @Test
+    fun `register should respond with bad request on invalid endpointUrl in payload`() {
+        val catalogId = "1234"
+
+        mockMvc
+            .post("/internal/catalogs/$catalogId/data-services") {
+                with(jwt())
+                contentType = MediaType.APPLICATION_JSON
+                content = """
+                {
+                    "endpointUrl": {},
+                    "title": {
+                        "nb": "title"
+                    }
+                }
+            """
+            }.andExpect {
+                status { isBadRequest() }
+                header {
+                    string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
+                }
+                jsonPath("$.detail") { value("Failed to read request") }
+            }
+    }
+
+    @Test
+    fun `register should respond with bad request on badly formatted title in payload`() {
+        val catalogId = "1234"
+
+        mockMvc
+            .post("/internal/catalogs/$catalogId/data-services") {
+                with(jwt())
+                contentType = MediaType.APPLICATION_JSON
+                content = """
+                {
+                    "endpointUrl": "endpointUrl",
+                    "title": "invalid"
+                }
+            """
+            }.andExpect {
+                status { isBadRequest() }
+                header {
+                    string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
+                }
+            }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["organization:%s:admin", "organization:%s:write"])
+    fun `update should respond with ok and payload`(authority: String) {
+        val catalogId = "1234"
+        val dataServiceId = "5678"
+
+        val dataService =
+            DataService(
                 id = dataServiceId,
                 catalogId = catalogId,
                 published = true,
@@ -91,218 +304,26 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
                 type = null,
                 availability = null,
                 costs = null,
-                version = null
+                version = null,
             )
-        }
 
-        mockMvc.get("/internal/catalogs/$catalogId/data-services/$dataServiceId") {
-            with(jwt().authorities(SimpleGrantedAuthority(authority.format(catalogId))))
-        }.andExpect {
-            status { isOk() }
-            jsonPath("$.endpointUrl") { value("endpointUrl") }
-        }
-    }
-
-    @Test
-    fun `find by id should respond with forbidden on invalid authority`() {
-        val catalogId = "1234"
-        val dataServiceId = "5678"
-
-        mockMvc.get("/internal/catalogs/$catalogId/data-services/$dataServiceId") {
-            with(jwt().authorities(SimpleGrantedAuthority("invalid")))
-        }.andExpect {
-            status { isForbidden() }
-        }
-    }
-
-    @Test
-    fun `find by id should respond with not found on exception`() {
-        val catalogId = "1234"
-        val dataServiceId = "5678"
-
-        handler.stub {
-            on { findById(catalogId, dataServiceId) } doThrow NotFoundException("Data Service $dataServiceId not found")
-        }
-
-        mockMvc.get("/internal/catalogs/$catalogId/data-services/$dataServiceId") {
-            with(jwt().authorities(SimpleGrantedAuthority("system:root:admin")))
-        }.andExpect {
-            status { isNotFound() }
-            header {
-                string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
-            }
-            jsonPath("$.detail") { value("Data Service $dataServiceId not found") }
-        }
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = ["organization:%s:admin", "organization:%s:write"])
-    fun `register should respond with created and location on valid payload`(authority: String) {
-        val catalogId = "1234"
-        val dataServiceId = "5678"
-
-        handler.stub {
-            on { register(any(), any()) } doReturn dataServiceId
-        }
-
-        mockMvc.post("/internal/catalogs/$catalogId/data-services") {
-            with(jwt().authorities(SimpleGrantedAuthority(authority.format(catalogId))))
-            contentType = MediaType.APPLICATION_JSON
-            content = """
-                {
-                    "endpointUrl": "endpointUrl",
-                    "title": {
-                        "nb": "title"
-                    }
-                }
-            """
-        }.andExpect {
-            status { isCreated() }
-            header {
-                string("location", "/internal/catalogs/$catalogId/data-services/$dataServiceId")
-            }
-        }
-    }
-
-    @Test
-    fun `register should respond with forbidden on invalid authority`() {
-        val catalogId = "1234"
-
-        mockMvc.post("/internal/catalogs/$catalogId/data-services") {
-            with(jwt().authorities(SimpleGrantedAuthority("invalid")))
-            contentType = MediaType.APPLICATION_JSON
-            content = """
-                {
-                    "endpointUrl": "endpointUrl",
-                    "title": {
-                        "nb": "title"
-                    }
-                }
-            """
-        }.andExpect {
-            status { isForbidden() }
-        }
-    }
-
-    @Test
-    fun `register should respond with not found on exception`() {
-        val catalogId = "1234"
-
-        handler.stub {
-            on { register(any(), any()) } doThrow NotFoundException("Catalog $catalogId not found")
-        }
-
-        mockMvc.post("/internal/catalogs/$catalogId/data-services") {
-            with(jwt().authorities(SimpleGrantedAuthority("organization:$catalogId:admin")))
-            contentType = MediaType.APPLICATION_JSON
-            content = """
-                {
-                    "endpointUrl": "endpointUrl",
-                    "title": {
-                        "nb": "title"
-                    }
-                }
-            """
-        }.andExpect {
-            status { isNotFound() }
-            header {
-                string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
-            }
-            jsonPath("$.detail") { value("Catalog 1234 not found") }
-        }
-    }
-
-    @Test
-    fun `register should respond with bad request on invalid endpointUrl in payload`() {
-        val catalogId = "1234"
-
-        mockMvc.post("/internal/catalogs/$catalogId/data-services") {
-            with(jwt())
-            contentType = MediaType.APPLICATION_JSON
-            content = """
-                {
-                    "endpointUrl": {},
-                    "title": {
-                        "nb": "title"
-                    }
-                }
-            """
-        }.andExpect {
-            status { isBadRequest() }
-            header {
-                string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
-            }
-            jsonPath("$.detail") { value("Failed to read request") }
-        }
-    }
-
-    @Test
-    fun `register should respond with bad request on badly formatted title in payload`() {
-        val catalogId = "1234"
-
-        mockMvc.post("/internal/catalogs/$catalogId/data-services") {
-            with(jwt())
-            contentType = MediaType.APPLICATION_JSON
-            content = """
-                {
-                    "endpointUrl": "endpointUrl",
-                    "title": "invalid"
-                }
-            """
-        }.andExpect {
-            status { isBadRequest() }
-            header {
-                string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
-            }
-        }
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = ["organization:%s:admin", "organization:%s:write"])
-    fun `update should respond with ok and payload`(authority: String) {
-        val catalogId = "1234"
-        val dataServiceId = "5678"
-
-        val dataService = DataService(
-            id = dataServiceId,
-            catalogId = catalogId,
-            published = true,
-            status = null,
-            endpointUrl = "endpointUrl",
-            title = LocalizedStrings(nb = "title", en = null, nn = null),
-            keywords = null,
-            endpointDescriptions = null,
-            formats = null,
-            contactPoint = null,
-            themes = null,
-            servesDataset = null,
-            description = null,
-            pages = null,
-            landingPage = null,
-            license = null,
-            mediaTypes = null,
-            accessRights = null,
-            type = null,
-            availability = null,
-            costs = null,
-            version = null
-        )
-
-        val operations = listOf(
-            JsonPatchOperation(
-                op = OpEnum.REMOVE,
-                path = "title"
+        val operations =
+            listOf(
+                JsonPatchOperation(
+                    op = OpEnum.REMOVE,
+                    path = "title",
+                ),
             )
-        )
 
         handler.stub {
             on { update(catalogId, dataServiceId, operations) } doReturn dataService
         }
 
-        mockMvc.patch("/internal/catalogs/$catalogId/data-services/$dataServiceId") {
-            with(jwt().authorities(SimpleGrantedAuthority(authority.format(catalogId))))
-            contentType = MediaType.APPLICATION_JSON
-            content = """
+        mockMvc
+            .patch("/internal/catalogs/$catalogId/data-services/$dataServiceId") {
+                with(jwt().authorities(SimpleGrantedAuthority(authority.format(catalogId))))
+                contentType = MediaType.APPLICATION_JSON
+                content = """
                 [
                   {
                     "op": "remove",
@@ -310,9 +331,9 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
                   }
                 ]
             """
-        }.andExpect {
-            status { isOk() }
-        }
+            }.andExpect {
+                status { isOk() }
+            }
     }
 
     @Test
@@ -320,10 +341,11 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
         val catalogId = "1234"
         val dataServiceId = "5678"
 
-        mockMvc.patch("/internal/catalogs/$catalogId/data-services/$dataServiceId") {
-            with(jwt().authorities(SimpleGrantedAuthority("invalid")))
-            contentType = MediaType.APPLICATION_JSON
-            content = """
+        mockMvc
+            .patch("/internal/catalogs/$catalogId/data-services/$dataServiceId") {
+                with(jwt().authorities(SimpleGrantedAuthority("invalid")))
+                contentType = MediaType.APPLICATION_JSON
+                content = """
                 [
                   {
                     "op": "add",
@@ -331,9 +353,9 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
                   }
                 ]
             """
-        }.andExpect {
-            status { isForbidden() }
-        }
+            }.andExpect {
+                status { isForbidden() }
+            }
     }
 
     @Test
@@ -341,27 +363,29 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
         val catalogId = "1234"
         val dataServiceId = "5678"
 
-        val operations = listOf(
-            JsonPatchOperation(
-                op = OpEnum.REMOVE,
-                path = "title"
+        val operations =
+            listOf(
+                JsonPatchOperation(
+                    op = OpEnum.REMOVE,
+                    path = "title",
+                ),
             )
-        )
 
         handler.stub {
             on {
                 update(
                     catalogId,
                     dataServiceId,
-                    operations
+                    operations,
                 )
             } doThrow NotFoundException("Data Service $dataServiceId not found")
         }
 
-        mockMvc.patch("/internal/catalogs/$catalogId/data-services/$dataServiceId") {
-            with(jwt().authorities(SimpleGrantedAuthority("organization:$catalogId:admin")))
-            contentType = MediaType.APPLICATION_JSON
-            content = """
+        mockMvc
+            .patch("/internal/catalogs/$catalogId/data-services/$dataServiceId") {
+                with(jwt().authorities(SimpleGrantedAuthority("organization:$catalogId:admin")))
+                contentType = MediaType.APPLICATION_JSON
+                content = """
                 [
                   {
                     "op": "remove",
@@ -369,13 +393,13 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
                   }
                 ]
             """
-        }.andExpect {
-            status { isNotFound() }
-            header {
-                string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
+            }.andExpect {
+                status { isNotFound() }
+                header {
+                    string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
+                }
+                jsonPath("$.detail") { value("Data Service $dataServiceId not found") }
             }
-            jsonPath("$.detail") { value("Data Service $dataServiceId not found") }
-        }
     }
 
     @Test
@@ -383,10 +407,11 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
         val catalogId = "1234"
         val dataServiceId = "5678"
 
-        mockMvc.patch("/internal/catalogs/$catalogId/data-services/$dataServiceId") {
-            with(jwt())
-            contentType = MediaType.APPLICATION_JSON
-            content = """
+        mockMvc
+            .patch("/internal/catalogs/$catalogId/data-services/$dataServiceId") {
+                with(jwt())
+                contentType = MediaType.APPLICATION_JSON
+                content = """
                 [
                   {
                     "op": "add",
@@ -394,9 +419,9 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
                   }
                 ]
             """
-        }.andExpect {
-            status { isBadRequest() }
-        }
+            }.andExpect {
+                status { isBadRequest() }
+            }
     }
 
     @ParameterizedTest
@@ -405,11 +430,12 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
         val catalogId = "1234"
         val dataServiceId = "5678"
 
-        mockMvc.delete("/internal/catalogs/$catalogId/data-services/$dataServiceId") {
-            with(jwt().authorities(SimpleGrantedAuthority(authority.format(catalogId))))
-        }.andExpect {
-            status { isNoContent() }
-        }
+        mockMvc
+            .delete("/internal/catalogs/$catalogId/data-services/$dataServiceId") {
+                with(jwt().authorities(SimpleGrantedAuthority(authority.format(catalogId))))
+            }.andExpect {
+                status { isNoContent() }
+            }
     }
 
     @Test
@@ -417,11 +443,12 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
         val catalogId = "1234"
         val dataServiceId = "5678"
 
-        mockMvc.delete("/internal/catalogs/$catalogId/data-services/$dataServiceId") {
-            with(jwt().authorities(SimpleGrantedAuthority("invalid")))
-        }.andExpect {
-            status { isForbidden() }
-        }
+        mockMvc
+            .delete("/internal/catalogs/$catalogId/data-services/$dataServiceId") {
+                with(jwt().authorities(SimpleGrantedAuthority("invalid")))
+            }.andExpect {
+                status { isForbidden() }
+            }
     }
 
     @Test
@@ -433,15 +460,16 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
             on { delete(catalogId, dataServiceId) } doThrow NotFoundException("Data Service $dataServiceId not found")
         }
 
-        mockMvc.delete("/internal/catalogs/$catalogId/data-services/$dataServiceId") {
-            with(jwt().authorities(SimpleGrantedAuthority("organization:$catalogId:admin")))
-        }.andExpect {
-            status { isNotFound() }
-            header {
-                string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
+        mockMvc
+            .delete("/internal/catalogs/$catalogId/data-services/$dataServiceId") {
+                with(jwt().authorities(SimpleGrantedAuthority("organization:$catalogId:admin")))
+            }.andExpect {
+                status { isNotFound() }
+                header {
+                    string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
+                }
+                jsonPath("$.detail") { value("Data Service $dataServiceId not found") }
             }
-            jsonPath("$.detail") { value("Data Service $dataServiceId not found") }
-        }
     }
 
     @ParameterizedTest
@@ -450,11 +478,12 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
         val catalogId = "1234"
         val dataServiceId = "5678"
 
-        mockMvc.post("/internal/catalogs/$catalogId/data-services/$dataServiceId/publish") {
-            with(jwt().authorities(SimpleGrantedAuthority(authority.format(catalogId))))
-        }.andExpect {
-            status { isOk() }
-        }
+        mockMvc
+            .post("/internal/catalogs/$catalogId/data-services/$dataServiceId/publish") {
+                with(jwt().authorities(SimpleGrantedAuthority(authority.format(catalogId))))
+            }.andExpect {
+                status { isOk() }
+            }
     }
 
     @Test
@@ -462,11 +491,12 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
         val catalogId = "1234"
         val dataServiceId = "5678"
 
-        mockMvc.post("/internal/catalogs/$catalogId/data-services/$dataServiceId/publish") {
-            with(jwt().authorities(SimpleGrantedAuthority("invalid")))
-        }.andExpect {
-            status { isForbidden() }
-        }
+        mockMvc
+            .post("/internal/catalogs/$catalogId/data-services/$dataServiceId/publish") {
+                with(jwt().authorities(SimpleGrantedAuthority("invalid")))
+            }.andExpect {
+                status { isForbidden() }
+            }
     }
 
     @Test
@@ -478,12 +508,13 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
             on { publish(catalogId, dataServiceId) } doThrow NotFoundException("Data Service $dataServiceId not found")
         }
 
-        mockMvc.post("/internal/catalogs/$catalogId/data-services/$dataServiceId/publish") {
-            with(jwt().authorities(SimpleGrantedAuthority("organization:$catalogId:admin")))
-        }.andExpect {
-            status { isNotFound() }
-            jsonPath("$.detail") { value("Data Service $dataServiceId not found") }
-        }
+        mockMvc
+            .post("/internal/catalogs/$catalogId/data-services/$dataServiceId/publish") {
+                with(jwt().authorities(SimpleGrantedAuthority("organization:$catalogId:admin")))
+            }.andExpect {
+                status { isNotFound() }
+                jsonPath("$.detail") { value("Data Service $dataServiceId not found") }
+            }
     }
 
     @Test
@@ -495,12 +526,13 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
             on { publish(catalogId, dataServiceId) } doThrow BadRequestException("Data Service $dataServiceId already published")
         }
 
-        mockMvc.post("/internal/catalogs/$catalogId/data-services/$dataServiceId/publish") {
-            with(jwt().authorities(SimpleGrantedAuthority("organization:$catalogId:admin")))
-        }.andExpect {
-            status { isBadRequest() }
-            jsonPath("$.detail") { value("Data Service $dataServiceId already published") }
-        }
+        mockMvc
+            .post("/internal/catalogs/$catalogId/data-services/$dataServiceId/publish") {
+                with(jwt().authorities(SimpleGrantedAuthority("organization:$catalogId:admin")))
+            }.andExpect {
+                status { isBadRequest() }
+                jsonPath("$.detail") { value("Data Service $dataServiceId already published") }
+            }
     }
 
     @ParameterizedTest
@@ -509,11 +541,12 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
         val catalogId = "1234"
         val dataServiceId = "5678"
 
-        mockMvc.post("/internal/catalogs/$catalogId/data-services/$dataServiceId/unpublish") {
-            with(jwt().authorities(SimpleGrantedAuthority(authority.format(catalogId))))
-        }.andExpect {
-            status { isOk() }
-        }
+        mockMvc
+            .post("/internal/catalogs/$catalogId/data-services/$dataServiceId/unpublish") {
+                with(jwt().authorities(SimpleGrantedAuthority(authority.format(catalogId))))
+            }.andExpect {
+                status { isOk() }
+            }
     }
 
     @Test
@@ -521,11 +554,12 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
         val catalogId = "1234"
         val dataServiceId = "5678"
 
-        mockMvc.post("/internal/catalogs/$catalogId/data-services/$dataServiceId/unpublish") {
-            with(jwt().authorities(SimpleGrantedAuthority("invalid")))
-        }.andExpect {
-            status { isForbidden() }
-        }
+        mockMvc
+            .post("/internal/catalogs/$catalogId/data-services/$dataServiceId/unpublish") {
+                with(jwt().authorities(SimpleGrantedAuthority("invalid")))
+            }.andExpect {
+                status { isForbidden() }
+            }
     }
 
     @Test
@@ -537,12 +571,13 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
             on { unpublish(catalogId, dataServiceId) } doThrow NotFoundException("Data Service $dataServiceId not found")
         }
 
-        mockMvc.post("/internal/catalogs/$catalogId/data-services/$dataServiceId/unpublish") {
-            with(jwt().authorities(SimpleGrantedAuthority("organization:$catalogId:admin")))
-        }.andExpect {
-            status { isNotFound() }
-            jsonPath("$.detail") { value("Data Service $dataServiceId not found") }
-        }
+        mockMvc
+            .post("/internal/catalogs/$catalogId/data-services/$dataServiceId/unpublish") {
+                with(jwt().authorities(SimpleGrantedAuthority("organization:$catalogId:admin")))
+            }.andExpect {
+                status { isNotFound() }
+                jsonPath("$.detail") { value("Data Service $dataServiceId not found") }
+            }
     }
 
     @Test
@@ -554,11 +589,12 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
             on { unpublish(catalogId, dataServiceId) } doThrow BadRequestException("Data Service $dataServiceId not published")
         }
 
-        mockMvc.post("/internal/catalogs/$catalogId/data-services/$dataServiceId/unpublish") {
-            with(jwt().authorities(SimpleGrantedAuthority("organization:$catalogId:admin")))
-        }.andExpect {
-            status { isBadRequest() }
-            jsonPath("$.detail") { value("Data Service $dataServiceId not published") }
-        }
+        mockMvc
+            .post("/internal/catalogs/$catalogId/data-services/$dataServiceId/unpublish") {
+                with(jwt().authorities(SimpleGrantedAuthority("organization:$catalogId:admin")))
+            }.andExpect {
+                status { isBadRequest() }
+                jsonPath("$.detail") { value("Data Service $dataServiceId not published") }
+            }
     }
 }

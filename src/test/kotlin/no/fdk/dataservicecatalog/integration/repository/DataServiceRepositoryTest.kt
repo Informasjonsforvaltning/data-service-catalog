@@ -17,9 +17,8 @@ import org.springframework.test.context.ActiveProfiles
 @Import(PostgresDBTestcontainer::class)
 @SpringBootTest
 class DataServiceRepositoryTest(
-    @param:Autowired val repository: DataServiceRepository
+    @param:Autowired val repository: DataServiceRepository,
 ) {
-
     @AfterEach
     fun cleanup() {
         repository.deleteAll()
@@ -30,15 +29,16 @@ class DataServiceRepositoryTest(
         val firstCatalogId = "123"
         val secondCatalogId = "456"
 
-        val dataService = DataServiceEntity(
-            id = "1111",
-            catalogId = firstCatalogId,
-            published = true,
-            data = emptyMap()
-        )
+        val dataService =
+            DataServiceEntity(
+                id = "1111",
+                catalogId = firstCatalogId,
+                published = true,
+                data = emptyMap(),
+            )
 
         repository.saveAll(
-            listOf(dataService, dataService.copy(id = "2222", catalogId = secondCatalogId))
+            listOf(dataService, dataService.copy(id = "2222", catalogId = secondCatalogId)),
         )
 
         val dataServices = repository.findAllByCatalogId(firstCatalogId)
@@ -52,15 +52,16 @@ class DataServiceRepositoryTest(
         val firstCatalogId = "123"
         val secondCatalogId = "456"
 
-        val dataService = DataServiceEntity(
-            id = "1111",
-            catalogId = firstCatalogId,
-            published = true,
-            data = emptyMap()
-        )
+        val dataService =
+            DataServiceEntity(
+                id = "1111",
+                catalogId = firstCatalogId,
+                published = true,
+                data = emptyMap(),
+            )
 
         repository.saveAll(
-            listOf(dataService, dataService.copy(id = "2222", catalogId = secondCatalogId))
+            listOf(dataService, dataService.copy(id = "2222", catalogId = secondCatalogId)),
         )
 
         val dataServices = repository.findAllByCatalogIdIn(setOf(firstCatalogId))
@@ -79,8 +80,8 @@ class DataServiceRepositoryTest(
                 id = dataServiceId,
                 catalogId = catalogId,
                 published = true,
-                data = emptyMap()
-            )
+                data = emptyMap(),
+            ),
         )
 
         val dataService = repository.findDataServiceById(dataServiceId)
@@ -92,15 +93,16 @@ class DataServiceRepositoryTest(
     fun `find all by published status`() {
         val catalogId = "1234"
 
-        val dataService = DataServiceEntity(
-            id = "1111",
-            catalogId = catalogId,
-            published = true,
-            data = emptyMap()
-        )
+        val dataService =
+            DataServiceEntity(
+                id = "1111",
+                catalogId = catalogId,
+                published = true,
+                data = emptyMap(),
+            )
 
         repository.saveAll(
-            listOf(dataService, dataService.copy(id = "2222", published = false))
+            listOf(dataService, dataService.copy(id = "2222", published = false)),
         )
 
         val dataServices = repository.findAllByPublished(true)
@@ -113,15 +115,16 @@ class DataServiceRepositoryTest(
     fun `find all by catalog id and published status`() {
         val catalogId = "1234"
 
-        val dataService = DataServiceEntity(
-            id = "1111",
-            catalogId = catalogId,
-            published = true,
-            data = emptyMap()
-        )
+        val dataService =
+            DataServiceEntity(
+                id = "1111",
+                catalogId = catalogId,
+                published = true,
+                data = emptyMap(),
+            )
 
         repository.saveAll(
-            listOf(dataService, dataService.copy(id = "2222", published = false))
+            listOf(dataService, dataService.copy(id = "2222", published = false)),
         )
 
         val dataServices = repository.findAllByCatalogIdAndPublished(catalogId, true)

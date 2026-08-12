@@ -22,7 +22,6 @@ import java.net.URI
 @Tag("unit")
 @ExtendWith(MockitoExtension::class)
 class HarvestAdminClientTest {
-
     private val baseUri = "https://harvest-admin.example.com"
     private val catalogId = "1234"
     private val dataServiceCatalogHost = "https://dataservice.example.com"
@@ -48,15 +47,19 @@ class HarvestAdminClientTest {
 
     @Test
     fun `createNewDataSource posts expected payload to Harvest Admin`() {
-        org.mockito.kotlin.whenever(applicationProperties.harvestAdminUri).thenReturn(baseUri)
-        org.mockito.kotlin.whenever(applicationProperties.dataServiceCatalogUriHost).thenReturn(dataServiceCatalogHost)
+        org.mockito.kotlin
+            .whenever(applicationProperties.harvestAdminUri)
+            .thenReturn(baseUri)
+        org.mockito.kotlin
+            .whenever(applicationProperties.dataServiceCatalogUriHost)
+            .thenReturn(dataServiceCatalogHost)
 
         client.createNewDataSource(catalogId)
 
         verify(restTemplate).postForEntity(
             capture(uriCaptor),
             capture(httpEntityCaptor),
-            eq(Any::class.java)
+            eq(Any::class.java),
         )
 
         val capturedUri = uriCaptor.value
@@ -79,19 +82,22 @@ class HarvestAdminClientTest {
 
     @Test
     fun `triggerHarvest posts expected payload to Harvest Admin`() {
-        org.mockito.kotlin.whenever(applicationProperties.harvestAdminUri).thenReturn(baseUri)
-        org.mockito.kotlin.whenever(applicationProperties.dataServiceCatalogUriHost).thenReturn(dataServiceCatalogHost)
+        org.mockito.kotlin
+            .whenever(applicationProperties.harvestAdminUri)
+            .thenReturn(baseUri)
+        org.mockito.kotlin
+            .whenever(applicationProperties.dataServiceCatalogUriHost)
+            .thenReturn(dataServiceCatalogHost)
 
         client.triggerHarvest(catalogId)
 
         verify(restTemplate).postForEntity(
             eq(URI("$baseUri/organizations/$catalogId/datasources/start-harvesting")),
             any<HttpEntity<StartHarvestByUrlRequest>>(),
-            eq(Any::class.java)
+            eq(Any::class.java),
         )
     }
 
     // Helper to use ArgumentCaptor with Mockito-Kotlin capture syntax
     private fun <T> capture(captor: ArgumentCaptor<T>): T = captor.capture()
 }
-

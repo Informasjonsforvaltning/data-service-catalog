@@ -1,12 +1,17 @@
 package no.fdk.dataservicecatalog.unit.handler
 
 import no.fdk.dataservicecatalog.adapter.HarvestAdminClient
-import no.fdk.dataservicecatalog.domain.*
+import no.fdk.dataservicecatalog.domain.DataServiceValues
+import no.fdk.dataservicecatalog.domain.JsonPatchOperation
+import no.fdk.dataservicecatalog.domain.LocalizedStrings
+import no.fdk.dataservicecatalog.domain.OpEnum
 import no.fdk.dataservicecatalog.entity.DataServiceEntity
 import no.fdk.dataservicecatalog.exception.NotFoundException
 import no.fdk.dataservicecatalog.handler.DataServiceHandler
 import no.fdk.dataservicecatalog.repository.DataServiceRepository
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -21,7 +26,6 @@ import org.mockito.kotlin.verify
 @Tag("unit")
 @ExtendWith(MockitoExtension::class)
 class DataServiceHandlerTest {
-
     @Mock
     lateinit var repository: DataServiceRepository
 
@@ -36,17 +40,19 @@ class DataServiceHandlerTest {
         val catalogId = "1234"
 
         repository.stub {
-            on { findAllByCatalogId(catalogId) } doReturn listOf(
-                DataServiceEntity(
-                    id = "5678",
-                    catalogId = catalogId,
-                    published = true,
-                    data = mapOf(
-                        Pair("endpointUrl", "endpointUrl"),
-                        Pair("title", LocalizedStrings(nb = "title", en = null, nn = null))
-                    )
+            on { findAllByCatalogId(catalogId) } doReturn
+                listOf(
+                    DataServiceEntity(
+                        id = "5678",
+                        catalogId = catalogId,
+                        published = true,
+                        data =
+                            mapOf(
+                                Pair("endpointUrl", "endpointUrl"),
+                                Pair("title", LocalizedStrings(nb = "title", en = null, nn = null)),
+                            ),
+                    ),
                 )
-            )
         }
 
         val dataServices = handler.findAll(catalogId)
@@ -60,15 +66,17 @@ class DataServiceHandlerTest {
         val dataServiceId = "5678"
 
         repository.stub {
-            on { findDataServiceById(dataServiceId) } doReturn DataServiceEntity(
-                id = dataServiceId,
-                catalogId = catalogId,
-                published = true,
-                data = mapOf(
-                    Pair("endpointUrl", "endpointUrl"),
-                    Pair("title", LocalizedStrings(nb = "title", en = null, nn = null))
+            on { findDataServiceById(dataServiceId) } doReturn
+                DataServiceEntity(
+                    id = dataServiceId,
+                    catalogId = catalogId,
+                    published = true,
+                    data =
+                        mapOf(
+                            Pair("endpointUrl", "endpointUrl"),
+                            Pair("title", LocalizedStrings(nb = "title", en = null, nn = null)),
+                        ),
                 )
-            )
         }
 
         val dataService = handler.findById(catalogId, dataServiceId)
@@ -82,15 +90,17 @@ class DataServiceHandlerTest {
         val dataServiceId = "5678"
 
         repository.stub {
-            on { findDataServiceById(dataServiceId) } doReturn DataServiceEntity(
-                id = dataServiceId,
-                catalogId = "invalid_catalog id",
-                published = true,
-                data = mapOf(
-                    Pair("endpointUrl", "endpointUrl"),
-                    Pair("title", LocalizedStrings(nb = "title", en = null, nn = null))
+            on { findDataServiceById(dataServiceId) } doReturn
+                DataServiceEntity(
+                    id = dataServiceId,
+                    catalogId = "invalid_catalog id",
+                    published = true,
+                    data =
+                        mapOf(
+                            Pair("endpointUrl", "endpointUrl"),
+                            Pair("title", LocalizedStrings(nb = "title", en = null, nn = null)),
+                        ),
                 )
-            )
         }
 
         assertThrows(NotFoundException::class.java) {
@@ -102,29 +112,31 @@ class DataServiceHandlerTest {
     fun `should register data service and return id`() {
         val catalogId = "1234"
 
-        val dataServiceId = handler.register(
-            catalogId, DataServiceValues(
-                endpointUrl = "endpointUrl",
-                title = LocalizedStrings(nb = "title", en = null, nn = null),
-                status = null,
-                keywords = null,
-                endpointDescriptions = null,
-                formats = null,
-                contactPoint = null,
-                themes = null,
-                servesDataset = null,
-                description = null,
-                pages = null,
-                landingPage = null,
-                license = null,
-                mediaTypes = null,
-                accessRights = null,
-                type = null,
-                availability = null,
-                costs = null,
-                version = null
+        val dataServiceId =
+            handler.register(
+                catalogId,
+                DataServiceValues(
+                    endpointUrl = "endpointUrl",
+                    title = LocalizedStrings(nb = "title", en = null, nn = null),
+                    status = null,
+                    keywords = null,
+                    endpointDescriptions = null,
+                    formats = null,
+                    contactPoint = null,
+                    themes = null,
+                    servesDataset = null,
+                    description = null,
+                    pages = null,
+                    landingPage = null,
+                    license = null,
+                    mediaTypes = null,
+                    accessRights = null,
+                    type = null,
+                    availability = null,
+                    costs = null,
+                    version = null,
+                ),
             )
-        )
 
         assertTrue(dataServiceId.isNotBlank())
 
@@ -136,33 +148,38 @@ class DataServiceHandlerTest {
         val catalogId = "1234"
         val dataServiceId = "5678"
 
-        val dataService = DataServiceEntity(
-            id = dataServiceId,
-            catalogId = catalogId,
-            published = true,
-            data = mapOf(
-                Pair("endpointUrl", "endpointUrl")
+        val dataService =
+            DataServiceEntity(
+                id = dataServiceId,
+                catalogId = catalogId,
+                published = true,
+                data =
+                    mapOf(
+                        Pair("endpointUrl", "endpointUrl"),
+                    ),
             )
-        )
 
-        val patchedDataService = dataService.copy(
-            data = mapOf(
-                Pair("endpointUrl", "newEndpointUrl")
+        val patchedDataService =
+            dataService.copy(
+                data =
+                    mapOf(
+                        Pair("endpointUrl", "newEndpointUrl"),
+                    ),
             )
-        )
 
         repository.stub {
             on { findDataServiceById(dataServiceId) } doReturn dataService
             on { save(patchedDataService) } doReturn patchedDataService
         }
 
-        val operations = listOf(
-            JsonPatchOperation(
-                op = OpEnum.REPLACE,
-                path = "/endpointUrl",
-                value = "newEndpointUrl"
+        val operations =
+            listOf(
+                JsonPatchOperation(
+                    op = OpEnum.REPLACE,
+                    path = "/endpointUrl",
+                    value = "newEndpointUrl",
+                ),
             )
-        )
 
         val update = handler.update(catalogId, dataServiceId, operations)
 
@@ -176,25 +193,29 @@ class DataServiceHandlerTest {
         val dataServiceId = "5678"
 
         repository.stub {
-            on { findDataServiceById(dataServiceId) } doReturn DataServiceEntity(
-                id = dataServiceId,
-                catalogId = "invalid catalog id",
-                published = true,
-                data = mapOf(
-                    Pair("endpointUrl", "endpointUrl"),
-                    Pair("title", LocalizedStrings(nb = "title", en = null, nn = null))
+            on { findDataServiceById(dataServiceId) } doReturn
+                DataServiceEntity(
+                    id = dataServiceId,
+                    catalogId = "invalid catalog id",
+                    published = true,
+                    data =
+                        mapOf(
+                            Pair("endpointUrl", "endpointUrl"),
+                            Pair("title", LocalizedStrings(nb = "title", en = null, nn = null)),
+                        ),
                 )
-            )
         }
 
         assertThrows(NotFoundException::class.java) {
             handler.update(
-                catalogId, dataServiceId, listOf(
+                catalogId,
+                dataServiceId,
+                listOf(
                     JsonPatchOperation(
                         op = OpEnum.REPLACE,
                         path = "/endpointUrl",
-                    )
-                )
+                    ),
+                ),
             )
         }
     }
@@ -205,15 +226,17 @@ class DataServiceHandlerTest {
         val dataServiceId = "5678"
 
         repository.stub {
-            on { findDataServiceById(dataServiceId) } doReturn DataServiceEntity(
-                id = dataServiceId,
-                catalogId = catalogId,
-                published = true,
-                data = mapOf(
-                    Pair("endpointUrl", "endpointUrl"),
-                    Pair("title", LocalizedStrings(nb = "title", en = null, nn = null))
+            on { findDataServiceById(dataServiceId) } doReturn
+                DataServiceEntity(
+                    id = dataServiceId,
+                    catalogId = catalogId,
+                    published = true,
+                    data =
+                        mapOf(
+                            Pair("endpointUrl", "endpointUrl"),
+                            Pair("title", LocalizedStrings(nb = "title", en = null, nn = null)),
+                        ),
                 )
-            )
         }
 
         handler.delete(catalogId, dataServiceId)
@@ -227,15 +250,17 @@ class DataServiceHandlerTest {
         val dataServiceId = "5678"
 
         repository.stub {
-            on { findDataServiceById(dataServiceId) } doReturn DataServiceEntity(
-                id = dataServiceId,
-                catalogId = "invalid catalog id",
-                published = true,
-                data = mapOf(
-                    Pair("endpointUrl", "endpointUrl"),
-                    Pair("title", LocalizedStrings(nb = "title", en = null, nn = null))
+            on { findDataServiceById(dataServiceId) } doReturn
+                DataServiceEntity(
+                    id = dataServiceId,
+                    catalogId = "invalid catalog id",
+                    published = true,
+                    data =
+                        mapOf(
+                            Pair("endpointUrl", "endpointUrl"),
+                            Pair("title", LocalizedStrings(nb = "title", en = null, nn = null)),
+                        ),
                 )
-            )
         }
 
         assertThrows(NotFoundException::class.java) {

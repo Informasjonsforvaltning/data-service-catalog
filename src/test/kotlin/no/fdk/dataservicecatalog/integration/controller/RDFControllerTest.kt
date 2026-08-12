@@ -1,7 +1,6 @@
 package no.fdk.dataservicecatalog.integration.controller
 
 import no.fdk.dataservicecatalog.controller.RDFController
-import no.fdk.dataservicecatalog.integration.config.WebMvcTestSecurityConfig
 import no.fdk.dataservicecatalog.controller.RDFController.Companion.JSON_LD
 import no.fdk.dataservicecatalog.controller.RDFController.Companion.N3
 import no.fdk.dataservicecatalog.controller.RDFController.Companion.N_QUADS
@@ -13,6 +12,7 @@ import no.fdk.dataservicecatalog.controller.RDFController.Companion.TRIX
 import no.fdk.dataservicecatalog.controller.RDFController.Companion.TURTLE
 import no.fdk.dataservicecatalog.exception.NotFoundException
 import no.fdk.dataservicecatalog.handler.RDFHandler
+import no.fdk.dataservicecatalog.integration.config.WebMvcTestSecurityConfig
 import org.apache.jena.riot.Lang
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -33,33 +33,35 @@ import org.springframework.test.web.servlet.get
 
 @Tag("integration")
 @ActiveProfiles("test")
-
 @Import(WebMvcTestSecurityConfig::class)
 @WebMvcTest(controllers = [RDFController::class])
-class RDFControllerTest(@param:Autowired val mockMvc: MockMvc) {
-
+class RDFControllerTest(
+    @param:Autowired val mockMvc: MockMvc,
+) {
     @MockitoBean
     lateinit var handler: RDFHandler
 
     @ParameterizedTest
     @ValueSource(strings = [N3, TURTLE, RDF_XML, RDF_JSON, JSON_LD, TRIX, TRIG, N_QUADS, N_TRIPLES])
     fun `should respond with ok on valid media type`(mediaType: String) {
-        mockMvc.get("/catalogs") {
-            with(jwt())
-            accept = MediaType.valueOf(mediaType)
-        }.andExpect {
-            status { isOk() }
-        }
+        mockMvc
+            .get("/catalogs") {
+                with(jwt())
+                accept = MediaType.valueOf(mediaType)
+            }.andExpect {
+                status { isOk() }
+            }
     }
 
     @Test
     fun `should respond with not acceptable on invalid media type`() {
-        mockMvc.get("/catalogs") {
-            with(jwt())
-            accept = MediaType.APPLICATION_JSON
-        }.andExpect {
-            status { isNotAcceptable() }
-        }
+        mockMvc
+            .get("/catalogs") {
+                with(jwt())
+                accept = MediaType.APPLICATION_JSON
+            }.andExpect {
+                status { isNotAcceptable() }
+            }
     }
 
     @Test
@@ -68,13 +70,14 @@ class RDFControllerTest(@param:Autowired val mockMvc: MockMvc) {
             on { findCatalogs(Lang.N3) } doReturn "turtle"
         }
 
-        mockMvc.get("/catalogs") {
-            with(jwt())
-            accept = MediaType.valueOf(N3)
-        }.andExpect {
-            status { isOk() }
-            content { string("turtle") }
-        }
+        mockMvc
+            .get("/catalogs") {
+                with(jwt())
+                accept = MediaType.valueOf(N3)
+            }.andExpect {
+                status { isOk() }
+                content { string("turtle") }
+            }
     }
 
     @Test
@@ -85,15 +88,15 @@ class RDFControllerTest(@param:Autowired val mockMvc: MockMvc) {
             on { findCatalogById(catalogId, Lang.N3) } doReturn "turtle"
         }
 
-        mockMvc.get("/catalogs/$catalogId") {
-            with(jwt())
-            accept = MediaType.valueOf(N3)
-        }.andExpect {
-            status { isOk() }
-            content { string("turtle") }
-        }
+        mockMvc
+            .get("/catalogs/$catalogId") {
+                with(jwt())
+                accept = MediaType.valueOf(N3)
+            }.andExpect {
+                status { isOk() }
+                content { string("turtle") }
+            }
     }
-
 
     @Test
     fun `find by id should respond with not found on exception`() {
@@ -103,16 +106,17 @@ class RDFControllerTest(@param:Autowired val mockMvc: MockMvc) {
             on { findCatalogById(catalogId, Lang.N3) } doThrow NotFoundException("Catalog $catalogId not found")
         }
 
-        mockMvc.get("/catalogs/$catalogId") {
-            with(jwt())
-            accept = MediaType.valueOf(N3)
-        }.andExpect {
-            status { isNotFound() }
-            header {
-                string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
+        mockMvc
+            .get("/catalogs/$catalogId") {
+                with(jwt())
+                accept = MediaType.valueOf(N3)
+            }.andExpect {
+                status { isNotFound() }
+                header {
+                    string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
+                }
+                jsonPath("$.detail") { value("Catalog $catalogId not found") }
             }
-            jsonPath("$.detail") { value("Catalog $catalogId not found") }
-        }
     }
 
     @Test
@@ -124,13 +128,14 @@ class RDFControllerTest(@param:Autowired val mockMvc: MockMvc) {
             on { findDataServiceByCatalogIdAndDataServiceId(catalogId, dataServiceId, Lang.N3) } doReturn "turtle"
         }
 
-        mockMvc.get("/catalogs/$catalogId/data-services/$dataServiceId") {
-            with(jwt())
-            accept = MediaType.valueOf(N3)
-        }.andExpect {
-            status { isOk() }
-            content { string("turtle") }
-        }
+        mockMvc
+            .get("/catalogs/$catalogId/data-services/$dataServiceId") {
+                with(jwt())
+                accept = MediaType.valueOf(N3)
+            }.andExpect {
+                status { isOk() }
+                content { string("turtle") }
+            }
     }
 
     @Test
@@ -144,15 +149,16 @@ class RDFControllerTest(@param:Autowired val mockMvc: MockMvc) {
             } doThrow NotFoundException("Data Service $dataServiceId not found")
         }
 
-        mockMvc.get("/catalogs/$catalogId/data-services/$dataServiceId") {
-            with(jwt())
-            accept = MediaType.valueOf(N3)
-        }.andExpect {
-            status { isNotFound() }
-            header {
-                string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
+        mockMvc
+            .get("/catalogs/$catalogId/data-services/$dataServiceId") {
+                with(jwt())
+                accept = MediaType.valueOf(N3)
+            }.andExpect {
+                status { isNotFound() }
+                header {
+                    string("content-type", MediaType.APPLICATION_PROBLEM_JSON_VALUE)
+                }
+                jsonPath("$.detail") { value("Data Service $dataServiceId not found") }
             }
-            jsonPath("$.detail") { value("Data Service $dataServiceId not found") }
-        }
     }
 }

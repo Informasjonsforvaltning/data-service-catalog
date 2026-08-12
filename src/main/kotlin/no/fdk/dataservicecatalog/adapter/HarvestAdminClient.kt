@@ -17,25 +17,26 @@ class HarvestAdminClient(
     private val applicationProperties: ApplicationProperties,
     private val restTemplate: RestTemplate = RestTemplate(),
 ) {
-
     fun createNewDataSource(catalogId: String) {
         val baseUri = applicationProperties.harvestAdminUri
 
         val url = "$baseUri/organizations/$catalogId/datasources"
 
-        val headers = HttpHeaders().apply {
-            contentType = MediaType.APPLICATION_JSON
-            resolveBearerToken()?.let { set(HttpHeaders.AUTHORIZATION, "Bearer $it") }
-        }
+        val headers =
+            HttpHeaders().apply {
+                contentType = MediaType.APPLICATION_JSON
+                resolveBearerToken()?.let { set(HttpHeaders.AUTHORIZATION, "Bearer $it") }
+            }
 
-        val body = HarvestAdminDataSource(
-            dataSourceType = "DCAT-AP-NO",
-            dataType = "dataservice",
-            url = "${applicationProperties.dataServiceCatalogUriHost}/$catalogId",
-            acceptHeaderValue = "text/turtle",
-            publisherId = catalogId,
-            description = "Automatically generated data source for $catalogId"
-        )
+        val body =
+            HarvestAdminDataSource(
+                dataSourceType = "DCAT-AP-NO",
+                dataType = "dataservice",
+                url = "${applicationProperties.dataServiceCatalogUriHost}/$catalogId",
+                acceptHeaderValue = "text/turtle",
+                publisherId = catalogId,
+                description = "Automatically generated data source for $catalogId",
+            )
 
         runCatching {
             restTemplate.postForEntity<Any>(URI(url), HttpEntity(body, headers))
@@ -49,15 +50,17 @@ class HarvestAdminClient(
 
         val url = "$baseUri/organizations/$catalogId/datasources/start-harvesting"
 
-        val headers = HttpHeaders().apply {
-            contentType = MediaType.APPLICATION_JSON
-            resolveBearerToken()?.let { set(HttpHeaders.AUTHORIZATION, "Bearer $it") }
-        }
+        val headers =
+            HttpHeaders().apply {
+                contentType = MediaType.APPLICATION_JSON
+                resolveBearerToken()?.let { set(HttpHeaders.AUTHORIZATION, "Bearer $it") }
+            }
 
-        val body = StartHarvestByUrlRequest(
-            url = "${applicationProperties.dataServiceCatalogUriHost}/$catalogId",
-            dataType = "dataservice",
-        )
+        val body =
+            StartHarvestByUrlRequest(
+                url = "${applicationProperties.dataServiceCatalogUriHost}/$catalogId",
+                dataType = "dataservice",
+            )
 
         runCatching {
             restTemplate.postForEntity<Any>(URI(url), HttpEntity(body, headers))

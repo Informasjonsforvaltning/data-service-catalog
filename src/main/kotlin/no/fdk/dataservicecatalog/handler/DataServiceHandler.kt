@@ -4,8 +4,8 @@ import com.fasterxml.jackson.module.kotlin.convertValue
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.fdk.dataservicecatalog.adapter.HarvestAdminClient
 import no.fdk.dataservicecatalog.domain.DataService
-import no.fdk.dataservicecatalog.domain.JsonPatchOperation
 import no.fdk.dataservicecatalog.domain.DataServiceValues
+import no.fdk.dataservicecatalog.domain.JsonPatchOperation
 import no.fdk.dataservicecatalog.entity.DataServiceEntity
 import no.fdk.dataservicecatalog.exception.BadRequestException
 import no.fdk.dataservicecatalog.exception.NotFoundException
@@ -14,14 +14,13 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 @Component
 class DataServiceHandler(
     private val repository: DataServiceRepository,
-    private val adminClient: HarvestAdminClient
+    private val adminClient: HarvestAdminClient,
 ) {
-
     private fun DataServiceEntity.toDataService(): DataService {
         val values = jacksonObjectMapper().convertValue<DataServiceValues>(data)
 
@@ -48,63 +47,88 @@ class DataServiceHandler(
             type = values.type,
             availability = values.availability,
             costs = values.costs,
-            version = values.version
+            version = values.version,
         )
     }
 
-    fun findAll(catalogId: String): List<DataService> {
-        return repository.findAllByCatalogId(catalogId)
+    fun findAll(catalogId: String): List<DataService> =
+        repository
+            .findAllByCatalogId(catalogId)
             .map { it.toDataService() }
-    }
 
-    fun findById(catalogId: String, dataServiceId: String): DataService {
-        return repository.findDataServiceById(dataServiceId)
+    fun findById(
+        catalogId: String,
+        dataServiceId: String,
+    ): DataService =
+        repository
+            .findDataServiceById(dataServiceId)
             ?.takeIf { it.catalogId == catalogId }
             ?.toDataService()
             ?: throw NotFoundException("Data Service with id: $dataServiceId not found in Catalog with id: $catalogId")
-    }
 
-    fun register(catalogId: String, values: DataServiceValues): String {
+    fun register(
+        catalogId: String,
+        values: DataServiceValues,
+    ): String {
         val id = UUID.randomUUID().toString()
 
         repository.save(
             DataServiceEntity(
                 id = id,
                 catalogId = catalogId,
-                data = jacksonObjectMapper().convertValue<Map<String, Any>>(values)
-            )
+                data = jacksonObjectMapper().convertValue<Map<String, Any>>(values),
+            ),
         )
 
         return id
     }
 
-    fun update(catalogId: String, dataServiceId: String, operations: List<JsonPatchOperation>): DataService {
-        val entity = repository.findDataServiceById(dataServiceId)
-            ?.takeIf { it.catalogId == catalogId }
-            ?: throw NotFoundException("Data Service with id: $dataServiceId not found in Catalog with id: $catalogId")
+    fun update(
+        catalogId: String,
+        dataServiceId: String,
+        operations: List<JsonPatchOperation>,
+    ): DataService {
+        val entity =
+            repository
+                .findDataServiceById(dataServiceId)
+                ?.takeIf { it.catalogId == catalogId }
+                ?: throw NotFoundException("Data Service with id: $dataServiceId not found in Catalog with id: $catalogId")
 
         val patchedValues = patchOriginal(entity.data, operations)
 
-        return repository.save(entity.copy(data = patchedValues))
+        return repository
+            .save(entity.copy(data = patchedValues))
             .toDataService()
             .also { if (entity.published) adminClient.triggerHarvest(catalogId) }
             .also { logger.info("Updated Data Service with id: $dataServiceId in Catalog with id: $catalogId") }
     }
 
-    fun delete(catalogId: String, dataServiceId: String) {
-        val dataService = (repository.findDataServiceById(dataServiceId)
-            ?.takeIf { it.catalogId == catalogId }
-            ?: throw NotFoundException("Data Service with id: $dataServiceId not found in Catalog with id: $catalogId"))
+    fun delete(
+        catalogId: String,
+        dataServiceId: String,
+    ) {
+        val dataService = (
+            repository
+                .findDataServiceById(dataServiceId)
+                ?.takeIf { it.catalogId == catalogId }
+                ?: throw NotFoundException("Data Service with id: $dataServiceId not found in Catalog with id: $catalogId")
+        )
 
         repository.delete(dataService)
 
         logger.info("Deleted Data Service with id: $dataServiceId in Catalog with id: $catalogId")
     }
 
-    fun publish(catalogId: String, dataServiceId: String) {
-        val dataService = (repository.findDataServiceById(dataServiceId)
-            ?.takeIf { it.catalogId == catalogId }
-            ?: throw NotFoundException("Data Service with id: $dataServiceId not found in Catalog with id: $catalogId"))
+    fun publish(
+        catalogId: String,
+        dataServiceId: String,
+    ) {
+        val dataService = (
+            repository
+                .findDataServiceById(dataServiceId)
+                ?.takeIf { it.catalogId == catalogId }
+                ?: throw NotFoundException("Data Service with id: $dataServiceId not found in Catalog with id: $catalogId")
+        )
 
         if (dataService.published) throw BadRequestException("Data Service with id: $dataServiceId is already published")
 
@@ -117,10 +141,16 @@ class DataServiceHandler(
         logger.info("Published Data Service with id: $dataServiceId in Catalog with id: $catalogId")
     }
 
-    fun unpublish(catalogId: String, dataServiceId: String) {
-        val dataService = (repository.findDataServiceById(dataServiceId)
-            ?.takeIf { it.catalogId == catalogId }
-            ?: throw NotFoundException("Data Service with id: $dataServiceId not found in Catalog with id: $catalogId"))
+    fun unpublish(
+        catalogId: String,
+        dataServiceId: String,
+    ) {
+        val dataService = (
+            repository
+                .findDataServiceById(dataServiceId)
+                ?.takeIf { it.catalogId == catalogId }
+                ?: throw NotFoundException("Data Service with id: $dataServiceId not found in Catalog with id: $catalogId")
+        )
 
         if (!dataService.published) throw BadRequestException("Data Service with id: $dataServiceId not published")
 

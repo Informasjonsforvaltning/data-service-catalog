@@ -11,7 +11,10 @@ import no.fdk.dataservicecatalog.exception.BadRequestException
 import no.fdk.dataservicecatalog.exception.InternalServerErrorException
 import java.io.StringReader
 
-inline fun <reified T> patchOriginal(original: T, operations: List<JsonPatchOperation>): T {
+inline fun <reified T> patchOriginal(
+    original: T,
+    operations: List<JsonPatchOperation>,
+): T {
     validateOperations(operations)
 
     try {
@@ -20,7 +23,8 @@ inline fun <reified T> patchOriginal(original: T, operations: List<JsonPatchOper
         when (ex) {
             is JsonException,
             is JsonProcessingException,
-            is IllegalArgumentException -> throw BadRequestException(ex.message)
+            is IllegalArgumentException,
+            -> throw BadRequestException(ex.message)
 
             else -> throw InternalServerErrorException(ex.message)
         }
@@ -29,7 +33,7 @@ inline fun <reified T> patchOriginal(original: T, operations: List<JsonPatchOper
 
 inline fun <reified T> applyPatch(
     originalObject: T,
-    operations: List<JsonPatchOperation>
+    operations: List<JsonPatchOperation>,
 ): T {
     if (operations.isEmpty()) {
         return originalObject
@@ -39,7 +43,9 @@ inline fun <reified T> applyPatch(
         val changes = Json.createReader(StringReader(writeValueAsString(operations))).readArray()
         val original = Json.createReader(StringReader(writeValueAsString(originalObject))).readObject()
 
-        return Json.createPatch(changes).apply(original)
+        return Json
+            .createPatch(changes)
+            .apply(original)
             .let { readValue(it.toString()) }
     }
 }
@@ -53,7 +59,10 @@ fun validateOperations(operations: List<JsonPatchOperation>) {
     }
 }
 
-inline fun <reified T> createPatchOperations(originalObject: T, updatedObject: T): List<JsonPatchOperation> =
+inline fun <reified T> createPatchOperations(
+    originalObject: T,
+    updatedObject: T,
+): List<JsonPatchOperation> =
     with(jacksonObjectMapper().registerModule(JavaTimeModule())) {
         val original = Json.createReader(StringReader(writeValueAsString(originalObject))).readObject()
         val updated = Json.createReader(StringReader(writeValueAsString(updatedObject))).readObject()

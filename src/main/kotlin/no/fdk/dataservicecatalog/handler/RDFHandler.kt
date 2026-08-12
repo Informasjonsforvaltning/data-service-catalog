@@ -20,7 +20,11 @@ import org.apache.jena.riot.Lang
 import org.apache.jena.sparql.vocabulary.FOAF
 import org.apache.jena.util.FileUtils
 import org.apache.jena.util.URIref
-import org.apache.jena.vocabulary.*
+import org.apache.jena.vocabulary.DCAT
+import org.apache.jena.vocabulary.DCTerms
+import org.apache.jena.vocabulary.OWL
+import org.apache.jena.vocabulary.RDF
+import org.apache.jena.vocabulary.VCARD4
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
@@ -28,12 +32,15 @@ import java.io.StringWriter
 import java.lang.Exception
 
 @Component
-class RDFHandler(private val repository: DataServiceRepository, private val properties: ApplicationProperties) {
-
+class RDFHandler(
+    private val repository: DataServiceRepository,
+    private val properties: ApplicationProperties,
+) {
     fun findCatalogs(lang: Lang): String {
         val model = createModel()
 
-        repository.findAllByPublished(true)
+        repository
+            .findAllByPublished(true)
             .groupBy(DataServiceEntity::catalogId)
             .forEach { (catalogId, dataServices) ->
                 catalogId.let { id ->
@@ -50,10 +57,14 @@ class RDFHandler(private val repository: DataServiceRepository, private val prop
         return model.serialize(lang)
     }
 
-    fun findCatalogById(catalogId: String, lang: Lang): String {
+    fun findCatalogById(
+        catalogId: String,
+        lang: Lang,
+    ): String {
         val model = createModel()
 
-        repository.findAllByCatalogIdAndPublished(catalogId, true)
+        repository
+            .findAllByCatalogIdAndPublished(catalogId, true)
             .forEach { dataService ->
                 dataService.catalogId.let { id ->
                     model.addCatalog(id, getCatalogUri(), getOrganizationUri(id))
@@ -66,10 +77,16 @@ class RDFHandler(private val repository: DataServiceRepository, private val prop
         return model.serialize(lang)
     }
 
-    fun findDataServiceByCatalogIdAndDataServiceId(catalogId: String, dataServiceId: String, lang: Lang): String {
-        val dataService = repository.findDataServiceById(dataServiceId)
-            ?.takeIf { it.catalogId == catalogId }
-            ?: throw NotFoundException("Data Service with id: $dataServiceId not found in Catalog with id: $catalogId")
+    fun findDataServiceByCatalogIdAndDataServiceId(
+        catalogId: String,
+        dataServiceId: String,
+        lang: Lang,
+    ): String {
+        val dataService =
+            repository
+                .findDataServiceById(dataServiceId)
+                ?.takeIf { it.catalogId == catalogId }
+                ?: throw NotFoundException("Data Service with id: $dataServiceId not found in Catalog with id: $catalogId")
 
         val model = createModel()
 
@@ -82,8 +99,9 @@ class RDFHandler(private val repository: DataServiceRepository, private val prop
         return model.serialize(lang)
     }
 
-    private fun createModel(): Model {
-        return ModelFactory.createDefaultModel()
+    private fun createModel(): Model =
+        ModelFactory
+            .createDefaultModel()
             .apply {
                 setNsPrefixes(
                     mapOf(
@@ -94,70 +112,95 @@ class RDFHandler(private val repository: DataServiceRepository, private val prop
                         "foaf" to FOAF.NS,
                         "adms" to ADMS.NS,
                         "dcatap" to DCATAP.NS,
-                        "cv" to CV.NS
-                    )
+                        "cv" to CV.NS,
+                    ),
                 )
             }
-    }
 
-    private fun getCatalogUri(): String {
-        return buildUri(properties.oldBaseUri, "/catalogs/")
-    }
+    private fun getCatalogUri(): String = buildUri(properties.oldBaseUri, "/catalogs/")
 
-    private fun getDataServiceUri(): String {
-        return buildUri(properties.oldBaseUri, "/data-services/")
-    }
+    private fun getDataServiceUri(): String = buildUri(properties.oldBaseUri, "/data-services/")
 
-    private fun getOrganizationUri(id: String): String {
-        return buildUri(properties.organizationCatalogBaseUri, "/organizations/$id")
-    }
+    private fun getOrganizationUri(id: String): String = buildUri(properties.organizationCatalogBaseUri, "/organizations/$id")
 
-    private fun buildUri(baseUri: String, path: String): String {
-        return "$baseUri$path"
-    }
+    private fun buildUri(
+        baseUri: String,
+        path: String,
+    ): String = "$baseUri$path"
 
-    private fun getNorwegianRegistryUri(id: String): String {
-        return "https://data.brreg.no/enhetsregisteret/api/enheter/$id"
-    }
+    private fun getNorwegianRegistryUri(id: String): String = "https://data.brreg.no/enhetsregisteret/api/enheter/$id"
 }
 
-fun Model.addCatalog(catalogId: String, baseUri: String, organizationCatalogUri: String) {
-    this.safeCreateResource(baseUri.plus(catalogId)).addProperty(
-        RDF.type, DCAT.Catalog
-    ).addProperty(
-        DCTerms.publisher, safeCreateResource(organizationCatalogUri)
-    ).addProperty(
-        DCTerms.title, ResourceFactory.createLangLiteral("Data service catalog ($catalogId)", "en")
-    )
+fun Model.addCatalog(
+    catalogId: String,
+    baseUri: String,
+    organizationCatalogUri: String,
+) {
+    this
+        .safeCreateResource(baseUri.plus(catalogId))
+        .addProperty(
+            RDF.type,
+            DCAT.Catalog,
+        ).addProperty(
+            DCTerms.publisher,
+            safeCreateResource(organizationCatalogUri),
+        ).addProperty(
+            DCTerms.title,
+            ResourceFactory.createLangLiteral("Data service catalog ($catalogId)", "en"),
+        )
 }
 
-fun Model.addPublisherData(catalogId: String, organizationCatalogUri: String, publisherUri: String) {
-    this.safeCreateResource(organizationCatalogUri).addProperty(
-        RDF.type, FOAF.Agent
-    ).addProperty(
-        DCTerms.identifier, catalogId
-    ).addProperty(
-        OWL.sameAs, URIref.encode(publisherUri)
-    )
+fun Model.addPublisherData(
+    catalogId: String,
+    organizationCatalogUri: String,
+    publisherUri: String,
+) {
+    this
+        .safeCreateResource(organizationCatalogUri)
+        .addProperty(
+            RDF.type,
+            FOAF.Agent,
+        ).addProperty(
+            DCTerms.identifier,
+            catalogId,
+        ).addProperty(
+            OWL.sameAs,
+            URIref.encode(publisherUri),
+        )
 }
 
-fun Model.addDataServiceToCatalog(dataService: DataServiceEntity, catalogUri: String, dataServiceUri: String) {
+fun Model.addDataServiceToCatalog(
+    dataService: DataServiceEntity,
+    catalogUri: String,
+    dataServiceUri: String,
+) {
     this.getProperty(URIref.encode(catalogUri.plus(dataService.catalogId))).addProperty(
-        DCAT.service, this.safeCreateResource(dataServiceUri.plus(dataService.id))
+        DCAT.service,
+        this.safeCreateResource(dataServiceUri.plus(dataService.id)),
     )
 }
 
-fun Model.addDataService(dataService: DataServiceEntity, dataServiceUri: String, organizationCatalogUri: String) {
-    val dataServiceResource = this.safeCreateResource(dataServiceUri.plus(dataService.id)).addProperty(
-        RDF.type, DCAT.DataService
-    ).addProperty(
-        DCTerms.publisher, safeCreateResource(organizationCatalogUri)
-    )
+fun Model.addDataService(
+    dataService: DataServiceEntity,
+    dataServiceUri: String,
+    organizationCatalogUri: String,
+) {
+    val dataServiceResource =
+        this
+            .safeCreateResource(dataServiceUri.plus(dataService.id))
+            .addProperty(
+                RDF.type,
+                DCAT.DataService,
+            ).addProperty(
+                DCTerms.publisher,
+                safeCreateResource(organizationCatalogUri),
+            )
     val values = jacksonObjectMapper().convertValue<DataServiceValues>(dataService.data)
 
     values.endpointUrl.let {
         dataServiceResource.addProperty(
-            DCAT.endpointURL, safeCreateResource(it)
+            DCAT.endpointURL,
+            safeCreateResource(it),
         )
     }
 
@@ -173,7 +216,8 @@ fun Model.addDataService(dataService: DataServiceEntity, dataServiceUri: String,
         ).forEach { (lang, value) ->
             value?.forEach {
                 dataServiceResource.addProperty(
-                    DCAT.keyword, ResourceFactory.createLangLiteral(it, lang)
+                    DCAT.keyword,
+                    ResourceFactory.createLangLiteral(it, lang),
                 )
             }
         }
@@ -181,75 +225,92 @@ fun Model.addDataService(dataService: DataServiceEntity, dataServiceUri: String,
 
     values.endpointDescriptions?.filter(FileUtils::isURI)?.forEach {
         dataServiceResource.addProperty(
-            DCAT.endpointDescription, safeCreateResource(it)
+            DCAT.endpointDescription,
+            safeCreateResource(it),
         )
     }
 
     values.formats?.filter(FileUtils::isURI)?.forEach {
         dataServiceResource.addProperty(
-            DCTerms.format, safeCreateResource(it)
+            DCTerms.format,
+            safeCreateResource(it),
         )
     }
 
     values.contactPoint?.let { point ->
-        val contactPointResource = this.safeCreateResource(null).addProperty(
-            RDF.type, VCARD4.Organization
-        )
+        val contactPointResource =
+            this.safeCreateResource(null).addProperty(
+                RDF.type,
+                VCARD4.Organization,
+            )
 
         point.name?.let { name ->
             contactPointResource.addLangLiteralFromLocalizedStrings(name, VCARD4.fn)
         }
 
         point.phone?.takeIf(String::isNotBlank)?.let {
-            val telephoneTypeResource = this.safeCreateResource(null).addProperty(
-                RDF.type, VCARD4.TelephoneType
-            ).addProperty(
-                VCARD4.hasValue, telephoneResource(it)
-            )
+            val telephoneTypeResource =
+                this
+                    .safeCreateResource(null)
+                    .addProperty(
+                        RDF.type,
+                        VCARD4.TelephoneType,
+                    ).addProperty(
+                        VCARD4.hasValue,
+                        telephoneResource(it),
+                    )
 
             contactPointResource.addProperty(
-                VCARD4.hasTelephone, telephoneTypeResource
+                VCARD4.hasTelephone,
+                telephoneTypeResource,
             )
         }
 
         point.email?.takeIf(String::isNotBlank)?.let {
             contactPointResource.addProperty(
-                VCARD4.hasEmail, safeCreateResource("mailto:${it.filterNot { char -> char.isWhitespace() } }")
+                VCARD4.hasEmail,
+                safeCreateResource("mailto:${it.filterNot { char -> char.isWhitespace() } }"),
             )
         }
 
         point.url?.takeIf(String::isNotBlank)?.let {
             contactPointResource.addProperty(
-                VCARD4.hasURL, safeCreateResource(it)
+                VCARD4.hasURL,
+                safeCreateResource(it),
             )
         }
 
         dataServiceResource.addProperty(
-            DCAT.contactPoint, contactPointResource
+            DCAT.contactPoint,
+            contactPointResource,
         )
     }
 
     values.status?.takeIf(String::isNotBlank)?.let {
         dataServiceResource.addProperty(
-            ADMS.status, safeCreateResource(it)
+            ADMS.status,
+            safeCreateResource(it),
         )
     }
 
     values.availability?.takeIf(String::isNotBlank)?.let {
         dataServiceResource.addProperty(
-            DCATAP.availability, safeCreateResource(it)
+            DCATAP.availability,
+            safeCreateResource(it),
         )
     }
 
     values.themes?.filter(FileUtils::isURI)?.forEach {
         dataServiceResource.addProperty(
-            DCAT.theme, safeCreateResource(it)
+            DCAT.theme,
+            safeCreateResource(it),
         )
     }
 
     values.servesDataset?.filter(FileUtils::isURI)?.forEach {
         dataServiceResource.addProperty(
-            DCAT.servesDataset, safeCreateResource(it)
+            DCAT.servesDataset,
+            safeCreateResource(it),
         )
     }
 
@@ -259,26 +320,30 @@ fun Model.addDataService(dataService: DataServiceEntity, dataServiceUri: String,
 
     values.pages?.filter(FileUtils::isURI)?.forEach {
         dataServiceResource.addProperty(
-            FOAF.page, safeCreateResource(it)
+            FOAF.page,
+            safeCreateResource(it),
         )
     }
 
     values.landingPage?.takeIf(FileUtils::isURI)?.let {
         dataServiceResource.addProperty(
-            DCAT.landingPage, safeCreateResource(it)
+            DCAT.landingPage,
+            safeCreateResource(it),
         )
     }
 
     values.license?.takeIf(FileUtils::isURI)?.let {
         dataServiceResource.addProperty(
-            DCTerms.license, safeCreateResource(it)
+            DCTerms.license,
+            safeCreateResource(it),
         )
     }
 
     values.mediaTypes?.filter(String::isNotBlank)?.forEach { type ->
         if (type.startsWith("https://www.iana.org/assignments/media-types/")) {
             dataServiceResource.addProperty(
-                DCAT.mediaType, safeCreateResource(type)
+                DCAT.mediaType,
+                safeCreateResource(type),
             )
         } else {
             logger.warn("Non iana media type {} on data service {} was skipped", type, dataService.id)
@@ -287,23 +352,28 @@ fun Model.addDataService(dataService: DataServiceEntity, dataServiceUri: String,
 
     values.accessRights?.takeIf(FileUtils::isURI)?.let {
         dataServiceResource.addProperty(
-            DCTerms.accessRights, safeCreateResource(it)
+            DCTerms.accessRights,
+            safeCreateResource(it),
         )
     }
 
     values.type?.takeIf(FileUtils::isURI)?.let {
         dataServiceResource.addProperty(
-            DCTerms.type, safeCreateResource(it)
+            DCTerms.type,
+            safeCreateResource(it),
         )
     }
 
     values.costs?.forEach { cost ->
-        val costResource = this.safeCreateResource(null)
-            .addProperty(RDF.type, CV.Cost)
+        val costResource =
+            this
+                .safeCreateResource(null)
+                .addProperty(RDF.type, CV.Cost)
 
         cost.value?.let {
             costResource.addProperty(
-                CV.hasValue, ResourceFactory.createTypedLiteral(it)
+                CV.hasValue,
+                ResourceFactory.createTypedLiteral(it),
             )
         }
 
@@ -313,13 +383,15 @@ fun Model.addDataService(dataService: DataServiceEntity, dataServiceUri: String,
 
         cost.documentation?.filter(FileUtils::isURI)?.forEach {
             costResource.addProperty(
-                FOAF.page, safeCreateResource(it)
+                FOAF.page,
+                safeCreateResource(it),
             )
         }
 
         cost.currency?.takeIf(FileUtils::isURI)?.let {
             costResource.addProperty(
-                CV.currency, safeCreateResource(it)
+                CV.currency,
+                safeCreateResource(it),
             )
         }
 
@@ -328,7 +400,8 @@ fun Model.addDataService(dataService: DataServiceEntity, dataServiceUri: String,
 
     values.version?.takeIf(String::isNotBlank)?.let {
         dataServiceResource.addProperty(
-            ResourceFactory.createProperty("${DCAT.NS}version"), it
+            ResourceFactory.createProperty("${DCAT.NS}version"),
+            it,
         )
     }
 }
@@ -361,17 +434,24 @@ private fun safeCreateResource(value: String?): Resource =
     }
 
 private fun telephoneResource(telephone: String): Resource =
-    telephone.trim { it <= ' ' }
+    telephone
+        .trim { it <= ' ' }
         .filterIndexed { index, c ->
             when {
-                index == 0 && c == '+' -> true // global-number-digits
-                c in '0'..'9' -> true // digit
+                index == 0 && c == '+' -> true
+
+                // global-number-digits
+                c in '0'..'9' -> true
+
+                // digit
                 else -> false // skip visual-separator and other content
             }
-        }
-        .let { safeCreateResource("tel:$it") }
+        }.let { safeCreateResource("tel:$it") }
 
-private fun Resource.addLangLiteralFromLocalizedStrings(localizedStrings: LocalizedStrings?, predicate: Property) {
+private fun Resource.addLangLiteralFromLocalizedStrings(
+    localizedStrings: LocalizedStrings?,
+    predicate: Property,
+) {
     listOf(
         "nb" to localizedStrings?.nb,
         "nn" to localizedStrings?.nn,

@@ -6,39 +6,51 @@ import org.springframework.http.MediaType
 import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.ExceptionHandler
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/internal/catalogs/{catalogId}/import")
-class ImportController() {
-
+class ImportController {
     @PreAuthorize(ADMIN)
     @PostMapping(
         consumes = [MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_YAML_VALUE],
-        produces = [MediaType.APPLICATION_JSON_VALUE]
+        produces = [MediaType.APPLICATION_JSON_VALUE],
     )
-    fun import(@PathVariable catalogId: String, @RequestBody dataService: String): ResponseEntity<Void> =
-        ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
+    fun import(
+        @PathVariable catalogId: String,
+        @RequestBody dataService: String,
+    ): ResponseEntity<Void> = ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
 
     @PreAuthorize(ADMIN)
     @GetMapping(value = ["/results"], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun result(@PathVariable catalogId: String): ResponseEntity<List<Void>> =
-        ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
+    fun result(
+        @PathVariable catalogId: String,
+    ): ResponseEntity<List<Void>> = ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
 
     @PreAuthorize(ADMIN)
     @GetMapping(value = ["/results/{id}"], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun result(@PathVariable catalogId: String, @PathVariable id: String): ResponseEntity<Void> =
-        ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
+    fun result(
+        @PathVariable catalogId: String,
+        @PathVariable id: String,
+    ): ResponseEntity<Void> = ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
 
     @PreAuthorize(ADMIN)
     @DeleteMapping(value = ["/results/{id}"])
-    fun delete(@PathVariable catalogId: String, @PathVariable id: String): ResponseEntity<Void> =
-        ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
+    fun delete(
+        @PathVariable catalogId: String,
+        @PathVariable id: String,
+    ): ResponseEntity<Void> = ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
 
     @ExceptionHandler
-    fun handleNotFoundException(ex: NotFoundException): ResponseEntity<ProblemDetail> {
-        return ResponseEntity.of(ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.message)).build()
-    }
+    fun handleNotFoundException(ex: NotFoundException): ResponseEntity<ProblemDetail> =
+        ResponseEntity.of(ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.message)).build()
 
     companion object {
         const val ADMIN =

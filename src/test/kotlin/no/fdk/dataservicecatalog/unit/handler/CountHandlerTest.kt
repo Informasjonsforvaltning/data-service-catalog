@@ -16,7 +16,6 @@ import org.mockito.kotlin.stub
 @Tag("unit")
 @ExtendWith(MockitoExtension::class)
 class CountHandlerTest {
-
     @Mock
     lateinit var repository: DataServiceRepository
 
@@ -28,19 +27,21 @@ class CountHandlerTest {
         val firstCatalogId = "1234"
         val secondCatalogId = "5678"
 
-        val dataService = DataServiceEntity(
-            id = "1111",
-            catalogId = firstCatalogId,
-            published = true,
-            data = emptyMap()
-        )
+        val dataService =
+            DataServiceEntity(
+                id = "1111",
+                catalogId = firstCatalogId,
+                published = true,
+                data = emptyMap(),
+            )
 
         repository.stub {
-            on { findAll() } doReturn listOf(
-                dataService,
-                dataService.copy(id = "2222"),
-                dataService.copy(id = "3333", catalogId = secondCatalogId)
-            )
+            on { findAll() } doReturn
+                listOf(
+                    dataService,
+                    dataService.copy(id = "2222"),
+                    dataService.copy(id = "3333", catalogId = secondCatalogId),
+                )
         }
 
         val dataServiceCounts = handler.findAll()
@@ -56,25 +57,26 @@ class CountHandlerTest {
         assertEquals(1, lastDataServiceCount.dataServiceCount)
     }
 
-
     @Test
     fun `find selected returns list of data service`() {
         val firstCatalogId = "1234"
         val secondCatalogId = "5678"
 
-        val dataService = DataServiceEntity(
-            id = "1111",
-            catalogId = firstCatalogId,
-            published = true,
-            data = emptyMap()
-        )
+        val dataService =
+            DataServiceEntity(
+                id = "1111",
+                catalogId = firstCatalogId,
+                published = true,
+                data = emptyMap(),
+            )
 
         repository.stub {
-            on { findAllByCatalogIdIn(setOf(firstCatalogId, secondCatalogId)) } doReturn listOf(
-                dataService,
-                dataService.copy(id = "2222"),
-                dataService.copy(id = "3333", catalogId = secondCatalogId)
-            )
+            on { findAllByCatalogIdIn(setOf(firstCatalogId, secondCatalogId)) } doReturn
+                listOf(
+                    dataService,
+                    dataService.copy(id = "2222"),
+                    dataService.copy(id = "3333", catalogId = secondCatalogId),
+                )
         }
 
         val dataServiceCounts = handler.findSelected(setOf(firstCatalogId, secondCatalogId))

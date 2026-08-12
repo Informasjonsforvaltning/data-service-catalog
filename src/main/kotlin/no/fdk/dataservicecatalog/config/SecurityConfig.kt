@@ -14,11 +14,12 @@ import org.springframework.web.cors.CorsConfiguration
 
 @Configuration
 @EnableMethodSecurity
-class SecurityConfig(@Value("\${application.cors.originPatterns}") private val corsOriginPatterns: Array<String>) {
-
+class SecurityConfig(
+    @Value("\${application.cors.originPatterns}") private val corsOriginPatterns: Array<String>,
+) {
     @Bean
-    fun filterChain(http: HttpSecurity): SecurityFilterChain {
-        return http
+    fun filterChain(http: HttpSecurity): SecurityFilterChain =
+        http
             .cors { cors ->
                 cors.configurationSource { _ ->
                     val config = CorsConfiguration()
@@ -32,21 +33,17 @@ class SecurityConfig(@Value("\${application.cors.originPatterns}") private val c
 
                     config
                 }
-            }
-            .csrf {
+            }.csrf {
                 it.disable()
-            }
-            .sessionManagement {
+            }.sessionManagement {
                 it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            }
-            .authorizeHttpRequests { authorize ->
-                authorize.requestMatchers(HttpMethod.GET, "/ping", "/ready", "/catalogs/**", "/swagger-ui/**", "/v3/**")
+            }.authorizeHttpRequests { authorize ->
+                authorize
+                    .requestMatchers(HttpMethod.GET, "/ping", "/ready", "/catalogs/**", "/swagger-ui/**", "/v3/**")
                     .permitAll()
                 authorize.anyRequest().authenticated()
-            }
-            .oauth2ResourceServer { resourceServer -> resourceServer.jwt { } }
+            }.oauth2ResourceServer { resourceServer -> resourceServer.jwt { } }
             .build()
-    }
 }
 
 private val logger: Logger = LoggerFactory.getLogger(SecurityConfig::class.java)

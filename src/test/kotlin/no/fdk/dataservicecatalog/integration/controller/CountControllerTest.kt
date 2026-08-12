@@ -1,9 +1,9 @@
 package no.fdk.dataservicecatalog.integration.controller
 
 import no.fdk.dataservicecatalog.controller.CountController
-import no.fdk.dataservicecatalog.integration.config.WebMvcTestSecurityConfig
 import no.fdk.dataservicecatalog.domain.DataServiceCount
 import no.fdk.dataservicecatalog.handler.CountHandler
+import no.fdk.dataservicecatalog.integration.config.WebMvcTestSecurityConfig
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -21,31 +21,33 @@ import org.springframework.test.web.servlet.get
 
 @Tag("integration")
 @ActiveProfiles("test")
-
 @Import(WebMvcTestSecurityConfig::class)
 @WebMvcTest(controllers = [CountController::class])
-class CountControllerTest(@param:Autowired val mockMvc: MockMvc) {
-
+class CountControllerTest(
+    @param:Autowired val mockMvc: MockMvc,
+) {
     @MockitoBean
     lateinit var handler: CountHandler
 
     @Test
     fun `count should respond with ok and payload on admin`() {
         handler.stub {
-            on { findAll() } doReturn listOf(
-                DataServiceCount(
-                    catalogId = "1234",
-                    dataServiceCount = 5
+            on { findAll() } doReturn
+                listOf(
+                    DataServiceCount(
+                        catalogId = "1234",
+                        dataServiceCount = 5,
+                    ),
                 )
-            )
         }
 
-        mockMvc.get("/internal/catalogs/count") {
-            with(jwt().jwt { jwt -> jwt.claim("authorities", "system:root:admin") })
-        }.andExpect {
-            status { isOk() }
-            jsonPath("$[0].dataServiceCount") { value(5) }
-        }
+        mockMvc
+            .get("/internal/catalogs/count") {
+                with(jwt().jwt { jwt -> jwt.claim("authorities", "system:root:admin") })
+            }.andExpect {
+                status { isOk() }
+                jsonPath("$[0].dataServiceCount") { value(5) }
+            }
     }
 
     @ParameterizedTest
@@ -54,19 +56,21 @@ class CountControllerTest(@param:Autowired val mockMvc: MockMvc) {
         val catalogId = "123456789"
 
         handler.stub {
-            on { findSelected(setOf(catalogId)) } doReturn listOf(
-                DataServiceCount(
-                    catalogId = catalogId,
-                    dataServiceCount = 5
+            on { findSelected(setOf(catalogId)) } doReturn
+                listOf(
+                    DataServiceCount(
+                        catalogId = catalogId,
+                        dataServiceCount = 5,
+                    ),
                 )
-            )
         }
 
-        mockMvc.get("/internal/catalogs/count") {
-            with(jwt().jwt { jwt -> jwt.claim("authorities", authority.format(catalogId)) })
-        }.andExpect {
-            status { isOk() }
-            jsonPath("$[0].dataServiceCount") { value(5) }
-        }
+        mockMvc
+            .get("/internal/catalogs/count") {
+                with(jwt().jwt { jwt -> jwt.claim("authorities", authority.format(catalogId)) })
+            }.andExpect {
+                status { isOk() }
+                jsonPath("$[0].dataServiceCount") { value(5) }
+            }
     }
 }

@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface DataServiceRepository : JpaRepository<DataServiceEntity, String> {
-
     fun findAllByCatalogId(catalogId: String): List<DataServiceEntity>
 
     fun findAllByCatalogIdIn(catalogIds: Set<String>): List<DataServiceEntity>
@@ -15,5 +14,8 @@ interface DataServiceRepository : JpaRepository<DataServiceEntity, String> {
 
     fun findAllByPublished(published: Boolean): List<DataServiceEntity>
 
-    fun findAllByCatalogIdAndPublished(catalogId: String, published: Boolean): List<DataServiceEntity>
+    fun findAllByCatalogIdAndPublished(
+        catalogId: String,
+        published: Boolean,
+    ): List<DataServiceEntity>
 }

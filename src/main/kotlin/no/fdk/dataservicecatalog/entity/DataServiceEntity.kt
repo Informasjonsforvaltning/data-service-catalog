@@ -20,7 +20,6 @@ data class DataServiceEntity(
     val published: Boolean = false,
     @Column(name = "published_date", nullable = true)
     val publishedDate: LocalDateTime? = null,
-
     /**
      * The JSON representation of the data service values.
      *

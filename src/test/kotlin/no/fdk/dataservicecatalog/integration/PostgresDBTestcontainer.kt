@@ -7,10 +7,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer
 
 @TestConfiguration(proxyBeanMethods = false)
 class PostgresDBTestcontainer {
-
     @Bean
     @ServiceConnection
-    fun postgresContainer(): PostgreSQLContainer {
-        return PostgreSQLContainer("postgres:latest").withReuse(true)
-    }
+    fun postgresContainer(): PostgreSQLContainer = PostgreSQLContainer("postgres:latest").withReuse(true)
 }
