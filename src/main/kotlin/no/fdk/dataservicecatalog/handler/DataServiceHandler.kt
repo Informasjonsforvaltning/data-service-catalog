@@ -17,10 +17,7 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 @Component
-class DataServiceHandler(
-    private val repository: DataServiceRepository,
-    private val adminClient: HarvestAdminClient,
-) {
+class DataServiceHandler(private val repository: DataServiceRepository, private val adminClient: HarvestAdminClient) {
     private fun DataServiceEntity.toDataService(): DataService {
         val values = jacksonObjectMapper().convertValue<DataServiceValues>(data)
 
@@ -51,25 +48,17 @@ class DataServiceHandler(
         )
     }
 
-    fun findAll(catalogId: String): List<DataService> =
-        repository
-            .findAllByCatalogId(catalogId)
-            .map { it.toDataService() }
+    fun findAll(catalogId: String): List<DataService> = repository
+        .findAllByCatalogId(catalogId)
+        .map { it.toDataService() }
 
-    fun findById(
-        catalogId: String,
-        dataServiceId: String,
-    ): DataService =
-        repository
-            .findDataServiceById(dataServiceId)
-            ?.takeIf { it.catalogId == catalogId }
-            ?.toDataService()
-            ?: throw NotFoundException("Data Service with id: $dataServiceId not found in Catalog with id: $catalogId")
+    fun findById(catalogId: String, dataServiceId: String): DataService = repository
+        .findDataServiceById(dataServiceId)
+        ?.takeIf { it.catalogId == catalogId }
+        ?.toDataService()
+        ?: throw NotFoundException("Data Service with id: $dataServiceId not found in Catalog with id: $catalogId")
 
-    fun register(
-        catalogId: String,
-        values: DataServiceValues,
-    ): String {
+    fun register(catalogId: String, values: DataServiceValues): String {
         val id = UUID.randomUUID().toString()
 
         repository.save(
@@ -83,11 +72,7 @@ class DataServiceHandler(
         return id
     }
 
-    fun update(
-        catalogId: String,
-        dataServiceId: String,
-        operations: List<JsonPatchOperation>,
-    ): DataService {
+    fun update(catalogId: String, dataServiceId: String, operations: List<JsonPatchOperation>): DataService {
         val entity =
             repository
                 .findDataServiceById(dataServiceId)
@@ -103,32 +88,26 @@ class DataServiceHandler(
             .also { logger.info("Updated Data Service with id: $dataServiceId in Catalog with id: $catalogId") }
     }
 
-    fun delete(
-        catalogId: String,
-        dataServiceId: String,
-    ) {
+    fun delete(catalogId: String, dataServiceId: String) {
         val dataService = (
             repository
                 .findDataServiceById(dataServiceId)
                 ?.takeIf { it.catalogId == catalogId }
                 ?: throw NotFoundException("Data Service with id: $dataServiceId not found in Catalog with id: $catalogId")
-        )
+            )
 
         repository.delete(dataService)
 
         logger.info("Deleted Data Service with id: $dataServiceId in Catalog with id: $catalogId")
     }
 
-    fun publish(
-        catalogId: String,
-        dataServiceId: String,
-    ) {
+    fun publish(catalogId: String, dataServiceId: String) {
         val dataService = (
             repository
                 .findDataServiceById(dataServiceId)
                 ?.takeIf { it.catalogId == catalogId }
                 ?: throw NotFoundException("Data Service with id: $dataServiceId not found in Catalog with id: $catalogId")
-        )
+            )
 
         if (dataService.published) throw BadRequestException("Data Service with id: $dataServiceId is already published")
 
@@ -141,16 +120,13 @@ class DataServiceHandler(
         logger.info("Published Data Service with id: $dataServiceId in Catalog with id: $catalogId")
     }
 
-    fun unpublish(
-        catalogId: String,
-        dataServiceId: String,
-    ) {
+    fun unpublish(catalogId: String, dataServiceId: String) {
         val dataService = (
             repository
                 .findDataServiceById(dataServiceId)
                 ?.takeIf { it.catalogId == catalogId }
                 ?: throw NotFoundException("Data Service with id: $dataServiceId not found in Catalog with id: $catalogId")
-        )
+            )
 
         if (!dataService.published) throw BadRequestException("Data Service with id: $dataServiceId not published")
 

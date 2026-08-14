@@ -31,26 +31,26 @@ data class DataService(
     override val costs: List<Cost>?,
     override val version: String?,
 ) : DataServiceValues(
-        status,
-        endpointUrl,
-        title,
-        keywords,
-        endpointDescriptions,
-        formats,
-        contactPoint,
-        themes,
-        servesDataset,
-        description,
-        pages,
-        landingPage,
-        license,
-        mediaTypes,
-        accessRights,
-        type,
-        availability,
-        costs,
-        version,
-    )
+    status,
+    endpointUrl,
+    title,
+    keywords,
+    endpointDescriptions,
+    formats,
+    contactPoint,
+    themes,
+    servesDataset,
+    description,
+    pages,
+    landingPage,
+    license,
+    mediaTypes,
+    accessRights,
+    type,
+    availability,
+    costs,
+    version,
+)
 
 /*
 https://data.norge.no/specification/dcat-ap-no#Datatjeneste
@@ -138,34 +138,16 @@ open class DataServiceValues(
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class LocalizedStrings(
-    val nb: String?,
-    val nn: String?,
-    val en: String?,
-)
+data class LocalizedStrings(val nb: String?, val nn: String?, val en: String?)
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class LocalizedStringLists(
-    val nb: List<String>?,
-    val nn: List<String>?,
-    val en: List<String>?,
-)
+data class LocalizedStringLists(val nb: List<String>?, val nn: List<String>?, val en: List<String>?)
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class ContactPoint(
-    val name: LocalizedStrings?,
-    val phone: String?,
-    val email: String?,
-    val url: String?,
-)
+data class ContactPoint(val name: LocalizedStrings?, val phone: String?, val email: String?, val url: String?)
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class Cost(
-    val value: Double?,
-    val description: LocalizedStrings?,
-    val documentation: List<String>?,
-    val currency: String?,
-)
+data class Cost(val value: Double?, val description: LocalizedStrings?, val documentation: List<String>?, val currency: String?)

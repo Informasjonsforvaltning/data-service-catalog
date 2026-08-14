@@ -32,10 +32,7 @@ import java.io.StringWriter
 import java.lang.Exception
 
 @Component
-class RDFHandler(
-    private val repository: DataServiceRepository,
-    private val properties: ApplicationProperties,
-) {
+class RDFHandler(private val repository: DataServiceRepository, private val properties: ApplicationProperties) {
     fun findCatalogs(lang: Lang): String {
         val model = createModel()
 
@@ -57,10 +54,7 @@ class RDFHandler(
         return model.serialize(lang)
     }
 
-    fun findCatalogById(
-        catalogId: String,
-        lang: Lang,
-    ): String {
+    fun findCatalogById(catalogId: String, lang: Lang): String {
         val model = createModel()
 
         repository
@@ -77,11 +71,7 @@ class RDFHandler(
         return model.serialize(lang)
     }
 
-    fun findDataServiceByCatalogIdAndDataServiceId(
-        catalogId: String,
-        dataServiceId: String,
-        lang: Lang,
-    ): String {
+    fun findDataServiceByCatalogIdAndDataServiceId(catalogId: String, dataServiceId: String, lang: Lang): String {
         val dataService =
             repository
                 .findDataServiceById(dataServiceId)
@@ -99,23 +89,22 @@ class RDFHandler(
         return model.serialize(lang)
     }
 
-    private fun createModel(): Model =
-        ModelFactory
-            .createDefaultModel()
-            .apply {
-                setNsPrefixes(
-                    mapOf(
-                        "dcat" to DCAT.NS,
-                        "dct" to DCTerms.NS,
-                        "rdf" to RDF.uri,
-                        "vcard" to VCARD4.NS,
-                        "foaf" to FOAF.NS,
-                        "adms" to ADMS.NS,
-                        "dcatap" to DCATAP.NS,
-                        "cv" to CV.NS,
-                    ),
-                )
-            }
+    private fun createModel(): Model = ModelFactory
+        .createDefaultModel()
+        .apply {
+            setNsPrefixes(
+                mapOf(
+                    "dcat" to DCAT.NS,
+                    "dct" to DCTerms.NS,
+                    "rdf" to RDF.uri,
+                    "vcard" to VCARD4.NS,
+                    "foaf" to FOAF.NS,
+                    "adms" to ADMS.NS,
+                    "dcatap" to DCATAP.NS,
+                    "cv" to CV.NS,
+                ),
+            )
+        }
 
     private fun getCatalogUri(): String = buildUri(properties.oldBaseUri, "/catalogs/")
 
@@ -123,19 +112,12 @@ class RDFHandler(
 
     private fun getOrganizationUri(id: String): String = buildUri(properties.organizationCatalogBaseUri, "/organizations/$id")
 
-    private fun buildUri(
-        baseUri: String,
-        path: String,
-    ): String = "$baseUri$path"
+    private fun buildUri(baseUri: String, path: String): String = "$baseUri$path"
 
     private fun getNorwegianRegistryUri(id: String): String = "https://data.brreg.no/enhetsregisteret/api/enheter/$id"
 }
 
-fun Model.addCatalog(
-    catalogId: String,
-    baseUri: String,
-    organizationCatalogUri: String,
-) {
+fun Model.addCatalog(catalogId: String, baseUri: String, organizationCatalogUri: String) {
     this
         .safeCreateResource(baseUri.plus(catalogId))
         .addProperty(
@@ -150,11 +132,7 @@ fun Model.addCatalog(
         )
 }
 
-fun Model.addPublisherData(
-    catalogId: String,
-    organizationCatalogUri: String,
-    publisherUri: String,
-) {
+fun Model.addPublisherData(catalogId: String, organizationCatalogUri: String, publisherUri: String) {
     this
         .safeCreateResource(organizationCatalogUri)
         .addProperty(
@@ -169,22 +147,14 @@ fun Model.addPublisherData(
         )
 }
 
-fun Model.addDataServiceToCatalog(
-    dataService: DataServiceEntity,
-    catalogUri: String,
-    dataServiceUri: String,
-) {
+fun Model.addDataServiceToCatalog(dataService: DataServiceEntity, catalogUri: String, dataServiceUri: String) {
     this.getProperty(URIref.encode(catalogUri.plus(dataService.catalogId))).addProperty(
         DCAT.service,
         this.safeCreateResource(dataServiceUri.plus(dataService.id)),
     )
 }
 
-fun Model.addDataService(
-    dataService: DataServiceEntity,
-    dataServiceUri: String,
-    organizationCatalogUri: String,
-) {
+fun Model.addDataService(dataService: DataServiceEntity, dataServiceUri: String, organizationCatalogUri: String) {
     val dataServiceResource =
         this
             .safeCreateResource(dataServiceUri.plus(dataService.id))
@@ -413,45 +383,39 @@ fun Model.serialize(lang: Lang): String {
     return stringWriter.buffer.toString()
 }
 
-private fun Model.safeCreateResource(value: String?): Resource =
-    try {
-        value
-            ?.let { URIref.encode(it) }
-            ?.let { createResource(value) }
-            ?: createResource()
-    } catch (e: Exception) {
-        createResource()
-    }
+private fun Model.safeCreateResource(value: String?): Resource = try {
+    value
+        ?.let { URIref.encode(it) }
+        ?.let { createResource(value) }
+        ?: createResource()
+} catch (e: Exception) {
+    createResource()
+}
 
-private fun safeCreateResource(value: String?): Resource =
-    try {
-        value
-            ?.let { URIref.encode(it) }
-            ?.let { ResourceFactory.createResource(value) }
-            ?: ResourceFactory.createResource()
-    } catch (e: Exception) {
-        ResourceFactory.createResource()
-    }
+private fun safeCreateResource(value: String?): Resource = try {
+    value
+        ?.let { URIref.encode(it) }
+        ?.let { ResourceFactory.createResource(value) }
+        ?: ResourceFactory.createResource()
+} catch (e: Exception) {
+    ResourceFactory.createResource()
+}
 
-private fun telephoneResource(telephone: String): Resource =
-    telephone
-        .trim { it <= ' ' }
-        .filterIndexed { index, c ->
-            when {
-                index == 0 && c == '+' -> true
+private fun telephoneResource(telephone: String): Resource = telephone
+    .trim { it <= ' ' }
+    .filterIndexed { index, c ->
+        when {
+            index == 0 && c == '+' -> true
 
-                // global-number-digits
-                c in '0'..'9' -> true
+            // global-number-digits
+            c in '0'..'9' -> true
 
-                // digit
-                else -> false // skip visual-separator and other content
-            }
-        }.let { safeCreateResource("tel:$it") }
+            // digit
+            else -> false // skip visual-separator and other content
+        }
+    }.let { safeCreateResource("tel:$it") }
 
-private fun Resource.addLangLiteralFromLocalizedStrings(
-    localizedStrings: LocalizedStrings?,
-    predicate: Property,
-) {
+private fun Resource.addLangLiteralFromLocalizedStrings(localizedStrings: LocalizedStrings?, predicate: Property) {
     listOf(
         "nb" to localizedStrings?.nb,
         "nn" to localizedStrings?.nn,

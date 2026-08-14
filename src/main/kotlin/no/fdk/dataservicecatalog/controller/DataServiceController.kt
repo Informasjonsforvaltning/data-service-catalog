@@ -28,41 +28,34 @@ import java.net.URI
 
 @RestController
 @RequestMapping("/internal/catalogs/{catalogId}/data-services")
-class DataServiceController(
-    private val handler: DataServiceHandler,
-) {
+class DataServiceController(private val handler: DataServiceHandler) {
     @PreAuthorize(READ)
     @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun findDataServicesByCatalogId(
-        @PathVariable catalogId: String,
-    ): ResponseEntity<List<DataService>> =
-        handler
-            .findAll(catalogId)
-            .let { ResponseEntity.ok(it) }
+    fun findDataServicesByCatalogId(@PathVariable catalogId: String): ResponseEntity<List<DataService>> = handler
+        .findAll(catalogId)
+        .let { ResponseEntity.ok(it) }
 
     @PreAuthorize(READ)
     @GetMapping("/{dataServiceId}", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun findDataServiceByCatalogIdAndDataServiceId(
         @PathVariable catalogId: String,
         @PathVariable dataServiceId: String,
-    ): ResponseEntity<DataService> =
-        handler
-            .findById(catalogId, dataServiceId)
-            .let { ResponseEntity.ok(it) }
+    ): ResponseEntity<DataService> = handler
+        .findById(catalogId, dataServiceId)
+        .let { ResponseEntity.ok(it) }
 
     @PreAuthorize(WRITE)
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun registerDataServiceByCatalogId(
         @PathVariable catalogId: String,
         @Valid @RequestBody registerDataService: DataServiceValues,
-    ): ResponseEntity<Void> =
-        handler
-            .register(catalogId, registerDataService)
-            .let {
-                ResponseEntity
-                    .created(URI("/internal/catalogs/$catalogId/data-services/$it"))
-                    .build()
-            }
+    ): ResponseEntity<Void> = handler
+        .register(catalogId, registerDataService)
+        .let {
+            ResponseEntity
+                .created(URI("/internal/catalogs/$catalogId/data-services/$it"))
+                .build()
+        }
 
     @PreAuthorize(WRITE)
     @PatchMapping(
@@ -74,44 +67,34 @@ class DataServiceController(
         @PathVariable catalogId: String,
         @PathVariable dataServiceId: String,
         @Valid @RequestBody operations: List<JsonPatchOperation>,
-    ): ResponseEntity<DataService> =
-        handler
-            .update(catalogId, dataServiceId, operations)
-            .let { ResponseEntity.ok(it) }
+    ): ResponseEntity<DataService> = handler
+        .update(catalogId, dataServiceId, operations)
+        .let { ResponseEntity.ok(it) }
 
     @PreAuthorize(WRITE)
     @PostMapping("/{dataServiceId}/publish")
-    fun publishDataService(
-        @PathVariable catalogId: String,
-        @PathVariable dataServiceId: String,
-    ): ResponseEntity<Void> =
-        handler
-            .publish(catalogId, dataServiceId)
-            .let { ResponseEntity.ok().build() }
+    fun publishDataService(@PathVariable catalogId: String, @PathVariable dataServiceId: String): ResponseEntity<Void> = handler
+        .publish(catalogId, dataServiceId)
+        .let { ResponseEntity.ok().build() }
 
     @PreAuthorize(WRITE)
     @PostMapping("/{dataServiceId}/unpublish")
-    fun unpublishDataService(
-        @PathVariable catalogId: String,
-        @PathVariable dataServiceId: String,
-    ): ResponseEntity<Void> =
-        handler
-            .unpublish(catalogId, dataServiceId)
-            .let { ResponseEntity.ok().build() }
+    fun unpublishDataService(@PathVariable catalogId: String, @PathVariable dataServiceId: String): ResponseEntity<Void> = handler
+        .unpublish(catalogId, dataServiceId)
+        .let { ResponseEntity.ok().build() }
 
     @PreAuthorize(WRITE)
     @DeleteMapping("/{dataServiceId}")
     fun deleteDataServiceByCatalogIdAndDataServiceId(
         @PathVariable catalogId: String,
         @PathVariable dataServiceId: String,
-    ): ResponseEntity<Void> =
-        handler
-            .delete(catalogId, dataServiceId)
-            .let {
-                ResponseEntity
-                    .noContent()
-                    .build()
-            }
+    ): ResponseEntity<Void> = handler
+        .delete(catalogId, dataServiceId)
+        .let {
+            ResponseEntity
+                .noContent()
+                .build()
+        }
 
     @ExceptionHandler
     fun handleMethodArgumentNotValidException(ex: MethodArgumentNotValidException): ResponseEntity<ProblemDetail> {

@@ -19,9 +19,7 @@ import org.springframework.test.web.servlet.get
 @SpringBootTest
 @AutoConfigureMockMvc
 @Import(PostgresDBTestcontainer::class)
-class SecurityConfigTest(
-    @param:Autowired val mockMvc: MockMvc,
-) {
+class SecurityConfigTest(@param:Autowired val mockMvc: MockMvc) {
     @ParameterizedTest
     @ValueSource(strings = ["/ping", "/ready"])
     fun `should not require authentication on ping and ready`(endpoint: String) {

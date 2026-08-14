@@ -23,30 +23,20 @@ class ImportController {
         consumes = [MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_YAML_VALUE],
         produces = [MediaType.APPLICATION_JSON_VALUE],
     )
-    fun import(
-        @PathVariable catalogId: String,
-        @RequestBody dataService: String,
-    ): ResponseEntity<Void> = ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
+    fun import(@PathVariable catalogId: String, @RequestBody dataService: String): ResponseEntity<Void> =
+        ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
 
     @PreAuthorize(ADMIN)
     @GetMapping(value = ["/results"], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun result(
-        @PathVariable catalogId: String,
-    ): ResponseEntity<List<Void>> = ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
+    fun result(@PathVariable catalogId: String): ResponseEntity<List<Void>> = ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
 
     @PreAuthorize(ADMIN)
     @GetMapping(value = ["/results/{id}"], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun result(
-        @PathVariable catalogId: String,
-        @PathVariable id: String,
-    ): ResponseEntity<Void> = ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
+    fun result(@PathVariable catalogId: String, @PathVariable id: String): ResponseEntity<Void> = ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
 
     @PreAuthorize(ADMIN)
     @DeleteMapping(value = ["/results/{id}"])
-    fun delete(
-        @PathVariable catalogId: String,
-        @PathVariable id: String,
-    ): ResponseEntity<Void> = ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
+    fun delete(@PathVariable catalogId: String, @PathVariable id: String): ResponseEntity<Void> = ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
 
     @ExceptionHandler
     fun handleNotFoundException(ex: NotFoundException): ResponseEntity<ProblemDetail> =

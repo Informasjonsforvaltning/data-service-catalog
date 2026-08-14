@@ -23,9 +23,7 @@ import org.springframework.test.web.servlet.get
 @ActiveProfiles("test")
 @Import(WebMvcTestSecurityConfig::class)
 @WebMvcTest(controllers = [CountController::class])
-class CountControllerTest(
-    @param:Autowired val mockMvc: MockMvc,
-) {
+class CountControllerTest(@param:Autowired val mockMvc: MockMvc) {
     @MockitoBean
     lateinit var handler: CountHandler
 

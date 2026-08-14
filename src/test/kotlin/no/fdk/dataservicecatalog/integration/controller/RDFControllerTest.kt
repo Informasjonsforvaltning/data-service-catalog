@@ -35,9 +35,7 @@ import org.springframework.test.web.servlet.get
 @ActiveProfiles("test")
 @Import(WebMvcTestSecurityConfig::class)
 @WebMvcTest(controllers = [RDFController::class])
-class RDFControllerTest(
-    @param:Autowired val mockMvc: MockMvc,
-) {
+class RDFControllerTest(@param:Autowired val mockMvc: MockMvc) {
     @MockitoBean
     lateinit var handler: RDFHandler
 

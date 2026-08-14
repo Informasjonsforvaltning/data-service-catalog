@@ -1,5 +1,3 @@
 package no.fdk.dataservicecatalog.exception
 
-class BadRequestException(
-    message: String?,
-) : RuntimeException(message)
+class BadRequestException(message: String?) : RuntimeException(message)

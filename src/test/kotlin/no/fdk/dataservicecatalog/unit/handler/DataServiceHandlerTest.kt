@@ -47,10 +47,10 @@ class DataServiceHandlerTest {
                         catalogId = catalogId,
                         published = true,
                         data =
-                            mapOf(
-                                Pair("endpointUrl", "endpointUrl"),
-                                Pair("title", LocalizedStrings(nb = "title", en = null, nn = null)),
-                            ),
+                        mapOf(
+                            Pair("endpointUrl", "endpointUrl"),
+                            Pair("title", LocalizedStrings(nb = "title", en = null, nn = null)),
+                        ),
                     ),
                 )
         }
@@ -72,10 +72,10 @@ class DataServiceHandlerTest {
                     catalogId = catalogId,
                     published = true,
                     data =
-                        mapOf(
-                            Pair("endpointUrl", "endpointUrl"),
-                            Pair("title", LocalizedStrings(nb = "title", en = null, nn = null)),
-                        ),
+                    mapOf(
+                        Pair("endpointUrl", "endpointUrl"),
+                        Pair("title", LocalizedStrings(nb = "title", en = null, nn = null)),
+                    ),
                 )
         }
 
@@ -96,10 +96,10 @@ class DataServiceHandlerTest {
                     catalogId = "invalid_catalog id",
                     published = true,
                     data =
-                        mapOf(
-                            Pair("endpointUrl", "endpointUrl"),
-                            Pair("title", LocalizedStrings(nb = "title", en = null, nn = null)),
-                        ),
+                    mapOf(
+                        Pair("endpointUrl", "endpointUrl"),
+                        Pair("title", LocalizedStrings(nb = "title", en = null, nn = null)),
+                    ),
                 )
         }
 
@@ -154,17 +154,17 @@ class DataServiceHandlerTest {
                 catalogId = catalogId,
                 published = true,
                 data =
-                    mapOf(
-                        Pair("endpointUrl", "endpointUrl"),
-                    ),
+                mapOf(
+                    Pair("endpointUrl", "endpointUrl"),
+                ),
             )
 
         val patchedDataService =
             dataService.copy(
                 data =
-                    mapOf(
-                        Pair("endpointUrl", "newEndpointUrl"),
-                    ),
+                mapOf(
+                    Pair("endpointUrl", "newEndpointUrl"),
+                ),
             )
 
         repository.stub {
@@ -199,10 +199,10 @@ class DataServiceHandlerTest {
                     catalogId = "invalid catalog id",
                     published = true,
                     data =
-                        mapOf(
-                            Pair("endpointUrl", "endpointUrl"),
-                            Pair("title", LocalizedStrings(nb = "title", en = null, nn = null)),
-                        ),
+                    mapOf(
+                        Pair("endpointUrl", "endpointUrl"),
+                        Pair("title", LocalizedStrings(nb = "title", en = null, nn = null)),
+                    ),
                 )
         }
 
@@ -232,10 +232,10 @@ class DataServiceHandlerTest {
                     catalogId = catalogId,
                     published = true,
                     data =
-                        mapOf(
-                            Pair("endpointUrl", "endpointUrl"),
-                            Pair("title", LocalizedStrings(nb = "title", en = null, nn = null)),
-                        ),
+                    mapOf(
+                        Pair("endpointUrl", "endpointUrl"),
+                        Pair("title", LocalizedStrings(nb = "title", en = null, nn = null)),
+                    ),
                 )
         }
 
@@ -256,10 +256,10 @@ class DataServiceHandlerTest {
                     catalogId = "invalid catalog id",
                     published = true,
                     data =
-                        mapOf(
-                            Pair("endpointUrl", "endpointUrl"),
-                            Pair("title", LocalizedStrings(nb = "title", en = null, nn = null)),
-                        ),
+                    mapOf(
+                        Pair("endpointUrl", "endpointUrl"),
+                        Pair("title", LocalizedStrings(nb = "title", en = null, nn = null)),
+                    ),
                 )
         }
 

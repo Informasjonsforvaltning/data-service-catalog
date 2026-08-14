@@ -35,9 +35,7 @@ import org.springframework.test.web.servlet.post
 @ActiveProfiles("test")
 @Import(WebMvcTestSecurityConfig::class)
 @WebMvcTest(controllers = [DataServiceController::class])
-class DataServiceControllerTest(
-    @param:Autowired val mockMvc: MockMvc,
-) {
+class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
     @MockitoBean
     lateinit var handler: DataServiceHandler
 

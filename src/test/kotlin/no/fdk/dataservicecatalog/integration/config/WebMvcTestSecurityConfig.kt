@@ -22,17 +22,16 @@ import org.springframework.security.web.SecurityFilterChain
 @ImportAutoConfiguration(SecurityAutoConfiguration::class, OAuth2ResourceServerAutoConfiguration::class)
 class WebMvcTestSecurityConfig {
     @Bean
-    fun filterChain(http: HttpSecurity): SecurityFilterChain =
-        http
-            .cors { it.disable() }
-            .csrf { it.disable() }
-            .sessionManagement {
-                it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            }.authorizeHttpRequests { authorize ->
-                authorize
-                    .requestMatchers(HttpMethod.GET, "/ping", "/ready", "/catalogs/**", "/swagger-ui/**", "/v3/**")
-                    .permitAll()
-                authorize.anyRequest().authenticated()
-            }.oauth2ResourceServer { resourceServer -> resourceServer.jwt { } }
-            .build()
+    fun filterChain(http: HttpSecurity): SecurityFilterChain = http
+        .cors { it.disable() }
+        .csrf { it.disable() }
+        .sessionManagement {
+            it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        }.authorizeHttpRequests { authorize ->
+            authorize
+                .requestMatchers(HttpMethod.GET, "/ping", "/ready", "/catalogs/**", "/swagger-ui/**", "/v3/**")
+                .permitAll()
+            authorize.anyRequest().authenticated()
+        }.oauth2ResourceServer { resourceServer -> resourceServer.jwt { } }
+        .build()
 }

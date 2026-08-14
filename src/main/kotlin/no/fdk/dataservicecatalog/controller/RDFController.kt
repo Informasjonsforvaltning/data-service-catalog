@@ -26,13 +26,9 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/catalogs", produces = [N3, TURTLE, RDF_XML, RDF_JSON, JSON_LD, TRIX, TRIG, N_QUADS, N_TRIPLES])
-class RDFController(
-    private val handler: RDFHandler,
-) {
+class RDFController(private val handler: RDFHandler) {
     @GetMapping
-    fun findCatalogs(
-        @RequestHeader(value = HttpHeaders.ACCEPT, defaultValue = TURTLE) acceptHeader: String,
-    ): ResponseEntity<String> =
+    fun findCatalogs(@RequestHeader(value = HttpHeaders.ACCEPT, defaultValue = TURTLE) acceptHeader: String): ResponseEntity<String> =
         getRDFLang(acceptHeader)
             .let { handler.findCatalogs(it) }
             .let { ResponseEntity.ok(it) }
@@ -41,20 +37,18 @@ class RDFController(
     fun findCatalogById(
         @RequestHeader(value = HttpHeaders.ACCEPT, defaultValue = TURTLE) acceptHeader: String,
         @PathVariable catalogId: String,
-    ): ResponseEntity<String> =
-        getRDFLang(acceptHeader)
-            .let { handler.findCatalogById(catalogId, it) }
-            .let { ResponseEntity.ok(it) }
+    ): ResponseEntity<String> = getRDFLang(acceptHeader)
+        .let { handler.findCatalogById(catalogId, it) }
+        .let { ResponseEntity.ok(it) }
 
     @GetMapping("/{catalogId}/data-services/{dataServiceId}")
     fun findDataServiceByCatalogIdAndDataServiceId(
         @RequestHeader(value = HttpHeaders.ACCEPT, defaultValue = TURTLE) acceptHeader: String,
         @PathVariable catalogId: String,
         @PathVariable dataServiceId: String,
-    ): ResponseEntity<String> =
-        getRDFLang(acceptHeader)
-            .let { handler.findDataServiceByCatalogIdAndDataServiceId(catalogId, dataServiceId, it) }
-            .let { ResponseEntity.ok(it) }
+    ): ResponseEntity<String> = getRDFLang(acceptHeader)
+        .let { handler.findDataServiceByCatalogIdAndDataServiceId(catalogId, dataServiceId, it) }
+        .let { ResponseEntity.ok(it) }
 
     companion object {
         const val N3 = "text/n3"

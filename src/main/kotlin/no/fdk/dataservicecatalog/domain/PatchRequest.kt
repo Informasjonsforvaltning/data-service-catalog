@@ -11,9 +11,7 @@ data class JsonPatchOperation(
     val from: String? = null,
 )
 
-enum class OpEnum(
-    private val value: String,
-) {
+enum class OpEnum(private val value: String) {
     ADD("add"),
     REMOVE("remove"),
     REPLACE("replace"),

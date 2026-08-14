@@ -16,9 +16,7 @@ import org.springframework.test.context.ActiveProfiles
 @ActiveProfiles("test")
 @Import(PostgresDBTestcontainer::class)
 @SpringBootTest
-class DataServiceRepositoryTest(
-    @param:Autowired val repository: DataServiceRepository,
-) {
+class DataServiceRepositoryTest(@param:Autowired val repository: DataServiceRepository) {
     @AfterEach
     fun cleanup() {
         repository.deleteAll()

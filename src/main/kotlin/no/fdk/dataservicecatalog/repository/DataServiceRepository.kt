@@ -14,8 +14,5 @@ interface DataServiceRepository : JpaRepository<DataServiceEntity, String> {
 
     fun findAllByPublished(published: Boolean): List<DataServiceEntity>
 
-    fun findAllByCatalogIdAndPublished(
-        catalogId: String,
-        published: Boolean,
-    ): List<DataServiceEntity>
+    fun findAllByCatalogIdAndPublished(catalogId: String, published: Boolean): List<DataServiceEntity>
 }

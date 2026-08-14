@@ -11,10 +11,7 @@ import no.fdk.dataservicecatalog.exception.BadRequestException
 import no.fdk.dataservicecatalog.exception.InternalServerErrorException
 import java.io.StringReader
 
-inline fun <reified T> patchOriginal(
-    original: T,
-    operations: List<JsonPatchOperation>,
-): T {
+inline fun <reified T> patchOriginal(original: T, operations: List<JsonPatchOperation>): T {
     validateOperations(operations)
 
     try {
@@ -31,10 +28,7 @@ inline fun <reified T> patchOriginal(
     }
 }
 
-inline fun <reified T> applyPatch(
-    originalObject: T,
-    operations: List<JsonPatchOperation>,
-): T {
+inline fun <reified T> applyPatch(originalObject: T, operations: List<JsonPatchOperation>): T {
     if (operations.isEmpty()) {
         return originalObject
     }
@@ -59,10 +53,7 @@ fun validateOperations(operations: List<JsonPatchOperation>) {
     }
 }
 
-inline fun <reified T> createPatchOperations(
-    originalObject: T,
-    updatedObject: T,
-): List<JsonPatchOperation> =
+inline fun <reified T> createPatchOperations(originalObject: T, updatedObject: T): List<JsonPatchOperation> =
     with(jacksonObjectMapper().registerModule(JavaTimeModule())) {
         val original = Json.createReader(StringReader(writeValueAsString(originalObject))).readObject()
         val updated = Json.createReader(StringReader(writeValueAsString(updatedObject))).readObject()

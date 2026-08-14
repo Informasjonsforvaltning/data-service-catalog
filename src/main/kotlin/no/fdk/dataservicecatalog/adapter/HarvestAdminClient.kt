@@ -69,9 +69,8 @@ class HarvestAdminClient(
         }
     }
 
-    private fun resolveBearerToken(): String? =
-        (SecurityContextHolder.getContext().authentication?.principal as? Jwt)
-            ?.tokenValue
+    private fun resolveBearerToken(): String? = (SecurityContextHolder.getContext().authentication?.principal as? Jwt)
+        ?.tokenValue
 
     companion object {
         private val logger = LoggerFactory.getLogger(HarvestAdminClient::class.java)
@@ -87,7 +86,4 @@ private data class HarvestAdminDataSource(
     val description: String? = null,
 )
 
-data class StartHarvestByUrlRequest(
-    val url: String,
-    val dataType: String,
-)
+data class StartHarvestByUrlRequest(val url: String, val dataType: String)
