@@ -17,40 +17,38 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.ExceptionHandler
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestHeader
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/catalogs", produces = [N3, TURTLE, RDF_XML, RDF_JSON, JSON_LD, TRIX, TRIG, N_QUADS, N_TRIPLES])
 class RDFController(private val handler: RDFHandler) {
-
     @GetMapping
-    fun findCatalogs(
-        @RequestHeader(value = HttpHeaders.ACCEPT, defaultValue = TURTLE) acceptHeader: String
-    ): ResponseEntity<String> {
-        return getRDFLang(acceptHeader)
+    fun findCatalogs(@RequestHeader(value = HttpHeaders.ACCEPT, defaultValue = TURTLE) acceptHeader: String): ResponseEntity<String> =
+        getRDFLang(acceptHeader)
             .let { handler.findCatalogs(it) }
             .let { ResponseEntity.ok(it) }
-    }
 
     @GetMapping("/{catalogId}")
     fun findCatalogById(
         @RequestHeader(value = HttpHeaders.ACCEPT, defaultValue = TURTLE) acceptHeader: String,
-        @PathVariable catalogId: String
-    ): ResponseEntity<String> {
-        return getRDFLang(acceptHeader)
-            .let { handler.findCatalogById(catalogId, it) }
-            .let { ResponseEntity.ok(it) }
-    }
+        @PathVariable catalogId: String,
+    ): ResponseEntity<String> = getRDFLang(acceptHeader)
+        .let { handler.findCatalogById(catalogId, it) }
+        .let { ResponseEntity.ok(it) }
 
     @GetMapping("/{catalogId}/data-services/{dataServiceId}")
     fun findDataServiceByCatalogIdAndDataServiceId(
         @RequestHeader(value = HttpHeaders.ACCEPT, defaultValue = TURTLE) acceptHeader: String,
-        @PathVariable catalogId: String, @PathVariable dataServiceId: String
-    ): ResponseEntity<String> {
-        return getRDFLang(acceptHeader)
-            .let { handler.findDataServiceByCatalogIdAndDataServiceId(catalogId, dataServiceId, it) }
-            .let { ResponseEntity.ok(it) }
-    }
+        @PathVariable catalogId: String,
+        @PathVariable dataServiceId: String,
+    ): ResponseEntity<String> = getRDFLang(acceptHeader)
+        .let { handler.findDataServiceByCatalogIdAndDataServiceId(catalogId, dataServiceId, it) }
+        .let { ResponseEntity.ok(it) }
 
     companion object {
         const val N3 = "text/n3"
@@ -63,13 +61,10 @@ class RDFController(private val handler: RDFHandler) {
         const val N_QUADS = "application/n-quads"
         const val N_TRIPLES = "application/n-triples"
 
-        fun getRDFLang(accept: String): Lang {
-            return RDFLanguages.contentTypeToLang(accept) ?: Lang.TURTLE
-        }
+        fun getRDFLang(accept: String): Lang = RDFLanguages.contentTypeToLang(accept) ?: Lang.TURTLE
     }
 
     @ExceptionHandler
-    fun handleNotFoundException(ex: NotFoundException): ResponseEntity<ProblemDetail> {
-        return ResponseEntity.of(ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.message)).build()
-    }
+    fun handleNotFoundException(ex: NotFoundException): ResponseEntity<ProblemDetail> =
+        ResponseEntity.of(ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.message)).build()
 }

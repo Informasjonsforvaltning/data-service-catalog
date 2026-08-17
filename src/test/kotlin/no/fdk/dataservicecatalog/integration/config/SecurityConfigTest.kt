@@ -16,12 +16,10 @@ import org.springframework.test.web.servlet.get
 
 @Tag("integration")
 @ActiveProfiles("test")
-
 @SpringBootTest
 @AutoConfigureMockMvc
 @Import(PostgresDBTestcontainer::class)
 class SecurityConfigTest(@param:Autowired val mockMvc: MockMvc) {
-
     @ParameterizedTest
     @ValueSource(strings = ["/ping", "/ready"])
     fun `should not require authentication on ping and ready`(endpoint: String) {
@@ -32,11 +30,12 @@ class SecurityConfigTest(@param:Autowired val mockMvc: MockMvc) {
 
     @Test
     fun `should respond with ok on jwt authentication`() {
-        mockMvc.get("/catalogs") {
-            with(jwt())
-        }.andExpect {
-            status { isOk() }
-        }
+        mockMvc
+            .get("/catalogs") {
+                with(jwt())
+            }.andExpect {
+                status { isOk() }
+            }
     }
 
     @Test

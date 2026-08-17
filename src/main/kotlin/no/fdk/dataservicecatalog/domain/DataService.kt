@@ -11,7 +11,6 @@ data class DataService(
     val published: Boolean = false,
     val publishedDate: LocalDateTime? = null,
     val catalogId: String,
-
     override val status: String?,
     override val endpointUrl: String?,
     override val title: LocalizedStrings?,
@@ -59,133 +58,96 @@ https://data.norge.no/specification/dcat-ap-no#Datatjeneste
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 open class DataServiceValues(
-
     /*
     status (adms:status)
      */
     open val status: String?,
-
     /*
     endepunktsURL (dcat:endpointURL)
      */
     open val endpointUrl: String?,
-
     /*
     tittel (dct:title)
      */
     open val title: LocalizedStrings?,
-
     /*
     emneord (dcat:keyword)
      */
     open val keywords: LocalizedStringLists?,
-
     /*
     endepunktsbeskrivelse (dcat:endpointDescription)
      */
     open val endpointDescriptions: List<String>?,
-
     /*
     format (dct:format)
      */
     open val formats: List<String>?,
-
     /*
     kontaktpunkt (dcat:contactPoint)
      */
     open val contactPoint: ContactPoint?,
-
     /*
     tema (dcat:theme)
      */
     open val themes: List<String>?,
-
     /*
     tilgjengeliggjør datasett (dcat:servesDataset)
      */
     open val servesDataset: List<String>?,
-
     /*
     beskrivelse (dct:description)
      */
     open val description: LocalizedStrings?,
-
     /*
     dokumentasjon (foaf:page)
      */
     open val pages: List<String>?,
-
     /*
     landingsside (dcat:landingPage)
      */
     open val landingPage: String?,
-
     /*
     lisens (dct:license)
      */
     open val license: String?,
-
     /*
     medietype (dcat:mediaType)
-    */
+     */
     open val mediaTypes: List<String>?,
-
     /*
     tilgangsrettigheter (dct:accessRights)
      */
     open val accessRights: String?,
-
     /*
     type (dct:type)
      */
     open val type: String?,
-
     /*
     tilgjengelighet (dcatap:availability)
      */
     open val availability: String?,
-
     /*
     har gebyr (cv:hasCost)
-    */
+     */
     open val costs: List<Cost>?,
-
     /*
     versjon (dcat:version)
-    */
+     */
     open val version: String?,
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class LocalizedStrings(
-    val nb: String?,
-    val nn: String?,
-    val en: String?,
-)
+data class LocalizedStrings(val nb: String?, val nn: String?, val en: String?)
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class LocalizedStringLists(
-    val nb: List<String>?,
-    val nn: List<String>?,
-    val en: List<String>?,
-)
+data class LocalizedStringLists(val nb: List<String>?, val nn: List<String>?, val en: List<String>?)
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class ContactPoint(
-    val name: LocalizedStrings?,
-    val phone: String?,
-    val email: String?,
-    val url: String?
-)
+data class ContactPoint(val name: LocalizedStrings?, val phone: String?, val email: String?, val url: String?)
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class Cost(
-    val value: Double?,
-    val description: LocalizedStrings?,
-    val documentation: List<String>?,
-    val currency: String?
-)
+data class Cost(val value: Double?, val description: LocalizedStrings?, val documentation: List<String>?, val currency: String?)

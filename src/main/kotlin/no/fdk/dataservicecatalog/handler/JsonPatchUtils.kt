@@ -20,17 +20,15 @@ inline fun <reified T> patchOriginal(original: T, operations: List<JsonPatchOper
         when (ex) {
             is JsonException,
             is JsonProcessingException,
-            is IllegalArgumentException -> throw BadRequestException(ex.message)
+            is IllegalArgumentException,
+            -> throw BadRequestException(ex.message)
 
             else -> throw InternalServerErrorException(ex.message)
         }
     }
 }
 
-inline fun <reified T> applyPatch(
-    originalObject: T,
-    operations: List<JsonPatchOperation>
-): T {
+inline fun <reified T> applyPatch(originalObject: T, operations: List<JsonPatchOperation>): T {
     if (operations.isEmpty()) {
         return originalObject
     }
@@ -39,7 +37,9 @@ inline fun <reified T> applyPatch(
         val changes = Json.createReader(StringReader(writeValueAsString(operations))).readArray()
         val original = Json.createReader(StringReader(writeValueAsString(originalObject))).readObject()
 
-        return Json.createPatch(changes).apply(original)
+        return Json
+            .createPatch(changes)
+            .apply(original)
             .let { readValue(it.toString()) }
     }
 }

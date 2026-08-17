@@ -26,7 +26,6 @@ import java.io.StringReader
 @Tag("unit")
 @ExtendWith(MockitoExtension::class)
 class RDFHandlerTest {
-
     @Mock
     lateinit var repository: DataServiceRepository
 
@@ -131,12 +130,13 @@ class RDFHandlerTest {
         expectedModel.read(StringReader(rdf), null, Lang.TURTLE.name)
 
         repository.stub {
-            on { findAllByPublished(true) } doReturn listOf(
-                dataService().copy(
-                    id = dataServiceId,
-                    catalogId = catalogId
+            on { findAllByPublished(true) } doReturn
+                listOf(
+                    dataService().copy(
+                        id = dataServiceId,
+                        catalogId = catalogId,
+                    ),
                 )
-            )
         }
 
         properties.stub {
@@ -249,12 +249,13 @@ class RDFHandlerTest {
         expectedModel.read(StringReader(rdf), null, Lang.TURTLE.name)
 
         repository.stub {
-            on { findAllByCatalogIdAndPublished(catalogId, true) } doReturn listOf(
-                dataService().copy(
-                    id = dataServiceId,
-                    catalogId = catalogId
+            on { findAllByCatalogIdAndPublished(catalogId, true) } doReturn
+                listOf(
+                    dataService().copy(
+                        id = dataServiceId,
+                        catalogId = catalogId,
+                    ),
                 )
-            )
         }
 
         properties.stub {
@@ -276,12 +277,13 @@ class RDFHandlerTest {
         val catalogId = "5678"
 
         repository.stub {
-            on { findDataServiceById(dataServiceId) } doReturn DataServiceEntity(
-                id = dataServiceId,
-                catalogId = "invalid catalog id",
-                published = true,
-                data = emptyMap(),
-            )
+            on { findDataServiceById(dataServiceId) } doReturn
+                DataServiceEntity(
+                    id = dataServiceId,
+                    catalogId = "invalid catalog id",
+                    published = true,
+                    data = emptyMap(),
+                )
         }
 
         assertThrows(NotFoundException::class.java) {
@@ -354,10 +356,11 @@ class RDFHandlerTest {
         expectedModel.read(StringReader(rdf), null, Lang.TURTLE.name)
 
         repository.stub {
-            on { findDataServiceById(dataServiceId) } doReturn dataService().copy(
-                id = dataServiceId,
-                catalogId = catalogId
-            )
+            on { findDataServiceById(dataServiceId) } doReturn
+                dataService().copy(
+                    id = dataServiceId,
+                    catalogId = catalogId,
+                )
         }
 
         properties.stub {
@@ -377,7 +380,8 @@ class RDFHandlerTest {
         id = "1234",
         catalogId = "5678",
         published = true,
-        data = mapOf(
+        data =
+        mapOf(
             Pair("status", "http://publications.europa.eu/resource/authority/distribution-status/DEVELOP"),
             Pair("endpointUrl", "http://example.com"),
             Pair("title", LocalizedStrings(nb = null, nn = null, en = "title")),
@@ -385,12 +389,13 @@ class RDFHandlerTest {
             Pair("endpointDescriptions", listOf("http://endpoint-description.com")),
             Pair("formats", listOf("http://format.com")),
             Pair(
-                "contactPoint", ContactPoint(
+                "contactPoint",
+                ContactPoint(
                     name = LocalizedStrings(nb = null, nn = null, en = "name"),
                     phone = "+47 123 45 678",
                     email = " email",
-                    url = "url"
-                )
+                    url = "url",
+                ),
             ),
             Pair("servesDataset", listOf("http://serves-dataset.com")),
             Pair("description", LocalizedStrings(nb = null, nn = null, en = "description")),
@@ -402,22 +407,23 @@ class RDFHandlerTest {
             Pair("type", "http://type.com"),
             Pair("availability", "http://publications.europa.eu/resource/authority/planned-availability/STABLE"),
             Pair(
-                "costs", listOf(
+                "costs",
+                listOf(
                     Cost(
                         value = 125.57,
                         currency = "http://publications.europa.eu/resource/authority/currency/EUR",
                         description = null,
-                        documentation = null
+                        documentation = null,
                     ),
                     Cost(
                         value = null,
                         currency = null,
                         description = LocalizedStrings(nb = "med doc", en = null, nn = null),
-                        documentation = listOf("https://gebyr-doc.no")
-                    )
-                )
+                        documentation = listOf("https://gebyr-doc.no"),
+                    ),
+                ),
             ),
             Pair("version", "1.0.0"),
-        )
+        ),
     )
 }

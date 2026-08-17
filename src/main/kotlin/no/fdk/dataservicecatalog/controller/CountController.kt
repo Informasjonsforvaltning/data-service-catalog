@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/internal/catalogs/count")
 class CountController(private val handler: CountHandler) {
-
     @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
     fun findDataServicesCount(@AuthenticationPrincipal jwt: Jwt): ResponseEntity<List<DataServiceCount>> {
         val authorities: String? = jwt.claims["authorities"] as? String
@@ -23,11 +22,13 @@ class CountController(private val handler: CountHandler) {
         } else {
             val regex = Regex("""[0-9]{9}""")
 
-            val ids = (authorities
-                ?.let { regex.findAll(it) }
-                ?.map { matchResult -> matchResult.value }
-                ?.toSet()
-                ?: emptySet())
+            val ids = (
+                authorities
+                    ?.let { regex.findAll(it) }
+                    ?.map { matchResult -> matchResult.value }
+                    ?.toSet()
+                    ?: emptySet()
+                )
 
             ResponseEntity.ok(handler.findSelected(ids))
         }

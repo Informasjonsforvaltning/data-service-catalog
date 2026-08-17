@@ -7,5 +7,5 @@ data class ApplicationProperties(
     val oldBaseUri: String,
     val organizationCatalogBaseUri: String,
     val harvestAdminUri: String,
-    val dataServiceCatalogUriHost: String
+    val dataServiceCatalogUriHost: String,
 )
