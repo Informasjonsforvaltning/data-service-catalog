@@ -24,6 +24,7 @@ import org.apache.jena.vocabulary.DCAT
 import org.apache.jena.vocabulary.DCTerms
 import org.apache.jena.vocabulary.OWL
 import org.apache.jena.vocabulary.RDF
+import org.apache.jena.vocabulary.RDFS
 import org.apache.jena.vocabulary.VCARD4
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -97,6 +98,7 @@ class RDFHandler(private val repository: DataServiceRepository, private val prop
                     "dcat" to DCAT.NS,
                     "dct" to DCTerms.NS,
                     "rdf" to RDF.uri,
+                    "rdfs" to RDFS.uri,
                     "vcard" to VCARD4.NS,
                     "foaf" to FOAF.NS,
                     "adms" to ADMS.NS,
@@ -373,6 +375,31 @@ fun Model.addDataService(dataService: DataServiceEntity, dataServiceUri: String,
             ResourceFactory.createProperty("${DCAT.NS}version"),
             it,
         )
+    }
+
+    values.conformsTo?.forEach { standard ->
+        val seeAlso = standard.uri?.takeIf(FileUtils::isURI)
+        val prefLabel = standard.prefLabel?.takeIf { it.nb != null || it.nn != null || it.en != null }
+
+        if (seeAlso != null || prefLabel != null) {
+            val standardResource =
+                this
+                    .safeCreateResource(null)
+                    .addProperty(RDF.type, DCTerms.Standard)
+
+            seeAlso?.let {
+                standardResource.addProperty(
+                    RDFS.seeAlso,
+                    safeCreateResource(it),
+                )
+            }
+
+            prefLabel?.let {
+                standardResource.addLangLiteralFromLocalizedStrings(it, DCTerms.title)
+            }
+
+            dataServiceResource.addProperty(DCTerms.conformsTo, standardResource)
+        }
     }
 }
 

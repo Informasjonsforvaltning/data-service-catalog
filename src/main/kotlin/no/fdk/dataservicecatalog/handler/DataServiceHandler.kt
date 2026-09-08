@@ -45,6 +45,7 @@ class DataServiceHandler(private val repository: DataServiceRepository, private 
             availability = values.availability,
             costs = values.costs,
             version = values.version,
+            conformsTo = values.conformsTo,
         )
     }
 

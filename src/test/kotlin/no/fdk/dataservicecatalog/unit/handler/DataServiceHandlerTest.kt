@@ -135,6 +135,7 @@ class DataServiceHandlerTest {
                     availability = null,
                     costs = null,
                     version = null,
+                    conformsTo = null,
                 ),
             )
 
