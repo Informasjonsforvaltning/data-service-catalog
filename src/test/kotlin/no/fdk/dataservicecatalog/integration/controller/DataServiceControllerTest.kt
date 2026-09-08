@@ -100,6 +100,7 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
                     availability = null,
                     costs = null,
                     version = null,
+                    conformsTo = null,
                 )
         }
 
@@ -303,6 +304,7 @@ class DataServiceControllerTest(@param:Autowired val mockMvc: MockMvc) {
                 availability = null,
                 costs = null,
                 version = null,
+                conformsTo = null,
             )
 
         val operations =

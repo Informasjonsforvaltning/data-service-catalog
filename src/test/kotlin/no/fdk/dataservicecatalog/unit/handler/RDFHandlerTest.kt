@@ -5,6 +5,7 @@ import no.fdk.dataservicecatalog.domain.ContactPoint
 import no.fdk.dataservicecatalog.domain.Cost
 import no.fdk.dataservicecatalog.domain.LocalizedStringLists
 import no.fdk.dataservicecatalog.domain.LocalizedStrings
+import no.fdk.dataservicecatalog.domain.UriWithLabel
 import no.fdk.dataservicecatalog.entity.DataServiceEntity
 import no.fdk.dataservicecatalog.exception.NotFoundException
 import no.fdk.dataservicecatalog.handler.RDFHandler
@@ -77,6 +78,7 @@ class RDFHandlerTest {
             PREFIX adms:  <http://www.w3.org/ns/adms#>
             PREFIX dcatap: <http://data.europa.eu/r5r/>
             PREFIX cv:    <http://data.europa.eu/m8g/>
+            PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
 
             <$organizationCatalogBaseUri/organizations/$catalogId>
                     rdf:type        foaf:Agent;
@@ -87,6 +89,13 @@ class RDFHandlerTest {
             <$baseUri/data-services/$dataServiceId>
                     rdf:type                  dcat:DataService;
                     dct:accessRights          <http://access-rights.com>;
+                    dct:conformsTo            [ rdf:type      dct:Standard;
+                                                rdfs:seeAlso  <https://www.w3.org/TR/sparql11-protocol/>;
+                                                dct:title     "SPARQL 1.1"@nb
+                                              ];
+                    dct:conformsTo            [ rdf:type   dct:Standard;
+                                                dct:title  "uten lenke"@nb
+                                              ];
                     dct:description           "description"@en;
                     dct:format                <http://format.com>;
                     dct:license               <http://license.com>;
@@ -196,6 +205,7 @@ class RDFHandlerTest {
             PREFIX adms:  <http://www.w3.org/ns/adms#>
             PREFIX dcatap: <http://data.europa.eu/r5r/>
             PREFIX cv:    <http://data.europa.eu/m8g/>
+            PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
 
             <$organizationCatalogBaseUri/organizations/$catalogId>
                     rdf:type        foaf:Agent;
@@ -206,6 +216,13 @@ class RDFHandlerTest {
             <$baseUri/data-services/$dataServiceId>
                     rdf:type                  dcat:DataService;
                     dct:accessRights          <http://access-rights.com>;
+                    dct:conformsTo            [ rdf:type      dct:Standard;
+                                                rdfs:seeAlso  <https://www.w3.org/TR/sparql11-protocol/>;
+                                                dct:title     "SPARQL 1.1"@nb
+                                              ];
+                    dct:conformsTo            [ rdf:type   dct:Standard;
+                                                dct:title  "uten lenke"@nb
+                                              ];
                     dct:description           "description"@en;
                     dct:format                <http://format.com>;
                     dct:license               <http://license.com>;
@@ -308,6 +325,7 @@ class RDFHandlerTest {
             PREFIX adms:  <http://www.w3.org/ns/adms#>
             PREFIX dcatap: <http://data.europa.eu/r5r/>
             PREFIX cv:    <http://data.europa.eu/m8g/>
+            PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
 
             <$organizationCatalogBaseUri/organizations/$catalogId>
                     rdf:type        foaf:Agent;
@@ -318,6 +336,13 @@ class RDFHandlerTest {
             <$baseUri/data-services/$dataServiceId>
                     rdf:type                  dcat:DataService;
                     dct:accessRights          <http://access-rights.com>;
+                    dct:conformsTo            [ rdf:type      dct:Standard;
+                                                rdfs:seeAlso  <https://www.w3.org/TR/sparql11-protocol/>;
+                                                dct:title     "SPARQL 1.1"@nb
+                                              ];
+                    dct:conformsTo            [ rdf:type   dct:Standard;
+                                                dct:title  "uten lenke"@nb
+                                              ];
                     dct:description           "description"@en;
                     dct:format                <http://format.com>;
                     dct:license               <http://license.com>;
@@ -424,6 +449,17 @@ class RDFHandlerTest {
                 ),
             ),
             Pair("version", "1.0.0"),
+            Pair(
+                "conformsTo",
+                listOf(
+                    UriWithLabel(
+                        uri = "https://www.w3.org/TR/sparql11-protocol/",
+                        prefLabel = LocalizedStrings(nb = "SPARQL 1.1", nn = null, en = null),
+                    ),
+                    UriWithLabel(uri = null, prefLabel = LocalizedStrings(nb = "uten lenke", nn = null, en = null)),
+                    UriWithLabel(uri = null, prefLabel = null),
+                ),
+            ),
         ),
     )
 }
