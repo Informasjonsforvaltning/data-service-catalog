@@ -5,6 +5,11 @@ logging:
   level.org.springframework.web: WARN
 server:
   port: 8080
+  compression:
+    enabled: true
+    min-response-size: 1024
+    # Extends Spring Boot’s default list with the RDF types the service serves.
+    additional-mime-types: text/turtle,text/n3,application/ld+json,application/rdf+xml,application/rdf+json,application/n-triples,application/n-quads,application/trig,application/trix
 management:
   endpoints:
     web:
