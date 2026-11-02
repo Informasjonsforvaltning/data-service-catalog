@@ -5,7 +5,7 @@ import no.fdk.dataservicecatalog.domain.ContactPoint
 import no.fdk.dataservicecatalog.domain.Cost
 import no.fdk.dataservicecatalog.domain.LocalizedStringLists
 import no.fdk.dataservicecatalog.domain.LocalizedStrings
-import no.fdk.dataservicecatalog.domain.UriWithLabel
+import no.fdk.dataservicecatalog.domain.Standard
 import no.fdk.dataservicecatalog.entity.DataServiceEntity
 import no.fdk.dataservicecatalog.exception.NotFoundException
 import no.fdk.dataservicecatalog.handler.RDFHandler
@@ -90,7 +90,8 @@ class RDFHandlerTest {
                     rdf:type                  dcat:DataService;
                     dct:accessRights          <http://access-rights.com>;
                     dct:conformsTo            [ rdf:type      dct:Standard;
-                                                rdfs:seeAlso  <https://www.w3.org/TR/sparql11-protocol/>;
+                                                rdfs:seeAlso  <https://www.w3.org/TR/sparql11-protocol/> ,
+                                                              <https://www.w3.org/TR/sparql11-query/>;
                                                 dct:title     "SPARQL 1.1"@nb
                                               ];
                     dct:conformsTo            [ rdf:type   dct:Standard;
@@ -217,7 +218,8 @@ class RDFHandlerTest {
                     rdf:type                  dcat:DataService;
                     dct:accessRights          <http://access-rights.com>;
                     dct:conformsTo            [ rdf:type      dct:Standard;
-                                                rdfs:seeAlso  <https://www.w3.org/TR/sparql11-protocol/>;
+                                                rdfs:seeAlso  <https://www.w3.org/TR/sparql11-protocol/> ,
+                                                              <https://www.w3.org/TR/sparql11-query/>;
                                                 dct:title     "SPARQL 1.1"@nb
                                               ];
                     dct:conformsTo            [ rdf:type   dct:Standard;
@@ -337,7 +339,8 @@ class RDFHandlerTest {
                     rdf:type                  dcat:DataService;
                     dct:accessRights          <http://access-rights.com>;
                     dct:conformsTo            [ rdf:type      dct:Standard;
-                                                rdfs:seeAlso  <https://www.w3.org/TR/sparql11-protocol/>;
+                                                rdfs:seeAlso  <https://www.w3.org/TR/sparql11-protocol/> ,
+                                                              <https://www.w3.org/TR/sparql11-query/>;
                                                 dct:title     "SPARQL 1.1"@nb
                                               ];
                     dct:conformsTo            [ rdf:type   dct:Standard;
@@ -452,12 +455,18 @@ class RDFHandlerTest {
             Pair(
                 "conformsTo",
                 listOf(
-                    UriWithLabel(
-                        uri = "https://www.w3.org/TR/sparql11-protocol/",
+                    Standard(
                         prefLabel = LocalizedStrings(nb = "SPARQL 1.1", nn = null, en = null),
+                        seeAlso =
+                        listOf(
+                            "https://www.w3.org/TR/sparql11-protocol/",
+                            "not a uri",
+                            "https://www.w3.org/TR/sparql11-query/",
+                        ),
                     ),
-                    UriWithLabel(uri = null, prefLabel = LocalizedStrings(nb = "uten lenke", nn = null, en = null)),
-                    UriWithLabel(uri = null, prefLabel = null),
+                    Standard(prefLabel = LocalizedStrings(nb = "uten lenke", nn = null, en = null), seeAlso = null),
+                    Standard(prefLabel = null, seeAlso = null),
+                    mapOf("seeAlso" to listOf(null)),
                 ),
             ),
         ),

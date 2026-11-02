@@ -378,16 +378,16 @@ fun Model.addDataService(dataService: DataServiceEntity, dataServiceUri: String,
     }
 
     values.conformsTo?.forEach { standard ->
-        val seeAlso = standard.uri?.takeIf(FileUtils::isURI)
+        val seeAlso = standard.seeAlso?.filter(FileUtils::isURI).orEmpty()
         val prefLabel = standard.prefLabel?.takeIf { it.nb != null || it.nn != null || it.en != null }
 
-        if (seeAlso != null || prefLabel != null) {
+        if (seeAlso.isNotEmpty() || prefLabel != null) {
             val standardResource =
                 this
                     .safeCreateResource(null)
                     .addProperty(RDF.type, DCTerms.Standard)
 
-            seeAlso?.let {
+            seeAlso.forEach {
                 standardResource.addProperty(
                     RDFS.seeAlso,
                     safeCreateResource(it),
