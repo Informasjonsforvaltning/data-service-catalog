@@ -30,7 +30,7 @@ data class DataService(
     override val availability: String?,
     override val costs: List<Cost>?,
     override val version: String?,
-    override val conformsTo: List<UriWithLabel>?,
+    override val conformsTo: List<Standard>?,
 ) : DataServiceValues(
     status,
     endpointUrl,
@@ -136,7 +136,7 @@ open class DataServiceValues(
     versjon (dcat:version)
      */
     open val version: String?,
-    open val conformsTo: List<UriWithLabel>?,
+    open val conformsTo: List<Standard>?,
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -153,7 +153,7 @@ data class ContactPoint(val name: LocalizedStrings?, val phone: String?, val ema
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class UriWithLabel(val uri: String?, val prefLabel: LocalizedStrings?)
+data class Standard(val prefLabel: LocalizedStrings?, val seeAlso: List<String>?)
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
